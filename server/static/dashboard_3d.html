@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydroSync 3D Digital Twin — ระบบจำลองสามมิติอัจฉริยะ (AI Foliar & Solution Simulation)</title>
+    <!-- Fonts: Kanit + Plus Jakarta Sans + JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Kanit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Three.js + OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- GSAP for smooth UI transitions -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <!-- Sensor Data & AI Predictions manifests -->
+    <script src="data/sensor_data.js"></script>
+    <script src="data/ensemble_predictions.js"></script>
+
+    <style>
+        :root {
+            --bg-h: 145;
+            --bg-s: 16%;
+            --bg-l: 88%;
+            --glass-blur: 20px;
+            --glass-surface: rgba(244, 248, 245, 0.82);
+            --glass-surface-hover: rgba(250, 253, 251, 0.94);
+            --glass-border: rgba(255, 255, 255, 0.78);
+            --glass-shadow: 0 16px 36px -12px rgba(14, 30, 21, 0.25), 0 2px 8px rgba(14, 30, 21, 0.08);
+            --text-primary: #0f2117;
+            --text-secondary: #284235;
+            --text-muted: #4e6b5b;
+            --accent-primary: #1e5e41;
+            --accent-primary-hover: #164630;
+            --color-healthy: #10b981;
+            --color-n: #d97706;
+            --color-p: #7c3aed;
+            --color-k: #b45309;
+            --color-danger: #ef4444;
+            --color-warn: #f59e0b;
+        }
+
+        body.dark-mode {
+            --bg-h: 155;
+            --bg-s: 22%;
+            --bg-l: 10%;
+            --glass-surface: rgba(18, 30, 24, 0.82);
+            --glass-surface-hover: rgba(24, 40, 32, 0.92);
+            --glass-border: rgba(50, 80, 64, 0.45);
+            --glass-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.6);
+            --text-primary: #e8f3ec;
+            --text-secondary: #c2d6cb;
+            --text-muted: #82a391;
+            --accent-primary: #34d399;
+            --accent-primary-hover: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Kanit', sans-serif;
+            background: hsl(var(--bg-h), var(--bg-s), var(--bg-l));
+            color: var(--text-primary);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            transition: background 0.4s ease;
+        }
+
+        /* 3D WebGL Canvas Layer */
+        #webgl-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+            display: block;
+        }
+
+        /* Ambient Forest Background gradient */
+        .ambient-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 40%, rgba(46, 204, 113, 0.12), transparent 65%),
+                        radial-gradient(circle at 80% 20%, rgba(30, 77, 56, 0.18), transparent 50%),
+                        radial-gradient(circle at 20% 80%, rgba(39, 174, 96, 0.15), transparent 60%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Glass HUD Overlays */
+        .hud-overlay {
+            position: absolute;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        /* Header Bar */
+        .header-bar {
+            top: 18px;
+            left: 24px;
+            right: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 22px;
+            background: var(--glass-surface);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .logo-group {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #10b981, #047857);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 20px;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+        }
+
+        .logo-title h1 {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .logo-title p {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.35);
+            color: var(--text-secondary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        body.dark-mode .nav-btn {
+            background: rgba(30, 50, 40, 0.5);
+            color: var(--text-primary);
+        }
+
+        .nav-btn:hover {
+            background: var(--accent-primary);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .nav-btn.active {
+            background: var(--accent-primary);
+            color: #fff;
+        }
+
+        /* Left Diagnostics Glass Panel */
+        .panel-left {
+            top: 92px;
+            left: 24px;
+            width: 360px;
+            max-height: calc(100vh - 180px);
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--glass-surface);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+            scrollbar-width: thin;
+        }
+
+        /* Right Telemetry Glass Panel */
+        .panel-right {
+            top: 92px;
+            right: 24px;
+            width: 340px;
+            max-height: calc(100vh - 180px);
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--glass-surface);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Panel Sections */
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .unit-select-box {
+            width: 100%;
+            margin-bottom: 16px;
+        }
+
+        select.unit-select {
+            width: 100%;
+            padding: 9px 12px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.6);
+            color: var(--text-primary);
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        body.dark-mode select.unit-select {
+            background: rgba(26, 42, 33, 0.85);
+            color: var(--text-primary);
+        }
+
+        /* Diagnosis Main Card */
+        .diag-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .diag-status-badge.healthy {
+            background: rgba(16, 185, 129, 0.16);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+        body.dark-mode .diag-status-badge.healthy {
+            background: rgba(16, 185, 129, 0.25);
+            color: #34d399;
+        }
+
+        .diag-status-badge.nitrogen {
+            background: rgba(217, 119, 6, 0.16);
+            color: #b45309;
+            border: 1px solid rgba(217, 119, 6, 0.4);
+        }
+        body.dark-mode .diag-status-badge.nitrogen {
+            background: rgba(217, 119, 6, 0.25);
+            color: #fbbf24;
+        }
+
+        .diag-status-badge.phosphorus {
+            background: rgba(124, 58, 237, 0.16);
+            color: #6d28d9;
+            border: 1px solid rgba(124, 58, 237, 0.4);
+        }
+        body.dark-mode .diag-status-badge.phosphorus {
+            background: rgba(124, 58, 237, 0.25);
+            color: #a78bfa;
+        }
+
+        .diag-status-badge.potassium {
+            background: rgba(180, 83, 9, 0.16);
+            color: #92400e;
+            border: 1px solid rgba(180, 83, 9, 0.4);
+        }
+        body.dark-mode .diag-status-badge.potassium {
+            background: rgba(180, 83, 9, 0.25);
+            color: #f59e0b;
+        }
+
+        .confidence-row {
+            margin-bottom: 12px;
+        }
+
+        .confidence-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .confidence-track {
+            height: 7px;
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body.dark-mode .confidence-track {
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Metric Grid */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .metric-pill {
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid var(--glass-border);
+        }
+
+        body.dark-mode .metric-pill {
+            background: rgba(24, 38, 30, 0.6);
+        }
+
+        .metric-pill .label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .metric-pill .value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-top: 2px;
+        }
+
+        .metric-pill .sub {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        /* Symptom Checklist */
+        .symptom-box {
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.03);
+            font-size: 11px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        body.dark-mode .symptom-box {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .symptom-box ul {
+            padding-left: 16px;
+            margin-top: 6px;
+        }
+
+        /* Bottom Controls Bar */
+        .bottom-toolbar {
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 10px 20px;
+            background: var(--glass-surface);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 999px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        .tool-btn {
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 999px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        body.dark-mode .tool-btn {
+            background: rgba(30, 48, 38, 0.7);
+        }
+
+        .tool-btn:hover {
+            background: var(--accent-primary);
+            color: #fff;
+            transform: scale(1.03);
+        }
+
+        .tool-btn.active {
+            background: var(--accent-primary);
+            color: #fff;
+        }
+
+        /* 3D Model Instruction Tooltip */
+        .hint-overlay {
+            position: absolute;
+            bottom: 84px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: var(--text-muted);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 14px;
+            border-radius: 999px;
+            pointer-events: none;
+            backdrop-filter: blur(8px);
+            color: #fff;
+            z-index: 5;
+        }
+
+        /* Notification Toast */
+        .alert-toast {
+            display: none;
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(239, 68, 68, 0.15);
+            color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+
+        body.dark-mode .alert-toast {
+            color: #f87171;
+        }
+    </style>
+</head>
+<body>
+    <div class="ambient-bg"></div>
+    <canvas id="webgl-canvas"></canvas>
+
+    <!-- Header Navigation -->
+    <header class="hud-overlay header-bar">
+        <div class="logo-group">
+            <div class="logo-icon">🌿</div>
+            <div class="logo-title">
+                <h1>HydroSync 3D Digital Twin</h1>
+                <p>ระบบแฝดดิจิทัลสามมิติ &middot; จำลองอาการขาดธาตุอาหาร (Ensemble AI)</p>
+            </div>
+        </div>
+        <nav class="nav-links">
+            <button class="nav-btn active" id="btnModePlant" onclick="switchSceneMode('plant')">🌱 โมเดลต้นผัก (Foliar)</button>
+            <button class="nav-btn" id="btnModeTank" onclick="switchSceneMode('tank')">🧪 ระบบถัง & แก้ว (Fluid)</button>
+            <div style="width: 1px; height: 20px; background: var(--glass-border); margin: 0 4px;"></div>
+            <a href="dashboard_control.html" class="nav-btn">📊 ถัง Control</a>
+            <a href="dashboard_smooth.html" class="nav-btn">📈 รวมทุกชุด</a>
+            <button class="nav-btn" id="btnThemeToggle" onclick="toggleTheme()" title="สลับโหมดมืด/สว่าง">🌓</button>
+        </nav>
+    </header>
+
+    <!-- Left Diagnostics HUD -->
+    <aside class="hud-overlay panel-left">
+        <div class="card-header">
+            <span class="card-title">🎯 เลือกชุดทดลอง (Select Unit)</span>
+            <span id="txtReplicateBadge" style="font-size: 11px; font-weight: 600; color: var(--accent-primary);">ชุดแก้ว 750ml</span>
+        </div>
+
+        <div class="unit-select-box">
+            <select class="unit-select" id="selUnit" onchange="onUnitChanged(this.value)">
+                <optgroup label="ถังโฟมมาตรฐาน 23.3L">
+                    <option value="Control">ถังโฟม Control (มาตรฐาน)</option>
+                    <option value="N">ถังโฟม ขาดไนโตรเจน (-N)</option>
+                    <option value="P">ถังโฟม ขาดฟอสฟอรัส (-P)</option>
+                    <option value="K">ถังโฟม ขาดโพแทสเซียม (-K)</option>
+                </optgroup>
+                <optgroup label="ชุดแก้วทดลอง 750ml">
+                    <option value="Cup1">Cup 1 (Control ซ้ำ 1)</option>
+                    <option value="Cup2">Cup 2 (Control ซ้ำ 2)</option>
+                    <option value="Cup3" selected>Cup 3 (ขาด N ซ้ำ 1 - เปลี่ยนสารละลายใหม่)</option>
+                    <option value="Cup4">Cup 4 (ขาด N ซ้ำ 2)</option>
+                    <option value="Cup5">Cup 5 (ขาด P ซ้ำ 1)</option>
+                    <option value="Cup6">Cup 6 (ขาด P ซ้ำ 2)</option>
+                    <option value="Cup7">Cup 7 (ขาด K ซ้ำ 1 - เปลี่ยนสารละลายใหม่)</option>
+                    <option value="Cup8">Cup 8 (ขาด K ซ้ำ 2 - เปลี่ยนสารละลายใหม่)</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <div class="card-header">
+            <span class="card-title">🤖 AI Multimodal Diagnosis</span>
+            <span style="font-size: 10px; font-weight: 700; color: var(--text-muted);">Ensemble v2.0</span>
+        </div>
+
+        <div>
+            <div id="diagBadge" class="diag-status-badge nitrogen">
+                <span id="diagBadgeDot">●</span>
+                <span id="diagBadgeText">ขาดไนโตรเจน (Nitrogen Deficiency)</span>
+            </div>
+
+            <div class="confidence-row">
+                <div class="confidence-label">
+                    <span>ความมั่นใจโดยรวม (Late Fusion)</span>
+                    <span id="txtConfCombined">84.25%</span>
+                </div>
+                <div class="confidence-track">
+                    <div id="barConfCombined" class="confidence-fill" style="width: 84.25%; background: var(--color-n);"></div>
+                </div>
+            </div>
+
+            <div class="confidence-row">
+                <div class="confidence-label">
+                    <span>โมเดลภาพใบ (Vision Stream A)</span>
+                    <span id="txtConfVision">85.52%</span>
+                </div>
+                <div class="confidence-track">
+                    <div id="barConfVision" class="confidence-fill" style="width: 85.52%; background: #3b82f6;"></div>
+                </div>
+            </div>
+
+            <div class="confidence-row">
+                <div class="confidence-label">
+                    <span>เซนเซอร์สารละลาย (Sensor Stream B)</span>
+                    <span id="txtConfSensor">86.76%</span>
+                </div>
+                <div class="confidence-track">
+                    <div id="barConfSensor" class="confidence-fill" style="width: 86.76%; background: #10b981;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="symptom-box" id="boxSymptomDesc">
+            <strong>ลักษณะอาการทางสรีรวิทยา 3D:</strong>
+            <ul id="listSymptomFeatures">
+                <li>ใบล่างแก่แสดงอาการคลอโรซิส (Chlorosis) เหลืองซีดชัดเจน</li>
+                <li>ไนโตรเจนเคลื่อนย้ายได้สูง (Mobile Element) ดึงธาตุขึ้นสู่ยอดอ่อน</li>
+                <li>เส้นใบยังคงมีสีเขียวจางๆ ก่อนเปลี่ยนเป็นเหลืองทั้งใบ</li>
+            </ul>
+        </div>
+
+        <div id="alertAcidEvent" class="alert-toast">
+            ⚠️ <strong>แจ้งเตือนสารละลาย:</strong> มีประวัติหยดกรดฟอสฟอริก pH ดิ่ง 1.58 และเปลี่ยนสารละลายใหม่ (Reset EC Baseline)
+        </div>
+    </aside>
+
+    <!-- Right Sensor Telemetry HUD -->
+    <aside class="hud-overlay panel-right">
+        <div class="card-header">
+            <span class="card-title">📡 ค่าเซนเซอร์ล่าสุด (Telemetry)</span>
+            <span id="txtTimestamp" style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">22/10 09:00</span>
+        </div>
+
+        <div class="metric-grid">
+            <div class="metric-pill">
+                <div class="label">ค่าการนำไฟฟ้า EC</div>
+                <div class="value" id="valEC">1.456</div>
+                <div class="sub" id="subEC">mS/cm (Δ 0.0%)</div>
+            </div>
+            <div class="metric-pill">
+                <div class="label">ความเป็นกรด-ด่าง pH</div>
+                <div class="value" id="valPH">5.82</div>
+                <div class="sub" id="subPH">สมบูรณ์ (5.5 - 6.5)</div>
+            </div>
+            <div class="metric-pill">
+                <div class="label">อุณหภูมิสารละลาย</div>
+                <div class="value" id="valTemp">28.5</div>
+                <div class="sub">°C (สภาวะปกติ)</div>
+            </div>
+            <div class="metric-pill">
+                <div class="label">ระดับสารละลาย</div>
+                <div class="value" id="valWater">95%</div>
+                <div class="sub" id="subWater">710 ml / 750ml</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 16px;">
+            <div class="card-header" style="margin-bottom: 8px;">
+                <span class="card-title">🧬 การควบคุม 3D Shader</span>
+            </div>
+
+            <div style="margin-bottom: 12px;">
+                <div class="confidence-label">
+                    <span>ความรุนแรงของอาการ (Symptom Severity)</span>
+                    <span id="txtSeverityVal">85%</span>
+                </div>
+                <input type="range" id="rngSeverity" min="0" max="100" value="85" style="width: 100%; accent-color: var(--accent-primary);" oninput="onSeverityChanged(this.value)">
+            </div>
+
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button class="tool-btn" id="btnToggleHeatmap" onclick="toggleHeatmap()" style="flex: 1; justify-content: center;">
+                    🔥 Attention Heatmap
+                </button>
+                <button class="tool-btn" id="btnToggleVeins" onclick="toggleVeins()" style="flex: 1; justify-content: center;">
+                    🌿 โครงสร้างเส้นใบ
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Bottom Toolbar Controls -->
+    <div class="hint-overlay">
+        🖱️ ลากเมาส์คลิกซ้ายเพื่อหมุนรอบทิศทาง &middot; ลูกกลิ้งซูมเข้า/ออก &middot; คลิกขวาลากเลื่อน
+    </div>
+
+    <div class="hud-overlay bottom-toolbar">
+        <button class="tool-btn" onclick="setCameraPreset('esp32')" title="มุมกล้อง ESP32-S3 ด้านบนตรง 90°">
+            📸 มุม ESP32-S3 (Top-down)
+        </button>
+        <button class="tool-btn active" id="btnCamIso" onclick="setCameraPreset('iso')" title="มุมมองไอโซเมตริก 45°">
+            📐 มุมสามมิติ (Perspective)
+        </button>
+        <button class="tool-btn" onclick="setCameraPreset('leaf')" title="ซูมตรวจรอยโรคบนใบ">
+            🍃 ส่องรอยโรค (Close-up)
+        </button>
+        <button class="tool-btn" onclick="setCameraPreset('root')" title="มองรากและสารละลาย">
+            💧 ราก & สารละลาย
+        </button>
+        <div style="width: 1px; height: 18px; background: var(--glass-border); margin: 0 4px;"></div>
+        <button class="tool-btn" id="btnAutoRotate" onclick="toggleAutoRotate()">
+            🔄 หมุนอัตโนมัติ: เปิด
+        </button>
+    </div>
+
+    <!-- 3D Scene Implementation -->
+    <script>
+        // ── Scene, Camera, Renderer ──────────────────────────────────────────
+        let scene, camera, renderer, controls;
+        let currentMode = 'plant'; // 'plant' or 'tank'
+        let currentUnitKey = 'Cup3';
+        let autoRotate = true;
+        let showHeatmap = false;
+        let showVeins = true;
+        let symptomSeverity = 0.85;
+
+        // Meshes
+        let plantGroup, tankGroup, fluidMesh, bubbleParticles;
+        let leafMaterials = [];
+        let stemMaterial;
+
+        // Lighting
+        let ambientLight, sunLight, growLight;
+
+        // Data caches
+        const sensorData = window.SENSOR_DATA || {};
+        const ensembleMeta = window.ENSEMBLE_METADATA || {};
+
+        function initScene() {
+            const canvas = document.getElementById('webgl-canvas');
+            scene = new THREE.Scene();
+            scene.fog = new THREE.FogExp2(0x132319, 0.025);
+
+            camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 3.5, 4.5);
+
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.15;
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.maxPolarAngle = Math.PI / 2 + 0.1;
+            controls.minDistance = 1.5;
+            controls.maxDistance = 12;
+            controls.autoRotate = autoRotate;
+            controls.autoRotateSpeed = 1.2;
+            controls.target.set(0, 0.6, 0);
+
+            // Lighting Setup
+            ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+            scene.add(ambientLight);
+
+            sunLight = new THREE.DirectionalLight(0xfff7e6, 1.2);
+            sunLight.position.set(5, 8, 4);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 2048;
+            sunLight.shadow.mapSize.height = 2048;
+            sunLight.shadow.bias = -0.0005;
+            scene.add(sunLight);
+
+            // Grow light (Red-Blue LED tint)
+            growLight = new THREE.PointLight(0xd946ef, 0.8, 8);
+            growLight.position.set(-2, 4, -2);
+            scene.add(growLight);
+
+            // Ground base plane
+            const floorGeo = new THREE.PlaneGeometry(20, 20);
+            const floorMat = new THREE.MeshStandardMaterial({
+                color: 0x142018,
+                roughness: 0.85,
+                metalness: 0.1,
+                transparent: true,
+                opacity: 0.4
+            });
+            const floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            floor.position.y = -0.01;
+            floor.receiveShadow = true;
+            scene.add(floor);
+
+            // Create 3D Objects
+            buildPlantModel();
+            buildTankModel();
+
+            // Set Initial Display
+            switchSceneMode('plant');
+            onUnitChanged('Cup3');
+
+            // Responsive Resize
+            window.addEventListener('resize', onWindowResize);
+
+            // Animation Loop
+            animate();
+        }
+
+        // ── 1. Procedural 3D Plant Model (Foliar Symptom Explorer) ────────────
+        function buildPlantModel() {
+            plantGroup = new THREE.Group();
+            plantGroup.position.set(0, 0.35, 0);
+
+            leafMaterials = [];
+
+            // Central Stem
+            const stemGeo = new THREE.CylinderGeometry(0.06, 0.09, 0.9, 16);
+            stemMaterial = new THREE.MeshStandardMaterial({
+                color: 0x27ae60,
+                roughness: 0.6,
+                metalness: 0.05
+            });
+            const stem = new THREE.Mesh(stemGeo, stemMaterial);
+            stem.position.y = 0.45;
+            stem.castShadow = true;
+            plantGroup.add(stem);
+
+            // Create Leaf Layers (Rosette Structure)
+            // Layer 1: Bottom mature leaves (4 leaves) - First to show N & K symptoms
+            // Layer 2: Mid-tier leaves (5 leaves) - Transition zone
+            // Layer 3: Young top leaves (4 leaves) - Protected or showing P symptoms
+            const leafLayers = [
+                { count: 4, y: 0.25, scale: 1.15, anglePitch: 0.65, tier: 'mature' },
+                { count: 5, y: 0.48, scale: 0.95, anglePitch: 0.45, tier: 'mid' },
+                { count: 4, y: 0.72, scale: 0.68, anglePitch: 0.25, tier: 'young' },
+                { count: 3, y: 0.88, scale: 0.45, anglePitch: 0.12, tier: 'heart' }
+            ];
+
+            leafLayers.forEach((layer, layerIdx) => {
+                const angleStep = (Math.PI * 2) / layer.count;
+                const layerOffset = layerIdx * 0.42;
+
+                for (let i = 0; i < layer.count; i++) {
+                    const angle = i * angleStep + layerOffset;
+                    const leaf = createSingleLeafMesh(layer.tier, layer.scale);
+                    leaf.position.set(0, layer.y, 0);
+                    leaf.rotation.y = angle;
+                    leaf.rotation.x = layer.anglePitch + (Math.random() * 0.08 - 0.04);
+                    leaf.rotation.z = (Math.random() * 0.1 - 0.05);
+
+                    plantGroup.add(leaf);
+                }
+            });
+
+            // Root System (Dangling below)
+            const rootGroup = new THREE.Group();
+            for (let r = 0; r < 24; r++) {
+                const rootCurve = new THREE.CatmullRomCurve3([
+                    new THREE.Vector3(0, 0.05, 0),
+                    new THREE.Vector3((Math.random() - 0.5) * 0.25, -0.3, (Math.random() - 0.5) * 0.25),
+                    new THREE.Vector3((Math.random() - 0.5) * 0.4, -0.7 - Math.random() * 0.3, (Math.random() - 0.5) * 0.4)
+                ]);
+                const rootGeo = new THREE.TubeGeometry(rootCurve, 12, 0.012, 6, false);
+                const rootMat = new THREE.MeshStandardMaterial({
+                    color: 0xf5f5f0,
+                    roughness: 0.8,
+                    metalness: 0.0
+                });
+                const rootMesh = new THREE.Mesh(rootGeo, rootMat);
+                rootGroup.add(rootMesh);
+            }
+            plantGroup.add(rootGroup);
+
+            // Net Pot
+            const potGeo = new THREE.CylinderGeometry(0.3, 0.22, 0.35, 24, 1, true);
+            const potMat = new THREE.MeshStandardMaterial({
+                color: 0x1e293b,
+                roughness: 0.5,
+                metalness: 0.2,
+                side: THREE.DoubleSide
+            });
+            const pot = new THREE.Mesh(potGeo, potMat);
+            pot.position.y = 0.18;
+            plantGroup.add(pot);
+
+            scene.add(plantGroup);
+        }
+
+        // Curved Leaf Geometry with Custom Material
+        function createSingleLeafMesh(tier, scale) {
+            // Leaf Shape
+            const shape = new THREE.Shape();
+            shape.moveTo(0, 0);
+            shape.bezierCurveTo(0.18, 0.3, 0.32, 0.8, 0, 1.4);
+            shape.bezierCurveTo(-0.32, 0.8, -0.18, 0.3, 0, 0);
+
+            const extrudeSettings = {
+                steps: 6,
+                depth: 0.015,
+                bevelEnabled: true,
+                bevelThickness: 0.008,
+                bevelSize: 0.01,
+                bevelSegments: 3
+            };
+
+            const leafGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+            leafGeo.center();
+            // Offset pivot to leaf base
+            leafGeo.translate(0, 0.65, 0);
+
+            // Curve the leaf tip downward
+            const pos = leafGeo.attributes.position;
+            for (let i = 0; i < pos.count; i++) {
+                const y = pos.getY(i);
+                const arch = Math.pow(y, 1.8) * 0.18;
+                pos.setZ(i, pos.getZ(i) - arch);
+            }
+            leafGeo.computeVertexNormals();
+
+            // Material
+            const leafMat = new THREE.MeshStandardMaterial({
+                color: 0x27ae60,
+                roughness: 0.45,
+                metalness: 0.08,
+                side: THREE.DoubleSide
+            });
+
+            // Keep reference to update shader color by tier
+            leafMat.userData = {
+                tier: tier,
+                baseColor: new THREE.Color(0x27ae60)
+            };
+            leafMaterials.push(leafMat);
+
+            const leafMesh = new THREE.Mesh(leafGeo, leafMat);
+            leafMesh.scale.set(scale, scale, scale);
+            leafMesh.castShadow = true;
+            leafMesh.receiveShadow = true;
+
+            return leafMesh;
+        }
+
+        // ── 2. 3D Hydroponic Tank & Fluid Simulation ─────────────────────────
+        function buildTankModel() {
+            tankGroup = new THREE.Group();
+
+            // Transparent Acrylic Cup / Tank Container
+            const containerGeo = new THREE.CylinderGeometry(0.75, 0.65, 1.6, 32);
+            const containerMat = new THREE.MeshPhysicalMaterial({
+                color: 0xffffff,
+                transmission: 0.88,
+                opacity: 1,
+                transparent: true,
+                roughness: 0.1,
+                ior: 1.45,
+                reflectivity: 0.5,
+                thickness: 0.2
+            });
+            const container = new THREE.Mesh(containerGeo, containerMat);
+            container.position.y = 0.8;
+            tankGroup.add(container);
+
+            // Container Rim
+            const rimGeo = new THREE.TorusGeometry(0.76, 0.025, 16, 48);
+            const rimMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, roughness: 0.3 });
+            const rim = new THREE.Mesh(rimGeo, rimMat);
+            rim.rotation.x = Math.PI / 2;
+            rim.position.y = 1.6;
+            tankGroup.add(rim);
+
+            // Nutrient Solution Fluid Body
+            const fluidGeo = new THREE.CylinderGeometry(0.72, 0.63, 1.35, 32);
+            const fluidMat = new THREE.MeshPhysicalMaterial({
+                color: 0x10b981,
+                transmission: 0.65,
+                transparent: true,
+                opacity: 0.85,
+                roughness: 0.15,
+                ior: 1.33,
+                thickness: 0.8
+            });
+            fluidMesh = new THREE.Mesh(fluidGeo, fluidMat);
+            fluidMesh.position.y = 0.7;
+            tankGroup.add(fluidMesh);
+
+            // Aeration Bubble Particles
+            const bubbleGeo = new THREE.BufferGeometry();
+            const bubbleCount = 70;
+            const posArray = new Float32Array(bubbleCount * 3);
+            for (let i = 0; i < bubbleCount * 3; i += 3) {
+                posArray[i] = (Math.random() - 0.5) * 0.9;
+                posArray[i + 1] = 0.15 + Math.random() * 1.1;
+                posArray[i + 2] = (Math.random() - 0.5) * 0.9;
+            }
+            bubbleGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const bubbleMat = new THREE.PointsMaterial({
+                color: 0xffffff,
+                size: 0.035,
+                transparent: true,
+                opacity: 0.75
+            });
+            bubbleParticles = new THREE.Points(bubbleGeo, bubbleMat);
+            tankGroup.add(bubbleParticles);
+
+            scene.add(tankGroup);
+        }
+
+        // ── 3. Update 3D Colors Based on AI Diagnosis & Sensor Data ──────────
+        function update3DVisuals() {
+            const pred = ensembleMeta.unit_predictions ? ensembleMeta.unit_predictions[currentUnitKey] : null;
+            const diagClass = pred ? pred.predicted_class : 'healthy';
+
+            // Find latest sensor reading for current unit
+            let latestReading = null;
+            if (sensorData.readings) {
+                const unitReadings = sensorData.readings.filter(r => r.tank === currentUnitKey);
+                if (unitReadings.length > 0) {
+                    latestReading = unitReadings[unitReadings.length - 1];
+                }
+            }
+
+            // A. Update Leaf Colors (Foliar AI Symptoms)
+            leafMaterials.forEach(mat => {
+                const tier = mat.userData.tier;
+                let targetColor = new THREE.Color(0x27ae60); // Healthy emerald base
+
+                if (showHeatmap) {
+                    // Attention Heatmap: Red/Orange highlight on symptomatic leaves
+                    if (diagClass === 'nitrogen' && tier === 'mature') {
+                        targetColor = new THREE.Color(0xef4444); // Max gradient attention
+                    } else if (diagClass === 'potassium' && tier === 'mature') {
+                        targetColor = new THREE.Color(0xf97316);
+                    } else if (diagClass === 'phosphorus') {
+                        targetColor = new THREE.Color(0xa855f7);
+                    } else {
+                        targetColor = new THREE.Color(0x10b981);
+                    }
+                } else {
+                    // Realistic Foliar Symptom Shader
+                    if (diagClass === 'healthy' || diagClass === 'Control') {
+                        targetColor = new THREE.Color(0x22c55e); // Healthy vibrant green
+                    } else if (diagClass === 'nitrogen') {
+                        // Nitrogen: Severe chlorosis on mature leaves, mid leaves fade, top stays greenish
+                        if (tier === 'mature') {
+                            targetColor = new THREE.Color(0xfacc15).lerp(new THREE.Color(0xfef08a), symptomSeverity * 0.6); // Yellowing
+                        } else if (tier === 'mid') {
+                            targetColor = new THREE.Color(0x86efac); // Pale lime
+                        } else {
+                            targetColor = new THREE.Color(0x4ade80); // Young top leaf
+                        }
+                    } else if (diagClass === 'phosphorus') {
+                        // Phosphorus: Purple/Bronze tint and dark dull bluish-green
+                        if (tier === 'mature' || tier === 'mid') {
+                            targetColor = new THREE.Color(0x1e3a2b).lerp(new THREE.Color(0x6b21a8), symptomSeverity * 0.7); // Purplish dark
+                        } else {
+                            targetColor = new THREE.Color(0x166534);
+                        }
+                    } else if (diagClass === 'potassium') {
+                        // Potassium: Marginal necrosis, scorched brown crispy edges
+                        if (tier === 'mature') {
+                            targetColor = new THREE.Color(0xb45309).lerp(new THREE.Color(0x78350f), symptomSeverity * 0.8); // Scorched brown
+                        } else if (tier === 'mid') {
+                            targetColor = new THREE.Color(0xeab308);
+                        } else {
+                            targetColor = new THREE.Color(0x22c55e);
+                        }
+                    }
+                }
+
+                gsap.to(mat.color, {
+                    r: targetColor.r,
+                    g: targetColor.g,
+                    b: targetColor.b,
+                    duration: 0.8,
+                    ease: "power2.out"
+                });
+            });
+
+            // B. Update Fluid Color and Level (Based on pH & EC)
+            if (fluidMesh && latestReading) {
+                let fluidColor = new THREE.Color(0x10b981); // Normal green
+
+                const ph = latestReading.ph_after || latestReading.ph_before || 6.0;
+                const flags = latestReading.quality_flag || [];
+
+                // Check acid shock or low pH
+                if (ph < 4.0 || flags.includes('acid_error') || flags.includes('solution_replaced')) {
+                    fluidColor = new THREE.Color(0xef4444); // Alert crimson red
+                } else if (ph < 5.5) {
+                    fluidColor = new THREE.Color(0xf59e0b); // Warning amber
+                } else if (ph > 7.5) {
+                    fluidColor = new THREE.Color(0x8b5cf6); // Alkaline purple
+                } else {
+                    fluidColor = new THREE.Color(0x10b981); // Emerald healthy
+                }
+
+                gsap.to(fluidMesh.material.color, {
+                    r: fluidColor.r,
+                    g: fluidColor.g,
+                    b: fluidColor.b,
+                    duration: 1.0
+                });
+
+                // Water scale / level
+                let levelScale = 1.0;
+                if (currentUnitKey.startsWith('Cup')) {
+                    levelScale = 0.95; // Cup 750ml level
+                } else {
+                    levelScale = 1.25; // Tank 23.3L
+                }
+                gsap.to(fluidMesh.scale, {
+                    y: levelScale,
+                    duration: 0.8
+                });
+            }
+        }
+
+        // ── 4. UI Synchronization with Manifests ──────────────────────────────
+        function onUnitChanged(unitKey) {
+            currentUnitKey = unitKey;
+
+            const pred = ensembleMeta.unit_predictions ? ensembleMeta.unit_predictions[unitKey] : null;
+            let latestReading = null;
+            if (sensorData.readings) {
+                const filtered = sensorData.readings.filter(r => r.tank === unitKey);
+                if (filtered.length > 0) latestReading = filtered[filtered.length - 1];
+            }
+
+            // Update Header Replicate Badge
+            const isCup = unitKey.startsWith('Cup');
+            document.getElementById('txtReplicateBadge').textContent = isCup ? "ชุดแก้วทดลอง 750ml" : "ถังโฟมมาตรฐาน 23.3L";
+
+            // Update Diagnostics
+            const badge = document.getElementById('diagBadge');
+            const badgeText = document.getElementById('diagBadgeText');
+            const confCombined = document.getElementById('txtConfCombined');
+            const barCombined = document.getElementById('barConfCombined');
+            const confVision = document.getElementById('txtConfVision');
+            const barVision = document.getElementById('barConfVision');
+            const confSensor = document.getElementById('txtConfSensor');
+            const barSensor = document.getElementById('barConfSensor');
+            const listSymptom = document.getElementById('listSymptomFeatures');
+            const alertAcid = document.getElementById('alertAcidEvent');
+
+            const predClass = pred ? pred.predicted_class : 'healthy';
+            badge.className = 'diag-status-badge ' + predClass;
+
+            if (predClass === 'healthy' || predClass === 'Control') {
+                badgeText.textContent = "สมบูรณ์ดี (Healthy / Control)";
+                barCombined.style.background = "var(--color-healthy)";
+                listSymptom.innerHTML = `
+                    <li>ใบเขียวเข้มสม่ำเสมอ ผิวใบเรียบและเต่งตึงสมบูรณ์</li>
+                    <li>ไม่พบอาการคลอโรซิสหรือรอยไหม้ที่ขอบใบ</li>
+                    <li>การเจริญเติบโตของยอดอ่อนและรากอยู่ในเกณฑ์ปกติ</li>
+                `;
+            } else if (predClass === 'nitrogen') {
+                badgeText.textContent = "ขาดไนโตรเจน (Nitrogen Deficiency)";
+                barCombined.style.background = "var(--color-n)";
+                listSymptom.innerHTML = `
+                    <li>ใบล่างแก่แสดงอาการคลอโรซิส (Chlorosis) เหลืองซีดชัดเจน</li>
+                    <li>ไนโตรเจนเคลื่อนย้ายได้สูง (Mobile Element) ดึงธาตุขึ้นสู่ยอดอ่อน</li>
+                    <li>เส้นใบและเนื้อใบซีดจางพร้อมกันจากปลายสู่โคนใบ</li>
+                `;
+            } else if (predClass === 'phosphorus') {
+                badgeText.textContent = "ขาดฟอสฟอรัส (Phosphorus Deficiency)";
+                barCombined.style.background = "var(--color-p)";
+                listSymptom.innerHTML = `
+                    <li>ใบมีสีเขียวคล้ำอมม่วงบรอนซ์ (Dark purplish-green tint)</li>
+                    <li>การสะสมของเม็ดสีแอนโทไซยานิน (Anthocyanin) บริเวณขอบใบ</li>
+                    <li>ต้นแคระแกร็น รากเติบโตช้าลงอย่างเห็นได้ชัด</li>
+                `;
+            } else if (predClass === 'potassium') {
+                badgeText.textContent = "ขาดโพแทสเซียม (Potassium Deficiency)";
+                barCombined.style.background = "var(--color-k)";
+                listSymptom.innerHTML = `
+                    <li>ขอบใบและปลายใบแก่มีรอยไหม้เกรียมสีน้ำตาล (Marginal Necrosis)</li>
+                    <li>ขอบใบม้วนงอลงด้านล่างเล็กน้อยและแห้งกรอบ</li>
+                    <li>กึ่งกลางใบยังคงมีสีเขียว (Interveinal pattern)</li>
+                `;
+            }
+
+            // Probabilities
+            const pVal = pred && pred.probabilities_pct ? pred.probabilities_pct[predClass] || 85.0 : 85.0;
+            const vVal = pred ? pred.vision_stream_conf_pct || 75.0 : 75.0;
+            const sVal = pred ? pred.sensor_stream_conf_pct || 90.0 : 90.0;
+
+            confCombined.textContent = pVal.toFixed(1) + '%';
+            barCombined.style.width = pVal.toFixed(1) + '%';
+            confVision.textContent = vVal.toFixed(1) + '%';
+            barVision.style.width = vVal.toFixed(1) + '%';
+            confSensor.textContent = sVal.toFixed(1) + '%';
+            barSensor.style.width = sVal.toFixed(1) + '%';
+
+            // Telemetry Cards
+            if (latestReading) {
+                document.getElementById('valEC').textContent = latestReading.ec ? latestReading.ec.toFixed(3) : '-';
+                document.getElementById('subEC').textContent = `mS/cm (Δ ${latestReading.ec_change_pct ? latestReading.ec_change_pct.toFixed(1) : '0.0'}%)`;
+                document.getElementById('valPH').textContent = latestReading.ph_after ? latestReading.ph_after.toFixed(2) : (latestReading.ph_before ? latestReading.ph_before.toFixed(2) : '-');
+                document.getElementById('valTemp').textContent = latestReading.temp ? latestReading.temp.toFixed(1) : '28.0';
+
+                const tsDate = new Date(latestReading.ts);
+                document.getElementById('txtTimestamp').textContent = `${tsDate.getDate()}/${tsDate.getMonth()+1} ${String(tsDate.getHours()).padStart(2,'0')}:${String(tsDate.getMinutes()).padStart(2,'0')}`;
+
+                // Acid Event Warning Alert
+                const flags = latestReading.quality_flag || [];
+                const notes = latestReading.notes || '';
+                if (notes.includes('1.58') || flags.includes('solution_replaced') || flags.includes('acid_error')) {
+                    alertAcid.style.display = 'block';
+                    alertAcid.innerHTML = `⚠️ <strong>บันทึกเหตุการณ์จริง:</strong> ${notes || 'พบประวัติกรดดิ่งและเปลี่ยนสารละลายใหม่'}`;
+                } else {
+                    alertAcid.style.display = 'none';
+                }
+            }
+
+            update3DVisuals();
+        }
+
+        // ── 5. Mode Switching & Controls ──────────────────────────────────────
+        function switchSceneMode(mode) {
+            currentMode = mode;
+            document.getElementById('btnModePlant').classList.toggle('active', mode === 'plant');
+            document.getElementById('btnModeTank').classList.toggle('active', mode === 'tank');
+
+            if (mode === 'plant') {
+                gsap.to(plantGroup.position, { y: 0.35, duration: 0.6 });
+                gsap.to(plantGroup.scale, { x: 1, y: 1, z: 1, duration: 0.6 });
+                gsap.to(tankGroup.position, { y: -3.5, duration: 0.6 });
+                setCameraPreset('iso');
+            } else {
+                gsap.to(plantGroup.position, { y: 1.6, duration: 0.6 });
+                gsap.to(plantGroup.scale, { x: 0.65, y: 0.65, z: 0.65, duration: 0.6 });
+                gsap.to(tankGroup.position, { y: 0, duration: 0.6 });
+                setCameraPreset('root');
+            }
+        }
+
+        function setCameraPreset(preset) {
+            document.querySelectorAll('.bottom-toolbar .tool-btn').forEach(btn => btn.classList.remove('active'));
+
+            if (preset === 'esp32') {
+                // Top-down 90 deg view (ESP32-S3 Camera Real View)
+                gsap.to(camera.position, { x: 0.01, y: 5.2, z: 0.05, duration: 1.0 });
+                controls.target.set(0, 0.4, 0);
+            } else if (preset === 'iso') {
+                gsap.to(camera.position, { x: 2.8, y: 3.2, z: 3.8, duration: 1.0 });
+                controls.target.set(0, 0.5, 0);
+                document.getElementById('btnCamIso').classList.add('active');
+            } else if (preset === 'leaf') {
+                gsap.to(camera.position, { x: 0.8, y: 1.2, z: 1.4, duration: 0.8 });
+                controls.target.set(0, 0.6, 0);
+            } else if (preset === 'root') {
+                gsap.to(camera.position, { x: 0, y: 0.8, z: 3.4, duration: 1.0 });
+                controls.target.set(0, 0.7, 0);
+            }
+        }
+
+        function toggleAutoRotate() {
+            autoRotate = !autoRotate;
+            controls.autoRotate = autoRotate;
+            document.getElementById('btnAutoRotate').textContent = `🔄 หมุนอัตโนมัติ: ${autoRotate ? 'เปิด' : 'ปิด'}`;
+            document.getElementById('btnAutoRotate').classList.toggle('active', autoRotate);
+        }
+
+        function toggleHeatmap() {
+            showHeatmap = !showHeatmap;
+            document.getElementById('btnToggleHeatmap').classList.toggle('active', showHeatmap);
+            update3DVisuals();
+        }
+
+        function toggleVeins() {
+            showVeins = !showVeins;
+            document.getElementById('btnToggleVeins').classList.toggle('active', showVeins);
+        }
+
+        function onSeverityChanged(val) {
+            symptomSeverity = val / 100.0;
+            document.getElementById('txtSeverityVal').textContent = val + '%';
+            update3DVisuals();
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            scene.fog.color.setHex(isDark ? 0x0a120d : 0xdce8e0);
+            renderer.setClearColor(isDark ? 0x0a120d : 0xdce8e0, 0);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // ── 6. Animation Frame Loop ──────────────────────────────────────────
+        let clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            const elapsed = clock.getElapsedTime();
+
+            controls.update();
+
+            // Animate Bubbles in Solution
+            if (bubbleParticles && currentMode === 'tank') {
+                const pos = bubbleParticles.geometry.attributes.position;
+                for (let i = 1; i < pos.count * 3; i += 3) {
+                    pos.array[i] += delta * 0.45;
+                    if (pos.array[i] > 1.35) {
+                        pos.array[i] = 0.15; // Reset to bottom
+                    }
+                }
+                bubbleParticles.geometry.attributes.position.needsUpdate = true;
+            }
+
+            // Gentle Plant Sway (Breathing Animation)
+            if (plantGroup) {
+                plantGroup.rotation.y = Math.sin(elapsed * 0.5) * 0.03;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // Initialize on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            initScene();
+        });
+    </script>
+</body>
+</html>

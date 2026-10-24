@@ -1,0 +1,114 @@
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.preprocessing import image
+import pickle
+import os
+ 
+# ============================================================
+# 1. โหลดโมเดล
+# ============================================================
+MODEL_PATH   = r'D:\Code มหาปลัย\model\kale_npk_model.keras'
+ENCODER_PATH = r'D:\Code มหาปลัย\model\label_encoder.pkl'
+
+model = tf.keras.models.load_model(MODEL_PATH)
+
+with open(ENCODER_PATH, 'rb') as f:
+    le = pickle.load(f)
+
+IMG_SIZE = (224, 224)
+ 
+CLASSES_TH = {
+    'healthy':    '✅ ปกติ (Healthy)',
+    'nitrogen':   '⚠️ ขาดธาตุ N — ไนโตรเจน',
+    'phosphorus': '⚠️ ขาดธาตุ P — ฟอสฟอรัส',
+    'potassium':  '⚠️ ขาดธาตุ K — โพแทสเซียม'
+}
+ 
+ADVICE = {
+    'healthy':    'พืชสมบูรณ์ดี ไม่ต้องปรับอะไร',
+    'nitrogen':   'เพิ่มปุ๋ยไนโตรเจน เช่น ยูเรีย หรือปุ๋ยสูตร 46-0-0',
+    'phosphorus': 'เพิ่มปุ๋ยฟอสฟอรัส เช่น ปุ๋ยสูตร 0-46-0 หรือปรับ pH ให้อยู่ในช่วง 6.0-7.0',
+    'potassium':  'เพิ่มปุ๋ยโพแทสเซียม เช่น ปุ๋ยสูตร 0-0-60 หรือโพแทสเซียมคลอไรด์'
+}
+ 
+# ============================================================
+# 2. ค่ามาตรฐานผักเคล
+# ============================================================
+STANDARD = {
+    'pH':       {'min': 6.0, 'max': 7.0, 'mid': 6.5},
+    'EC':       {'min': 1.5, 'max': 2.5, 'mid': 2.0},
+    'moisture': {'min': 60,  'max': 80,  'mid': 70}
+}
+ 
+# ============================================================
+# 3. ฟังก์ชันทำนาย
+# ============================================================
+def predict_npk(img_path, pH, EC, moisture):
+ 
+    print("\n" + "="*50)
+    print(f"📸 รูปภาพ : {os.path.basename(img_path)}")
+    print(f"📊 pH      : {pH}")
+    print(f"📊 EC      : {EC} mS/cm")
+    print(f"📊 ความชื้น: {moisture}%")
+    print("="*50)
+ 
+    # --- Rule-Based ตรวจสอบก่อน ---
+    pH_ok  = STANDARD['pH']['min']       <= pH       <= STANDARD['pH']['max']
+    EC_ok  = STANDARD['EC']['min']       <= EC       <= STANDARD['EC']['max']
+    moi_ok = STANDARD['moisture']['min'] <= moisture <= STANDARD['moisture']['max']
+ 
+    # --- เตรียม Sensor Features ---
+    sensor = np.array([[
+        pH, EC, moisture,
+        pH       - STANDARD['pH']['mid'],
+        EC       - STANDARD['EC']['mid'],
+        moisture - STANDARD['moisture']['mid'],
+        int(not pH_ok),
+        int(not EC_ok),
+        int(not moi_ok)
+    ]])
+ 
+    # --- เตรียมรูปภาพ ---
+    img       = image.load_img(img_path, target_size=IMG_SIZE)
+    img_array = image.img_to_array(img) / 255.0
+    img_array = np.expand_dims(img_array, axis=0)
+ 
+    # --- ถ้าค่า sensor ปกติทุกอย่าง ใช้ Rule ก่อน ---
+    if pH_ok and EC_ok and moi_ok:
+        print("🔍 Rule: ค่า sensor อยู่ในเกณฑ์ปกติ → ตรวจรูปภาพเพิ่ม")
+ 
+    # --- ML ตัดสินใจ ---
+    pred       = model.predict(
+        {'image_input': img_array, 'sensor_input': sensor},
+        verbose=0
+    )
+    class_idx  = np.argmax(pred[0])
+    class_name = le.inverse_transform([class_idx])[0]
+    confidence = pred[0][class_idx] * 100
+ 
+    # --- แสดงผล ---
+    print(f"\n🌿 ผลการวินิจฉัย : {CLASSES_TH[class_name]}")
+    print(f"🎯 ความมั่นใจ    : {confidence:.1f}%")
+    print(f"💡 คำแนะนำ       : {ADVICE[class_name]}")
+ 
+    # --- แสดงความน่าจะเป็นทุกคลาส ---
+    print("\n📈 ความน่าจะเป็นแต่ละคลาส:")
+    for i, cls in enumerate(le.classes_):
+        bar = "█" * int(pred[0][i] * 20)
+        print(f"   {cls:<12} {pred[0][i]*100:5.1f}% {bar}")
+ 
+    return class_name, confidence
+ 
+ 
+# ============================================================
+# 4. ทดสอบใช้งาน — แก้ค่าตรงนี้
+# ============================================================
+if __name__ == '__main__':
+
+    # เปลี่ยน path รูปและค่า sensor ตามจริง
+    IMG_PATH = r'D:\Code มหาปลัย\Ai มหาปลัย\dataset\val\phosphorus\000023.jpg'
+    PH       = 7.8    # ค่า pH
+    EC       = 0.6    # ค่า EC
+    MOISTURE = 40     # ความชื้น
+
+    result, confidence = predict_npk(IMG_PATH, PH, EC, MOISTURE)

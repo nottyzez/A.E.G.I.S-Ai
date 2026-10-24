@@ -1,0 +1,917 @@
+{
+  "version": 1,
+  "skills": {
+    "academic-plotting": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "20-ml-paper-writing/academic-plotting/SKILL.md",
+      "computedHash": "44eb3f65b52a253bc30e4f21ede90ef51f724743d20de21500132238210d2305"
+    },
+    "academy-guide": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/academy-guide/SKILL.md",
+      "computedHash": "3850fdb589a7a5ba8c3fc5610b43751fef339ba8569a106e316a3b199f6426bc"
+    },
+    "algorithmic-art": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/algorithmic-art/SKILL.md",
+      "computedHash": "987b24aa98171a0d3690420173b2cdb6eaafd57981ed716b5d50371affa82ea3"
+    },
+    "animate": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/animate/SKILL.md",
+      "computedHash": "fb0a18403891238d4ce4fc80f891689678766c29092de1e3aadc0c917133ee5d"
+    },
+    "animate-expo": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/animate-expo/SKILL.md",
+      "computedHash": "3e914b8abdff154a289dcabc63817b6b5d649272a0d054e7e799f37e4bb1c471"
+    },
+    "animation-performance": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/animation-performance/SKILL.md",
+      "computedHash": "01effa412b72097494cd89613ce15c166e9dae04e2a578eb015a45f4a89b7e29"
+    },
+    "animation-vocabulary": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/animation-vocabulary/SKILL.md",
+      "computedHash": "9aaad861dd54dab7c9bb3fb5bd4c539078d8d06c14530d92d49cdb1509bfa937"
+    },
+    "apple-design": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/apple-design/SKILL.md",
+      "computedHash": "f3f1d2cbc8f3e79ccddff05f4e42d34d995f057fb30ff670e4edf8c87d568b69"
+    },
+    "ara-compiler": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "22-agent-native-research-artifact/compiler/SKILL.md",
+      "computedHash": "01ef7373eb65573d29ddfa66f5fecdd23a6cbf824d4cc8a96ce2eaab509a2e4f"
+    },
+    "ara-research-manager": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "22-agent-native-research-artifact/research-manager/SKILL.md",
+      "computedHash": "771cecdf65b46bc0026e97ffcf0f9af49eca63543d641e8b7add9839718f3cb9"
+    },
+    "ara-rigor-reviewer": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "22-agent-native-research-artifact/rigor-reviewer/SKILL.md",
+      "computedHash": "ffdcf769b0cd5d7f37d5bb91347ef7c2ba60d5ca0ef6427fb1477c2d72cdf33e"
+    },
+    "ask-sonner": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/ask-sonner/SKILL.md",
+      "computedHash": "0168a6a129ba0a3561ccbda3a3d8d0dc0af1d556f373e315e9479e3364420dd3"
+    },
+    "audiocraft-audio-generation": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "18-multimodal/audiocraft/SKILL.md",
+      "computedHash": "850fb7038d07df1fdbdc964ee12211a1c803ed2df6dfa8fb48c6a9ba17f1a367"
+    },
+    "autogpt-agents": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "14-agents/autogpt/SKILL.md",
+      "computedHash": "3e38029dfde68616750a198e4937bd3c318f2316ff5f8fc18a3359785d8e89a1"
+    },
+    "autoresearch": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "0-autoresearch-skill/SKILL.md",
+      "computedHash": "4143b022401634b95ef38bb053493dbba772a619ac80c70b204c35d97c6e1b0e"
+    },
+    "awq-quantization": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "10-optimization/awq/SKILL.md",
+      "computedHash": "7df5c18d72ccd3884d9473624b7282de73a302921f7a80a314a1dfe60a39743c"
+    },
+    "axolotl": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "03-fine-tuning/axolotl/SKILL.md",
+      "computedHash": "87033a6ae8f10fe8e2be1a5e24a5e1d8da8238bccae7c9bc82eb2ec53498109c"
+    },
+    "azure-cognitive-search": {
+      "source": "microsoftdocs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/azure-cognitive-search/SKILL.md",
+      "computedHash": "e37ec22c9137c3789c609df239fdb4dfbf96ef5c4ff32f80b1fa6d0eced1c205"
+    },
+    "azure-databricks": {
+      "source": "microsoftdocs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/azure-databricks/SKILL.md",
+      "computedHash": "8d81a27aa6d52e6f8db49d29c423c601e1608d039a9a55e5dba456b6dd77efb2"
+    },
+    "blip-2-vision-language": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "18-multimodal/blip-2/SKILL.md",
+      "computedHash": "a7b354dbb673d10e264c41a031c03545cbe013410c88435be7246be5641f4e07"
+    },
+    "brainstorming-research-ideas": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "21-research-ideation/brainstorming-research-ideas/SKILL.md",
+      "computedHash": "507bff7a63934eac726a4b26b64cb5e3a915b5c209e7037ca2a79ff014f0d321"
+    },
+    "brand-guidelines": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/brand-guidelines/SKILL.md",
+      "computedHash": "c82f0b24cdcc7e2693a963d30c810558b7bb89ed84508b2328228d21256ef865"
+    },
+    "break-ui": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/break-ui/SKILL.md",
+      "computedHash": "79e9e01e3f2fe2ced55448b55de1835c6e641826ee0a81991289e79d3f50cdc7"
+    },
+    "canvas-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/canvas-design/SKILL.md",
+      "computedHash": "4e8bbc31d3b159efdd32d31a63ba8cd5a44d84911e924c1f2c709c50cbcdd0ec"
+    },
+    "chroma": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "15-rag/chroma/SKILL.md",
+      "computedHash": "c53a59bde55e41edd2e7ea604dce84dabc1f316adc054f91fc66c0824791c133"
+    },
+    "claude-api": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/claude-api/SKILL.md",
+      "computedHash": "148a06f190cb71885f74eb401aa732d1eb7bc56b0d94517d526380e043298f8b"
+    },
+    "clip": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "18-multimodal/clip/SKILL.md",
+      "computedHash": "426c780108f17f8fc8478cdc936366935b0785e6edd678697aa9a9b66194a3ca"
+    },
+    "constitutional-ai": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "07-safety-alignment/constitutional-ai/SKILL.md",
+      "computedHash": "43cda1cab5010f8ba4b49f717b6426de937c6be45037d39d9344a932dcaabbc2"
+    },
+    "creative-thinking-for-research": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "21-research-ideation/creative-thinking-for-research/SKILL.md",
+      "computedHash": "2292a3a6b14e934e2077fe8d5c2fe5f2b636f068d44ec2bfb0d615d19c4fd740"
+    },
+    "crewai-multi-agent": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "14-agents/crewai/SKILL.md",
+      "computedHash": "487d8dfd3f3cbe34786c0e671fe5898969b617213d6395ccdad87e4d64429d46"
+    },
+    "deep-research": {
+      "source": "199-biotechnologies/claude-deep-research-skill",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "9eae8e09f41ddde4f85b49687eefe3301c2b5369f71fdfb1ff9ca46ce35d5cef"
+    },
+    "deepspeed": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "08-distributed-training/deepspeed/SKILL.md",
+      "computedHash": "73b43e60ce390220ff614240b49c157ce275ac8abfb23304c4791dd9e33383f3"
+    },
+    "deploy-to-vercel": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/deploy-to-vercel/SKILL.md",
+      "computedHash": "3a0481591523c55ecfe2569b6b28b2dcbfa3742367667697219d29170981ad53"
+    },
+    "design-taste-frontend": {
+      "source": "Leonxlnx/taste-skill",
+      "sourceType": "github",
+      "skillPath": "skills/taste-skill/SKILL.md",
+      "computedHash": "65049e1890f5fedf8f8e1144848f07bcda788e51c22bac78afbd073aeb486725"
+    },
+    "discernment-nudge": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/discernment-nudge/SKILL.md",
+      "computedHash": "80db132d056a73d1ff7b209c4fba8e414285ff20ccc2d3e9e6803e6283b3b931"
+    },
+    "distributed-llm-pretraining-torchtitan": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "01-model-architecture/torchtitan/SKILL.md",
+      "computedHash": "d47f735fbd5020656f5713af3337edb561e99ae6942bb7283fb6e844fa1fcdec"
+    },
+    "doc-coauthoring": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/doc-coauthoring/SKILL.md",
+      "computedHash": "62cd7744438ee2aecc986c520bb603988a78ff6aaaf70a471bf4584fe0b78dae"
+    },
+    "docx": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/docx/SKILL.md",
+      "computedHash": "3b8f8cf1ca7a427607c78312655e95e21b5f8f2b06a1aad4dc5554cc90eb095c"
+    },
+    "dotnet-ai": {
+      "source": "thelobbi/claude",
+      "sourceType": "github",
+      "skillPath": "plugins/dotnet-blazor/skills/dotnet-ai/SKILL.md",
+      "computedHash": "6212215e0c712742cf87333301806667a2c7e790d43d06185ec44e79b47a2696"
+    },
+    "dspy": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "16-prompt-engineering/dspy/SKILL.md",
+      "computedHash": "6cc629ec64e10cc2794aab0ead2a23dd7528089edd03355dd632680c30da1a3b"
+    },
+    "emil-design-eng": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/emil-design-eng/SKILL.md",
+      "computedHash": "77853cec799207f80868c611374c6ed5fdf34a55355c5ab544b59e791c63ad98"
+    },
+    "evaluating-code-models": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "11-evaluation/bigcode-evaluation-harness/SKILL.md",
+      "computedHash": "03aa565ec540ed586594aea368b39f5d8a456fdfd701be778441aa0fa1d9ed4f"
+    },
+    "evaluating-cosmos-policy": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "18-multimodal/cosmos-policy/SKILL.md",
+      "computedHash": "e7e3bed0323d8e6587a2064abb43a4e14cb6e1f9b7b68553582c7be57233bd2e"
+    },
+    "evaluating-llms-harness": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "11-evaluation/lm-evaluation-harness/SKILL.md",
+      "computedHash": "bb59037597fe101031982be5d665682856b6c26307c86646f900ad6092d7b63e"
+    },
+    "evolving-ai-agents": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "14-agents/a-evolve/SKILL.md",
+      "computedHash": "d2450dfee0d9244bfb61184eba26038f834b4d7d62c96fee1e68352f86b99514"
+    },
+    "experiment-tracking-swanlab": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "13-mlops/swanlab/SKILL.md",
+      "computedHash": "47995e8afeaba213ea8dfc6765d76ca7557b48813f28adb6abbf0e6bb8e76729"
+    },
+    "faiss": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "15-rag/faiss/SKILL.md",
+      "computedHash": "951c4010ce958065c952efb152b5cf16b49a24df0b5396ba1f30fcbda66dff31"
+    },
+    "find-animation-opportunities": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/find-animation-opportunities/SKILL.md",
+      "computedHash": "c6673fadf179233cc0a52c978ea9acc9b82a210665c749307a571a86ed4c092e"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "computedHash": "b146008599c31057cef1c145774cea5d5afb30e8f43fa802e47a4b461419aaaf"
+    },
+    "fine-tuning-openvla-oft": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "18-multimodal/openvla-oft/SKILL.md",
+      "computedHash": "9600b6fa8395ead41f930295668990aadb96e5fb979de0f28d902c0523a9ca1b"
+    },
+    "fine-tuning-serving-openpi": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "18-multimodal/openpi/SKILL.md",
+      "computedHash": "843c0ae31aa54e371e198ed48e5ae97831ca86cfa28a9cc8bb04ad440f67b788"
+    },
+    "fine-tuning-with-trl": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "06-post-training/trl-fine-tuning/SKILL.md",
+      "computedHash": "fefda43859328e8384ffee62c8a2fd0837aa76c5e82dfe7d5686769cda8f651f"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "106acf230014cbb43ca34e6410371321b56ca742f9ee0442e8ec05bf02eb0384"
+    },
+    "gguf-quantization": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "10-optimization/gguf/SKILL.md",
+      "computedHash": "ae00f27f64eabba770309f9cbd89ccfebfa9921f2f811ccce07dbbec904c009f"
+    },
+    "gptq": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "10-optimization/gptq/SKILL.md",
+      "computedHash": "41b74929f6e0ba5e8c0a8756306470d9d1064bdeaf6ffda570c294de9ca943c0"
+    },
+    "grpo-rl-training": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "06-post-training/grpo-rl-training/SKILL.md",
+      "computedHash": "33e65f7dfec3108b0d6d8439b078e9dbf63bee7f3d5fbb04c7139e68bf5b6012"
+    },
+    "guidance": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "16-prompt-engineering/guidance/SKILL.md",
+      "computedHash": "1f0c54efc9f489ad78107b39a522eacc6e9a33f1f70f81bb882decb2e729a378"
+    },
+    "hqq-quantization": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "10-optimization/hqq/SKILL.md",
+      "computedHash": "a4ec729e2044315a5c904b2c893910b5f5728694a09996b99b5da79e856f9847"
+    },
+    "huggingface-accelerate": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "08-distributed-training/accelerate/SKILL.md",
+      "computedHash": "fde0ed50e08a97a04a98764c211c58ff0dca6bf1b1f893c6add75375d64a61d7"
+    },
+    "huggingface-tokenizers": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "02-tokenization/huggingface-tokenizers/SKILL.md",
+      "computedHash": "c49d33eb8bf3624aa81b7a842a4fbac99f606be07724501a148da173fa5b0b9a"
+    },
+    "implementing-llms-litgpt": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "01-model-architecture/litgpt/SKILL.md",
+      "computedHash": "3425f70e972ff637ff18b78ae422dc1a818558c100df523e25a387fdd578a3f2"
+    },
+    "improve-animations": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/improve-animations/SKILL.md",
+      "computedHash": "b913ec7ef2b1aa900060eb6e5dbdccc94b6ea631059ec3474c4b61e2ffefeeb4"
+    },
+    "instructor": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "16-prompt-engineering/instructor/SKILL.md",
+      "computedHash": "12a9ac7aade14bcc7b8ad707e8a3028c9b0e945600bfe170b0cc5ec2fc7d3c7d"
+    },
+    "internal-comms": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/internal-comms/SKILL.md",
+      "computedHash": "cf3dba93fd569d7380505db211f89a467869c1a2ef301941148d06f33ed17332"
+    },
+    "jupyter-notebook": {
+      "source": "openai/skills",
+      "sourceType": "github",
+      "skillPath": "skills/.curated/jupyter-notebook/SKILL.md",
+      "computedHash": "ed6cf5b159eeb076eaa43007920ae5aca10336ad1e6cec7baf973f3f83a9eb7f"
+    },
+    "knowledge-distillation": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "19-emerging-techniques/knowledge-distillation/SKILL.md",
+      "computedHash": "83570ac666d6cd29245341531446be1227fb5ae223f7f4bd67f41e3cc15ce7bb"
+    },
+    "lambda-labs-gpu-cloud": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "09-infrastructure/lambda-labs/SKILL.md",
+      "computedHash": "4404110fa638ac37c6beff1830493a3cea2754479007b9fc110d42dd48fb6e75"
+    },
+    "langchain": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "14-agents/langchain/SKILL.md",
+      "computedHash": "35c093146e1c0147709a900eef682b79c1cbda35d895c967039c4bd646684cf2"
+    },
+    "langsmith-observability": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "17-observability/langsmith/SKILL.md",
+      "computedHash": "77353a496a8a74fe9aea4dcbc71aec63aefea92acf511f3205951bf5497e9343"
+    },
+    "llama-cpp": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "12-inference-serving/llama-cpp/SKILL.md",
+      "computedHash": "21aa41619f44a0ea0a8d066c69a5229490a089ec18d1fd099c00057bf43bceb6"
+    },
+    "llama-factory": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "03-fine-tuning/llama-factory/SKILL.md",
+      "computedHash": "45c651226d7ed81b8b0f4ecd972952d0ebf386f3ea8021d6af508c9c0d6e7009"
+    },
+    "llamaguard": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "07-safety-alignment/llamaguard/SKILL.md",
+      "computedHash": "036ab30f6e303f69a530cf554a27c6a61b46369640bf24e49f19c98b8d771daa"
+    },
+    "llamaindex": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "14-agents/llamaindex/SKILL.md",
+      "computedHash": "d5532596a00b3093c1d4d9de3ef143d46f29a94b7ffbce18b621bc6f5bffb7c3"
+    },
+    "llava": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "18-multimodal/llava/SKILL.md",
+      "computedHash": "89391378b3cec71fca5ee48551ecc1acff0fbb017db128d1460438c69147c1a7"
+    },
+    "loki-mode": {
+      "source": "sickn33/agentic-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/loki-mode/SKILL.md",
+      "computedHash": "90e73e12406a17799afa5d12c93ef2aa0c7f2ad2e3bd2eb83a390e018bc2cd0e"
+    },
+    "long-context": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "19-emerging-techniques/long-context/SKILL.md",
+      "computedHash": "61b550bafff4e8f21737b7af2e38bfdc96ed1423fa92cc2588a7eafedd9c8533"
+    },
+    "mamba-architecture": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "01-model-architecture/mamba/SKILL.md",
+      "computedHash": "60f2a91b5136d37932b33be5bb1ebdbf0fbe5f4795deb91aee621e6ec441f114"
+    },
+    "mcp-builder": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/mcp-builder/SKILL.md",
+      "computedHash": "6498a736a8dc5c645047c8a875b8ea7417e2ad97146f005200e50d20a9337ada"
+    },
+    "miles-rl-training": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "06-post-training/miles/SKILL.md",
+      "computedHash": "2826c4e54758eb041eeca3930817922c45d6c70699c63d8f7393d504e96f9b51"
+    },
+    "ml-paper-writing": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "20-ml-paper-writing/ml-paper-writing/SKILL.md",
+      "computedHash": "68715c9272519a5b53a5a96dad8aa344da2674769d4083584c5acb31eec0605f"
+    },
+    "ml-training-recipes": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "10-optimization/ml-training-recipes/SKILL.md",
+      "computedHash": "784a856332e5ab566a9f1c752e3e258d27dad9e55f1da12b0a6cbd2ea145de4a"
+    },
+    "mlflow": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "13-mlops/mlflow/SKILL.md",
+      "computedHash": "92490db364058792bc478232dfa297c8dcd0697876800f4ca9ecec4d03e51a60"
+    },
+    "mobile-native": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/mobile-native/SKILL.md",
+      "computedHash": "8d77850a34ec20f745aed3215aa0d587e90438599bb09dc72d9d09ce896a5765"
+    },
+    "modal-serverless-gpu": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "09-infrastructure/modal/SKILL.md",
+      "computedHash": "ec1712cd12927dc5c808925e2c9bb6c1a2ca9aee0deca985245f40cc00d1bc54"
+    },
+    "model-merging": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "19-emerging-techniques/model-merging/SKILL.md",
+      "computedHash": "bd75a5c3a94a6411c26cfeff9ddbc19f4a23ab7ba8f87917f69e8b3cb8c2bf17"
+    },
+    "model-pruning": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "19-emerging-techniques/model-pruning/SKILL.md",
+      "computedHash": "773358507b84007e143a395288a969269393b8f3a8e21e0b0239bf21723ab448"
+    },
+    "moe-training": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "19-emerging-techniques/moe-training/SKILL.md",
+      "computedHash": "49b9d70fb7e3e82c33e0f2516fadc9af32cb9626bfb65cd8a0acf72248c272cf"
+    },
+    "nanogpt": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "01-model-architecture/nanogpt/SKILL.md",
+      "computedHash": "1c1384ee2e356c98a970ebe1c5e50c6144d5d0a8f813635da88a1d2321e47d17"
+    },
+    "nemo-curator": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "05-data-processing/nemo-curator/SKILL.md",
+      "computedHash": "b5a433cf2ee7fb24a21b7583bae20fedafa906b8f38af6259ff18fc3f276a0d0"
+    },
+    "nemo-evaluator-sdk": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "11-evaluation/nemo-evaluator/SKILL.md",
+      "computedHash": "5abf098b1cd60806ca103fd0514738dd91af9184e8a036d18d3215734a596661"
+    },
+    "nemo-guardrails": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "07-safety-alignment/nemo-guardrails/SKILL.md",
+      "computedHash": "264b2f5945f91724d1a539d4d85664e575a88d347ac217bcb9e7dec1b700dc2d"
+    },
+    "nnsight-remote-interpretability": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "04-mechanistic-interpretability/nnsight/SKILL.md",
+      "computedHash": "51000c08b139d82e6f6344f5eed8bd46797a556c4f8b5201f1777db3dbde8b72"
+    },
+    "openrlhf-training": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "06-post-training/openrlhf/SKILL.md",
+      "computedHash": "e0e1d99a71c8dd594db271b8f810cb6cf84dccef8bbb5975cdc27ecda882df4f"
+    },
+    "optimizing-attention-flash": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "10-optimization/flash-attention/SKILL.md",
+      "computedHash": "76219a0e36632c40b7d68aa89ec2caf908ac5099132451076584b73804b51148"
+    },
+    "outlines": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "16-prompt-engineering/outlines/SKILL.md",
+      "computedHash": "9f3c8402b998503938339dfeb2d260a466e0cc4cf94a548593770ccfe86d7a30"
+    },
+    "pdf": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/pdf/SKILL.md",
+      "computedHash": "37226d4220d844377e6b2a386c51a011df4cd130855ff0b80bcc22f9c28abd57"
+    },
+    "peft-fine-tuning": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "03-fine-tuning/peft/SKILL.md",
+      "computedHash": "e4a7ee9040fe581444e7de7baa2ab4a38b7a8b1b2ec2e6d2342aec3b13962a00"
+    },
+    "phoenix-observability": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "17-observability/phoenix/SKILL.md",
+      "computedHash": "fac660539b4a822813683cf05eacbdaf87ef1c3678737a7b95f9c7b210953534"
+    },
+    "pick-ui-library": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/pick-ui-library/SKILL.md",
+      "computedHash": "95f37cddc1c5f7cf5c60c8f8f07c938f2ddd1a70dd45f50c37e7e522fcde5bb9"
+    },
+    "pinecone": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "15-rag/pinecone/SKILL.md",
+      "computedHash": "496e45c1a8cf5d7c9568927e3f258609a3d498d8e0a8d32289d64945968107ca"
+    },
+    "pptx": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/pptx/SKILL.md",
+      "computedHash": "d6198c2f85d5d1c737d451b98ebacc3bbc187730c9a79252aa738ddb8d818455"
+    },
+    "presenting-conference-talks": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "20-ml-paper-writing/presenting-conference-talks/SKILL.md",
+      "computedHash": "d2235b9c13b20814b613a192f494607695c4aa0fc16056370609f836ef292398"
+    },
+    "prompt-guard": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "07-safety-alignment/prompt-guard/SKILL.md",
+      "computedHash": "fa4d4c55a03f0df8967c35c40c18c13c01fa4d36ab7758f78d2d687a4365cc4b"
+    },
+    "prototype": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/prototype/SKILL.md",
+      "computedHash": "165c803775adbe0df600b961167747b6ba6577e6e1dc9ae1b87fcf5dee800645"
+    },
+    "pytorch-fsdp2": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "08-distributed-training/pytorch-fsdp2/SKILL.md",
+      "computedHash": "8955700e72b71c790fb7c3a7043df8f02803b70995f789de86ea512e7c3c2150"
+    },
+    "pytorch-lightning": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "08-distributed-training/pytorch-lightning/SKILL.md",
+      "computedHash": "4518728be0825fd4ac8c93df26fbc45d6eb0f81ed2b556269f1e40bb4d98edc4"
+    },
+    "pyvene-interventions": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "04-mechanistic-interpretability/pyvene/SKILL.md",
+      "computedHash": "32d0365706650f072e19b209866058f5d095bbf9f7cb0fed3cb3a145c76edaec"
+    },
+    "qdrant-vector-search": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "15-rag/qdrant/SKILL.md",
+      "computedHash": "85e1e9fe69ae564e1b87b2bf52876ceb3eabb9e4266ea171f774f55a1e2c3352"
+    },
+    "quantizing-models-bitsandbytes": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "10-optimization/bitsandbytes/SKILL.md",
+      "computedHash": "07c2dd3ffa62869390328a28324946465e363dc4e00469eb6d24ee8cdacb3726"
+    },
+    "ray-data": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "05-data-processing/ray-data/SKILL.md",
+      "computedHash": "7fe868d9f3b12fb4602be9018d3264af1a4875cd660fa91880597d1a7a2f8c64"
+    },
+    "ray-train": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "08-distributed-training/ray-train/SKILL.md",
+      "computedHash": "4d21303b3d7dbb50e44246c61954e816a48c96a9c9439286c937b5f72d320bd6"
+    },
+    "review-animations": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/review-animations/SKILL.md",
+      "computedHash": "8c2befeb28bb484bf2de7b2fc228774857e266d32a65d76895e78651a536d8cf"
+    },
+    "rwkv-architecture": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "01-model-architecture/rwkv/SKILL.md",
+      "computedHash": "d3d70b5a7f660c976598d403f8134192490d76fc2de4b5df60460fca41b8b8a6"
+    },
+    "segment-anything-model": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "18-multimodal/segment-anything/SKILL.md",
+      "computedHash": "dd6ab7284eb1c2c808812cf47d44d0b41af54df84c0728bc6a9c289c6c851ad9"
+    },
+    "sentence-transformers": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "15-rag/sentence-transformers/SKILL.md",
+      "computedHash": "b1ec651d05d41b826f03eaf153444b63891817e82bfdd22db2f08ceda5b1edac"
+    },
+    "sentencepiece": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "02-tokenization/sentencepiece/SKILL.md",
+      "computedHash": "7ee840480f074a8cb519305773c667b15148be3b54c337e0d463f94a30a62336"
+    },
+    "serving-llms-vllm": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "12-inference-serving/vllm/SKILL.md",
+      "computedHash": "8d51c09bf42a8592a7e84fa179ceaed56b83b6fa1d682f002967d45eb40469e2"
+    },
+    "sglang": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "12-inference-serving/sglang/SKILL.md",
+      "computedHash": "0b297a29b523df13650c1b516f138818ae6997bc53ce6d1057c9c5de117a8c7c"
+    },
+    "shadcn": {
+      "source": "shadcn-ui/ui",
+      "sourceType": "github",
+      "skillPath": "skills/shadcn/SKILL.md",
+      "computedHash": "7859e9a064940a1a0010c992b63e4633c4f5f39ed367a23c16f24029816b1703"
+    },
+    "simpo-training": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "06-post-training/simpo/SKILL.md",
+      "computedHash": "2a73811838947cc2f940baead0d9a317124dd37d383a098dba6128f13ed3ec9a"
+    },
+    "skill-creator": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/skill-creator/SKILL.md",
+      "computedHash": "7e3c9cd74e9e2b4828527a857170e86310f2dab5ea8030a9043df2c7e6c88857"
+    },
+    "skypilot-multi-cloud-orchestration": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "09-infrastructure/skypilot/SKILL.md",
+      "computedHash": "d2f7fdf7364b9c9f76572711690466d5cc947396b661fed409e509dccbea7358"
+    },
+    "slack-gif-creator": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/slack-gif-creator/SKILL.md",
+      "computedHash": "a36e1ceb3f07eb37bdc259f1bfb18e48cc0e809b2e1651cb2369286cd66b2107"
+    },
+    "slime-rl-training": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "06-post-training/slime/SKILL.md",
+      "computedHash": "089474429511584f3448a08bfec416ef14685dac62c4b3613bee019d1289d826"
+    },
+    "sparse-autoencoder-training": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "04-mechanistic-interpretability/saelens/SKILL.md",
+      "computedHash": "363ae94599c94832c18e762350d3f858ac086aaa2ed94ed6c79f2fd41cca6b11"
+    },
+    "speculative-decoding": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "19-emerging-techniques/speculative-decoding/SKILL.md",
+      "computedHash": "eca8b02d2b6d6cfaca5d2013103c8ecdef53b174a90388ee4198e4bbdb6dde6a"
+    },
+    "stable-diffusion-image-generation": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "18-multimodal/stable-diffusion/SKILL.md",
+      "computedHash": "1a7f74e63f53cd6904734f3ec6a8e9a74e649c6b0daf192742e93b804b717300"
+    },
+    "static-analysis": {
+      "source": "mohitmishra786/low-level-dev-skills",
+      "sourceType": "github",
+      "skillPath": "skills/build-systems/static-analysis/SKILL.md",
+      "computedHash": "2f3b7119b9c9795182310e8e101a651d6363ff5eed66eb70a4b5041cd0d1c764"
+    },
+    "systems-paper-writing": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "20-ml-paper-writing/systems-paper-writing/SKILL.md",
+      "computedHash": "a2bb344283fd7b08c1315f84abb0c8e87e0a195178ad30719839a134cd89818d"
+    },
+    "template-skill": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "template/SKILL.md",
+      "computedHash": "daf176f2cd0030d321982d3e813fd1a794a0b4744c5a92d2931a37001bb40fb9"
+    },
+    "tensorboard": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "13-mlops/tensorboard/SKILL.md",
+      "computedHash": "81309b7cbadd4eb64ae4ec6ed014d30972e9aaaa9d822a437e805d84fa344786"
+    },
+    "tensorrt-llm": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "12-inference-serving/tensorrt-llm/SKILL.md",
+      "computedHash": "b5d31427652dfdc965d22e4f86d98dcc79a67e8fd2a3b9938bafe1b4726aaf50"
+    },
+    "theme-factory": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/theme-factory/SKILL.md",
+      "computedHash": "e9ec1fe85faa729e9f3d1731cd7e4e485f98c099ccc7c1c0d198f473aa4b654a"
+    },
+    "torchforge-rl-training": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "06-post-training/torchforge/SKILL.md",
+      "computedHash": "468b3d860811a6ea011cc36b7fa7f7092c74d7db528348e11b26a77e78360d88"
+    },
+    "training-llms-megatron": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "08-distributed-training/megatron-core/SKILL.md",
+      "computedHash": "0be441d206a0d094fe977fc621bb6415445837fa4c66e304e5cdd50be331903e"
+    },
+    "transformer-lens-interpretability": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "04-mechanistic-interpretability/transformer-lens/SKILL.md",
+      "computedHash": "fb256fac46513645a0842beb0ef4aa5ec6b3cf5e9e98a53a588e50257e48bf80"
+    },
+    "unsloth": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "03-fine-tuning/unsloth/SKILL.md",
+      "computedHash": "49aa02ff1761e1faa076ad7f883b09e6d93d54bf21e9082f1260ad50e5242d79"
+    },
+    "vercel-cli-with-tokens": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/vercel-cli-with-tokens/SKILL.md",
+      "computedHash": "d3ad6e1d6278a4df322ee5bf49211f921f4aaea1148fb127b4e928de04b39fef"
+    },
+    "vercel-composition-patterns": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/composition-patterns/SKILL.md",
+      "computedHash": "10eb4ec94577b79ae98c63ce3e7f35f8a6a06436a4011bff083b397de6960eeb"
+    },
+    "vercel-optimize": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/vercel-optimize/SKILL.md",
+      "computedHash": "fb87d3a135fef30748f772200a9f161f780b5a16830e8e70a3a126195cb16963"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/react-best-practices/SKILL.md",
+      "computedHash": "6b526d013e28073246a36f99b529bc43745d30832ecfa8217b359c34f260ca6b"
+    },
+    "vercel-react-native-skills": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/react-native-skills/SKILL.md",
+      "computedHash": "a804b4e848059822638c390359976f7021380bcefb1469d473aa4e9202c15ecb"
+    },
+    "vercel-react-view-transitions": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/react-view-transitions/SKILL.md",
+      "computedHash": "12f8e118b8ca5fa45e3f0b56c269fb2e35251b705d2320b26b0727a0f58adefc"
+    },
+    "verl-rl-training": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "06-post-training/verl/SKILL.md",
+      "computedHash": "e2d5118fa530282b7758e94f6a70914bab4ac577634bde91b3808a96c9fea322"
+    },
+    "web-artifacts-builder": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-artifacts-builder/SKILL.md",
+      "computedHash": "fdddbe9bb720ea1aea9292ee513ec10b2a8f4912e2c343bdc246ab3febd7c9b3"
+    },
+    "web-design-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/web-design-guidelines/SKILL.md",
+      "computedHash": "d8e7d3afe37dcc8a97b99ffb5afdb4d0919ae0092ea8b68f44eb201f035e33ac"
+    },
+    "webapp-testing": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/webapp-testing/SKILL.md",
+      "computedHash": "3f14af7f5690695209c22fbf8c8d133769a86d64892602c09bb13f135e14e857"
+    },
+    "weights-and-biases": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "13-mlops/weights-and-biases/SKILL.md",
+      "computedHash": "061d03ebf73dadb198a389d0deb5222287290571b6a689eef5d074d58b834e1b"
+    },
+    "whisper": {
+      "source": "orchestra-research/ai-research-skills",
+      "sourceType": "github",
+      "skillPath": "18-multimodal/whisper/SKILL.md",
+      "computedHash": "b5abdd770c3ca1cbea146649a74ba8a27fff2d6cb2e2efc563e88cb708269545"
+    },
+    "write-swift": {
+      "source": "emilkowalski/skills",
+      "sourceType": "github",
+      "skillPath": "skills/write-swift/SKILL.md",
+      "computedHash": "3c4854221f2c654172c3532e71dcb4ece25ef62057d97bec1c26c3ab17eca191"
+    },
+    "writing-guidelines": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/writing-guidelines/SKILL.md",
+      "computedHash": "9c221f46dca7bdf94af9c27ce54a7b4ea323c590333f8bc0a55c65254c646584"
+    },
+    "xlsx": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/xlsx/SKILL.md",
+      "computedHash": "cbaaabead69c5e03643f116cde6a396ad53f6da058da6eaa7bad6c4fbafe6026"
+    }
+  }
+}

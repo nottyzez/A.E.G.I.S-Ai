@@ -1,0 +1,2622 @@
+{
+  "generated_at": "2026-10-22T16:58:13.591680",
+  "source": "hydroponic_log.xlsx",
+  "optimal_ranges": {
+    "ec_min": 1.2,
+    "ec_max": 2.5,
+    "ph_min": 5.5,
+    "ph_max": 6.5,
+    "temp_min": 22.0,
+    "temp_max": 28.0
+  },
+  "baselines": {
+    "Control": 2.641,
+    "N": 2.572,
+    "P": 3.512,
+    "K": 2.196,
+    "Cup1": 1.808,
+    "Cup2": 1.996,
+    "Cup3": 1.13,
+    "Cup4": 1.144,
+    "Cup5": 1.086,
+    "Cup6": 1.15,
+    "Cup7": 0.938,
+    "Cup8": 1.02
+  },
+  "baselines_round2": {
+    "Control": 3.0,
+    "N": 1.53,
+    "P": 1.912,
+    "K": 1.66
+  },
+  "units": {
+    "Control": {
+      "id": "Control",
+      "name": "ถังโฟม Control",
+      "sheet_name": "Control",
+      "group": "Control",
+      "system": "tank_23L",
+      "baseline_ec": 2.641,
+      "baseline_ec_round2": 3.0,
+      "replicate": 1
+    },
+    "N": {
+      "id": "N",
+      "name": "ถังโฟม ขาด N",
+      "sheet_name": "ขาด N",
+      "group": "N",
+      "system": "tank_23L",
+      "baseline_ec": 2.572,
+      "baseline_ec_round2": 1.53,
+      "replicate": 1
+    },
+    "P": {
+      "id": "P",
+      "name": "ถังโฟม ขาด P",
+      "sheet_name": "ขาด P",
+      "group": "P",
+      "system": "tank_23L",
+      "baseline_ec": 3.512,
+      "baseline_ec_round2": 1.912,
+      "replicate": 1
+    },
+    "K": {
+      "id": "K",
+      "name": "ถังโฟม ขาด K",
+      "sheet_name": "ขาด K",
+      "group": "K",
+      "system": "tank_23L",
+      "baseline_ec": 2.196,
+      "baseline_ec_round2": 1.66,
+      "replicate": 1
+    },
+    "Cup1": {
+      "id": "Cup1",
+      "name": "แก้ว 1 (Control ซ้ำ 1)",
+      "sheet_name": "แก้ว 1",
+      "group": "Control",
+      "system": "cup_750ml",
+      "baseline_ec": 1.808,
+      "baseline_ec_round2": null,
+      "replicate": 1
+    },
+    "Cup2": {
+      "id": "Cup2",
+      "name": "แก้ว 2 (Control ซ้ำ 2)",
+      "sheet_name": "แก้ว 2",
+      "group": "Control",
+      "system": "cup_750ml",
+      "baseline_ec": 1.996,
+      "baseline_ec_round2": null,
+      "replicate": 2
+    },
+    "Cup3": {
+      "id": "Cup3",
+      "name": "แก้ว 3 (ขาด N ซ้ำ 1)",
+      "sheet_name": "แก้ว 3",
+      "group": "N",
+      "system": "cup_750ml",
+      "baseline_ec": 1.13,
+      "baseline_ec_round2": null,
+      "replicate": 1
+    },
+    "Cup4": {
+      "id": "Cup4",
+      "name": "แก้ว 4 (ขาด N ซ้ำ 2)",
+      "sheet_name": "แก้ว 4",
+      "group": "N",
+      "system": "cup_750ml",
+      "baseline_ec": 1.144,
+      "baseline_ec_round2": null,
+      "replicate": 2
+    },
+    "Cup5": {
+      "id": "Cup5",
+      "name": "แก้ว 5 (ขาด P ซ้ำ 1)",
+      "sheet_name": "แก้ว 5",
+      "group": "P",
+      "system": "cup_750ml",
+      "baseline_ec": 1.086,
+      "baseline_ec_round2": null,
+      "replicate": 1
+    },
+    "Cup6": {
+      "id": "Cup6",
+      "name": "แก้ว 6 (ขาด P ซ้ำ 2)",
+      "sheet_name": "แก้ว 6",
+      "group": "P",
+      "system": "cup_750ml",
+      "baseline_ec": 1.15,
+      "baseline_ec_round2": null,
+      "replicate": 2
+    },
+    "Cup7": {
+      "id": "Cup7",
+      "name": "แก้ว 7 (ขาด K ซ้ำ 1)",
+      "sheet_name": "แก้ว 7",
+      "group": "K",
+      "system": "cup_750ml",
+      "baseline_ec": 0.938,
+      "baseline_ec_round2": null,
+      "replicate": 1
+    },
+    "Cup8": {
+      "id": "Cup8",
+      "name": "แก้ว 8 (ขาด K ซ้ำ 2)",
+      "sheet_name": "แก้ว 8",
+      "group": "K",
+      "system": "cup_750ml",
+      "baseline_ec": 1.02,
+      "baseline_ec_round2": null,
+      "replicate": 2
+    }
+  },
+  "readings": [
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-09T08:36:00",
+      "ec": 2.641,
+      "ph_before": null,
+      "ph_after": 6.39,
+      "temp": 28.5,
+      "ec_change_pct": 0.0,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-09T20:36:00",
+      "ec": 2.596,
+      "ph_before": null,
+      "ph_after": 6.46,
+      "temp": 25.5,
+      "ec_change_pct": -1.7,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-10T08:00:00",
+      "ec": null,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": null,
+      "ec_change_pct": null,
+      "solution_round": "รอบ 1",
+      "image": "10_10_2026-time08_00.jpg",
+      "notes": "ไม่ได้วัด",
+      "quality_flag": [
+        "transplant_shock",
+        "missing_ec",
+        "missing_ph",
+        "missed_measurement"
+      ]
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-10T16:16:00",
+      "ec": 2.436,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": 30.0,
+      "ec_change_pct": -7.76,
+      "solution_round": "รอบ 1",
+      "image": "10_10_2026-time16_16.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock",
+        "missing_ph"
+      ]
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-11T10:00:00",
+      "ec": 2.58,
+      "ph_before": 7.15,
+      "ph_after": 5.67,
+      "temp": 28.0,
+      "ec_change_pct": -2.31,
+      "solution_round": "รอบ 1",
+      "image": "11_10_2026-time10_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-11T17:00:00",
+      "ec": 2.8,
+      "ph_before": 8.09,
+      "ph_after": 5.6,
+      "temp": 27.0,
+      "ec_change_pct": 6.02,
+      "solution_round": "รอบ 1",
+      "image": "11_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock",
+        "ph_anomaly",
+        "ph_jump_between_readings"
+      ]
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-12T08:30:00",
+      "ec": 2.52,
+      "ph_before": 7.52,
+      "ph_after": 6.22,
+      "temp": 28.5,
+      "ec_change_pct": -4.58,
+      "solution_round": "รอบ 1",
+      "image": "12_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": [
+        "ph_jump_between_readings"
+      ]
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-12T16:30:00",
+      "ec": 2.438,
+      "ph_before": 6.85,
+      "ph_after": 6.85,
+      "temp": 30.0,
+      "ec_change_pct": -7.69,
+      "solution_round": "รอบ 1",
+      "image": "12_10_2026-time16_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-13T07:00:00",
+      "ec": 2.676,
+      "ph_before": 7.11,
+      "ph_after": 5.97,
+      "temp": 26.5,
+      "ec_change_pct": 1.33,
+      "solution_round": "รอบ 1",
+      "image": "13_10_2026-time07_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-13T17:00:00",
+      "ec": null,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": null,
+      "ec_change_pct": null,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": "ไม่ได้วัด",
+      "quality_flag": [
+        "missing_ec",
+        "missing_ph",
+        "missed_measurement"
+      ]
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-14T07:00:00",
+      "ec": null,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": null,
+      "ec_change_pct": null,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": "ไม่ได้วัด",
+      "quality_flag": [
+        "missing_ec",
+        "missing_ph",
+        "missed_measurement"
+      ]
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-14T17:00:00",
+      "ec": 2.648,
+      "ph_before": 6.21,
+      "ph_after": 6.21,
+      "temp": 28.0,
+      "ec_change_pct": 0.27,
+      "solution_round": "รอบ 1",
+      "image": "14_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-15T08:00:00",
+      "ec": 3.0,
+      "ph_before": 7.08,
+      "ph_after": 6.45,
+      "temp": null,
+      "ec_change_pct": 13.59,
+      "solution_round": "รอบ 2",
+      "image": "15_10_2026-time08_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-15T17:30:00",
+      "ec": 2.824,
+      "ph_before": 6.86,
+      "ph_after": 6.25,
+      "temp": 28.5,
+      "ec_change_pct": 6.93,
+      "solution_round": "รอบ 2",
+      "image": "15_10_2026-time17_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-16T08:30:00",
+      "ec": 2.756,
+      "ph_before": 7.82,
+      "ph_after": 6.32,
+      "temp": 28.5,
+      "ec_change_pct": 4.35,
+      "solution_round": "รอบ 2",
+      "image": "16_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": [
+        "ph_jump_between_readings"
+      ]
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-16T16:30:00",
+      "ec": 2.816,
+      "ph_before": 7.96,
+      "ph_after": 5.15,
+      "temp": 30.0,
+      "ec_change_pct": 6.63,
+      "solution_round": "รอบ 2",
+      "image": "16_10_2026-time16_30.jpg",
+      "notes": "เติมสารปรับ pH เยอะเกิน",
+      "quality_flag": [
+        "ph_anomaly",
+        "acid_error",
+        "acid_addition",
+        "ph_jump_between_readings"
+      ]
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-17T08:30:00",
+      "ec": 2.68,
+      "ph_before": 6.8,
+      "ph_after": 5.66,
+      "temp": 28.0,
+      "ec_change_pct": 1.48,
+      "solution_round": "รอบ 2",
+      "image": "17_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": [
+        "ph_jump_between_readings"
+      ]
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-17T17:00:00",
+      "ec": 2.868,
+      "ph_before": 5.62,
+      "ph_after": 5.62,
+      "temp": 30.0,
+      "ec_change_pct": -4.4,
+      "solution_round": "รอบ 2",
+      "image": "17_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-18T07:30:00",
+      "ec": 3.102,
+      "ph_before": 5.8,
+      "ph_after": 5.8,
+      "temp": 27.1,
+      "ec_change_pct": 3.4,
+      "solution_round": "รอบ 2",
+      "image": "18_10_2026-time07_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-18T17:00:00",
+      "ec": 2.908,
+      "ph_before": 5.77,
+      "ph_after": 5.77,
+      "temp": 31.5,
+      "ec_change_pct": -3.07,
+      "solution_round": "รอบ 2",
+      "image": "18_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-19T08:30:00",
+      "ec": 3.044,
+      "ph_before": 5.79,
+      "ph_after": 5.79,
+      "temp": 28.0,
+      "ec_change_pct": 1.47,
+      "solution_round": "รอบ 2",
+      "image": "19_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-19T17:00:00",
+      "ec": 2.888,
+      "ph_before": 5.86,
+      "ph_after": 5.86,
+      "temp": 32.0,
+      "ec_change_pct": -3.73,
+      "solution_round": "รอบ 2",
+      "image": "19_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-20T08:30:00",
+      "ec": 3.002,
+      "ph_before": 6.06,
+      "ph_after": 6.06,
+      "temp": 28.5,
+      "ec_change_pct": 0.07,
+      "solution_round": "รอบ 2",
+      "image": "20_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-20T17:00:00",
+      "ec": 2.958,
+      "ph_before": 6.08,
+      "ph_after": 6.08,
+      "temp": 30.6,
+      "ec_change_pct": -1.4,
+      "solution_round": "รอบ 2",
+      "image": "20_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-21T08:00:00",
+      "ec": 3.006,
+      "ph_before": 6.12,
+      "ph_after": 6.12,
+      "temp": 27.3,
+      "ec_change_pct": 0.2,
+      "solution_round": "รอบ 2",
+      "image": "21_10_2026-time08_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-21T18:00:00",
+      "ec": 3.048,
+      "ph_before": 5.77,
+      "ph_after": 5.77,
+      "temp": 28.5,
+      "ec_change_pct": 1.6,
+      "solution_round": "รอบ 2",
+      "image": null,
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "group": "Control",
+      "ts": "2026-10-22T09:00:00",
+      "ec": 2.872,
+      "ph_before": 6.2,
+      "ph_after": 6.2,
+      "temp": 29.5,
+      "ec_change_pct": -4.27,
+      "solution_round": "รอบ 2",
+      "image": null,
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-08T17:53:00",
+      "ec": 2.572,
+      "ph_before": null,
+      "ph_after": 5.96,
+      "temp": 30.0,
+      "ec_change_pct": 0.0,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-09T08:56:00",
+      "ec": 1.956,
+      "ph_before": null,
+      "ph_after": 6.43,
+      "temp": 28.5,
+      "ec_change_pct": -23.95,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-09T20:42:00",
+      "ec": 2.232,
+      "ph_before": null,
+      "ph_after": 6.25,
+      "temp": 25.5,
+      "ec_change_pct": -13.22,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-10T08:00:00",
+      "ec": null,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": null,
+      "ec_change_pct": null,
+      "solution_round": "รอบ 1",
+      "image": "10_10_2026-time08_00.jpg",
+      "notes": "ลืมวัด",
+      "quality_flag": [
+        "transplant_shock",
+        "missing_ec",
+        "missing_ph",
+        "missed_measurement"
+      ]
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-10T16:18:00",
+      "ec": 1.94,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": 30.0,
+      "ec_change_pct": -24.57,
+      "solution_round": "รอบ 1",
+      "image": "10_10_2026-time16_18.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock",
+        "missing_ph"
+      ]
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-11T10:00:00",
+      "ec": 1.964,
+      "ph_before": 7.14,
+      "ph_after": 6.2,
+      "temp": 28.0,
+      "ec_change_pct": -23.64,
+      "solution_round": "รอบ 1",
+      "image": "11_10_2026-time10_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-11T17:00:00",
+      "ec": 2.0,
+      "ph_before": 6.36,
+      "ph_after": 6.36,
+      "temp": 27.0,
+      "ec_change_pct": -22.24,
+      "solution_round": "รอบ 1",
+      "image": "11_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-12T08:30:00",
+      "ec": 1.785,
+      "ph_before": 6.35,
+      "ph_after": 6.35,
+      "temp": 28.5,
+      "ec_change_pct": -30.6,
+      "solution_round": "รอบ 1",
+      "image": "12_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-12T16:30:00",
+      "ec": 1.74,
+      "ph_before": 6.39,
+      "ph_after": 6.39,
+      "temp": 30.0,
+      "ec_change_pct": -32.35,
+      "solution_round": "รอบ 1",
+      "image": "12_10_2026-time16_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-13T07:00:00",
+      "ec": 1.882,
+      "ph_before": 6.34,
+      "ph_after": 6.34,
+      "temp": 26.5,
+      "ec_change_pct": -26.83,
+      "solution_round": "รอบ 1",
+      "image": "13_10_2026-time07_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-13T17:00:00",
+      "ec": null,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": null,
+      "ec_change_pct": null,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": "ไม่ได้วัด",
+      "quality_flag": [
+        "missing_ec",
+        "missing_ph",
+        "missed_measurement"
+      ]
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-14T07:00:00",
+      "ec": null,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": null,
+      "ec_change_pct": null,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": "ไม่ได้วัด",
+      "quality_flag": [
+        "missing_ec",
+        "missing_ph",
+        "missed_measurement"
+      ]
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-14T17:00:00",
+      "ec": 1.84,
+      "ph_before": 6.32,
+      "ph_after": 6.32,
+      "temp": 28.0,
+      "ec_change_pct": -28.46,
+      "solution_round": "รอบ 1",
+      "image": "14_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-15T08:00:00",
+      "ec": 1.53,
+      "ph_before": 7.0,
+      "ph_after": 6.34,
+      "temp": null,
+      "ec_change_pct": 0.0,
+      "solution_round": "รอบ 2",
+      "image": "15_10_2026-time08_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-15T17:30:00",
+      "ec": 1.826,
+      "ph_before": 6.85,
+      "ph_after": 6.45,
+      "temp": 28.5,
+      "ec_change_pct": 19.35,
+      "solution_round": "รอบ 2",
+      "image": "15_10_2026-time17_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-16T08:30:00",
+      "ec": 1.77,
+      "ph_before": 7.29,
+      "ph_after": 6.45,
+      "temp": null,
+      "ec_change_pct": 15.69,
+      "solution_round": "รอบ 2",
+      "image": "16_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-16T16:30:00",
+      "ec": 1.704,
+      "ph_before": 7.05,
+      "ph_after": 6.41,
+      "temp": 30.0,
+      "ec_change_pct": 11.37,
+      "solution_round": "รอบ 2",
+      "image": "16_10_2026-time16_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-17T08:30:00",
+      "ec": 1.738,
+      "ph_before": 6.85,
+      "ph_after": 6.45,
+      "temp": 28.0,
+      "ec_change_pct": 13.59,
+      "solution_round": "รอบ 2",
+      "image": "17_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-17T17:00:00",
+      "ec": 1.672,
+      "ph_before": 6.47,
+      "ph_after": 6.47,
+      "temp": 30.0,
+      "ec_change_pct": 9.28,
+      "solution_round": "รอบ 2",
+      "image": "17_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-18T07:30:00",
+      "ec": 1.796,
+      "ph_before": 6.62,
+      "ph_after": 6.23,
+      "temp": 27.1,
+      "ec_change_pct": 17.39,
+      "solution_round": "รอบ 2",
+      "image": "18_10_2026-time07_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-18T17:00:00",
+      "ec": 1.668,
+      "ph_before": 6.45,
+      "ph_after": 6.45,
+      "temp": 31.5,
+      "ec_change_pct": 9.02,
+      "solution_round": "รอบ 2",
+      "image": "18_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-19T08:30:00",
+      "ec": 1.752,
+      "ph_before": 6.56,
+      "ph_after": 6.23,
+      "temp": 29.5,
+      "ec_change_pct": 14.51,
+      "solution_round": "รอบ 2",
+      "image": "19_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-19T17:00:00",
+      "ec": 1.696,
+      "ph_before": 6.33,
+      "ph_after": 6.33,
+      "temp": 30.6,
+      "ec_change_pct": 10.85,
+      "solution_round": "รอบ 2",
+      "image": "19_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-20T08:30:00",
+      "ec": 1.76,
+      "ph_before": 6.21,
+      "ph_after": 6.21,
+      "temp": 28.5,
+      "ec_change_pct": 15.03,
+      "solution_round": "รอบ 2",
+      "image": "20_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-20T17:00:00",
+      "ec": 1.67,
+      "ph_before": 6.25,
+      "ph_after": 6.25,
+      "temp": 30.6,
+      "ec_change_pct": 9.15,
+      "solution_round": "รอบ 2",
+      "image": "20_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-21T08:00:00",
+      "ec": 1.734,
+      "ph_before": 6.33,
+      "ph_after": 6.33,
+      "temp": 27.3,
+      "ec_change_pct": 13.33,
+      "solution_round": "รอบ 2",
+      "image": "21_10_2026-time08_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-21T18:00:00",
+      "ec": 1.76,
+      "ph_before": 6.23,
+      "ph_after": 6.23,
+      "temp": 28.5,
+      "ec_change_pct": 15.03,
+      "solution_round": "รอบ 2",
+      "image": null,
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "N",
+      "system": "tank_23L",
+      "group": "N",
+      "ts": "2026-10-22T09:00:00",
+      "ec": 1.744,
+      "ph_before": 6.08,
+      "ph_after": 6.08,
+      "temp": 29.5,
+      "ec_change_pct": 13.99,
+      "solution_round": "รอบ 2",
+      "image": null,
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-08T18:00:00",
+      "ec": 3.512,
+      "ph_before": null,
+      "ph_after": 6.12,
+      "temp": 30.0,
+      "ec_change_pct": 0.0,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-09T08:58:00",
+      "ec": 2.856,
+      "ph_before": null,
+      "ph_after": 6.31,
+      "temp": 28.5,
+      "ec_change_pct": -18.68,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock",
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-09T20:49:00",
+      "ec": 2.784,
+      "ph_before": null,
+      "ph_after": 6.4,
+      "temp": 25.5,
+      "ec_change_pct": -20.73,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock",
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-10T08:00:00",
+      "ec": null,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": null,
+      "ec_change_pct": null,
+      "solution_round": "รอบ 1",
+      "image": "10_10_2026-time08_00.jpg",
+      "notes": "ไม่ได้วัด",
+      "quality_flag": [
+        "transplant_shock",
+        "missing_ec",
+        "missing_ph",
+        "high_baseline",
+        "missed_measurement"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-10T16:20:00",
+      "ec": 2.562,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": 30.0,
+      "ec_change_pct": -27.05,
+      "solution_round": "รอบ 1",
+      "image": "10_10_2026-time16_20.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock",
+        "missing_ph",
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-11T10:00:00",
+      "ec": 2.66,
+      "ph_before": 5.89,
+      "ph_after": 5.89,
+      "temp": 28.0,
+      "ec_change_pct": -24.26,
+      "solution_round": "รอบ 1",
+      "image": "11_10_2026-time10_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock",
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-11T17:00:00",
+      "ec": 2.7,
+      "ph_before": 5.92,
+      "ph_after": 5.92,
+      "temp": 27.0,
+      "ec_change_pct": -23.12,
+      "solution_round": "รอบ 1",
+      "image": "11_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock",
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-12T08:30:00",
+      "ec": 2.304,
+      "ph_before": 5.65,
+      "ph_after": 5.65,
+      "temp": 28.5,
+      "ec_change_pct": -34.4,
+      "solution_round": "รอบ 1",
+      "image": "12_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-12T16:30:00",
+      "ec": 2.33,
+      "ph_before": 5.67,
+      "ph_after": 5.67,
+      "temp": 30.0,
+      "ec_change_pct": -33.66,
+      "solution_round": "รอบ 1",
+      "image": "12_10_2026-time16_30.jpg",
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-13T07:00:00",
+      "ec": 2.452,
+      "ph_before": 5.54,
+      "ph_after": 5.54,
+      "temp": 26.5,
+      "ec_change_pct": -30.18,
+      "solution_round": "รอบ 1",
+      "image": "13_10_2026-time07_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-13T17:00:00",
+      "ec": null,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": null,
+      "ec_change_pct": null,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": "ไม่ได้วัด",
+      "quality_flag": [
+        "missing_ec",
+        "missing_ph",
+        "high_baseline",
+        "missed_measurement"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-14T07:00:00",
+      "ec": null,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": null,
+      "ec_change_pct": null,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": "ไม่ได้วัด",
+      "quality_flag": [
+        "missing_ec",
+        "missing_ph",
+        "high_baseline",
+        "missed_measurement"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-14T17:00:00",
+      "ec": 2.496,
+      "ph_before": 5.54,
+      "ph_after": 5.54,
+      "temp": 28.0,
+      "ec_change_pct": -28.93,
+      "solution_round": "รอบ 1",
+      "image": "14_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-15T08:00:00",
+      "ec": 1.912,
+      "ph_before": 7.36,
+      "ph_after": 6.31,
+      "temp": 30.0,
+      "ec_change_pct": 0.0,
+      "solution_round": "รอบ 2",
+      "image": "15_10_2026-time08_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "high_baseline",
+        "ph_jump_between_readings"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-15T17:30:00",
+      "ec": 1.898,
+      "ph_before": 7.46,
+      "ph_after": 6.34,
+      "temp": 28.5,
+      "ec_change_pct": -0.73,
+      "solution_round": "รอบ 2",
+      "image": "15_10_2026-time17_30.jpg",
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-16T08:30:00",
+      "ec": 1.948,
+      "ph_before": 8.62,
+      "ph_after": 6.09,
+      "temp": null,
+      "ec_change_pct": 1.88,
+      "solution_round": "รอบ 2",
+      "image": "16_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": [
+        "ph_anomaly",
+        "high_baseline",
+        "ph_jump_between_readings"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-16T16:30:00",
+      "ec": 1.94,
+      "ph_before": 8.22,
+      "ph_after": 5.64,
+      "temp": 30.0,
+      "ec_change_pct": 1.46,
+      "solution_round": "รอบ 2",
+      "image": "16_10_2026-time16_30.jpg",
+      "notes": null,
+      "quality_flag": [
+        "ph_anomaly",
+        "high_baseline",
+        "ph_jump_between_readings"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-17T08:30:00",
+      "ec": 1.856,
+      "ph_before": 6.86,
+      "ph_after": 5.75,
+      "temp": 28.0,
+      "ec_change_pct": -2.93,
+      "solution_round": "รอบ 2",
+      "image": "17_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-17T17:00:00",
+      "ec": 1.868,
+      "ph_before": 7.04,
+      "ph_after": 6.18,
+      "temp": 30.0,
+      "ec_change_pct": -2.3,
+      "solution_round": "รอบ 2",
+      "image": "17_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-18T07:30:00",
+      "ec": 2.0,
+      "ph_before": 6.56,
+      "ph_after": 6.11,
+      "temp": 27.6,
+      "ec_change_pct": 4.6,
+      "solution_round": "รอบ 2",
+      "image": "18_10_2026-time07_30.jpg",
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-18T17:00:00",
+      "ec": 1.958,
+      "ph_before": 6.53,
+      "ph_after": 6.53,
+      "temp": 31.5,
+      "ec_change_pct": 2.41,
+      "solution_round": "รอบ 2",
+      "image": "18_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-19T08:30:00",
+      "ec": 2.038,
+      "ph_before": 6.66,
+      "ph_after": 5.11,
+      "temp": 28.0,
+      "ec_change_pct": 6.59,
+      "solution_round": "รอบ 2",
+      "image": "19_10_2026-time08_30.jpg",
+      "notes": "เติมสารปรับ pH ลงไป 2 ml",
+      "quality_flag": [
+        "ph_anomaly",
+        "high_baseline",
+        "acid_addition"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-19T17:00:00",
+      "ec": 1.962,
+      "ph_before": 6.3,
+      "ph_after": 6.3,
+      "temp": 30.0,
+      "ec_change_pct": 2.62,
+      "solution_round": "รอบ 2",
+      "image": "19_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-20T08:30:00",
+      "ec": 2.026,
+      "ph_before": 6.41,
+      "ph_after": 6.41,
+      "temp": 27.6,
+      "ec_change_pct": 5.96,
+      "solution_round": "รอบ 2",
+      "image": "20_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-20T17:00:00",
+      "ec": 1.92,
+      "ph_before": 6.56,
+      "ph_after": 6.32,
+      "temp": 30.6,
+      "ec_change_pct": 0.42,
+      "solution_round": "รอบ 2",
+      "image": "20_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-21T08:00:00",
+      "ec": 2.07,
+      "ph_before": 6.77,
+      "ph_after": 5.43,
+      "temp": 27.3,
+      "ec_change_pct": 8.26,
+      "solution_round": "รอบ 2",
+      "image": "21_10_2026-time08_00.jpg",
+      "notes": "เติมสารปรับ pH ลงไป 1 ml",
+      "quality_flag": [
+        "high_baseline",
+        "acid_addition"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-21T18:00:00",
+      "ec": 2.028,
+      "ph_before": 5.88,
+      "ph_after": 5.88,
+      "temp": 28.0,
+      "ec_change_pct": 6.07,
+      "solution_round": "รอบ 2",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "group": "P",
+      "ts": "2026-10-22T09:00:00",
+      "ec": 1.948,
+      "ph_before": 6.41,
+      "ph_after": 6.41,
+      "temp": 29.5,
+      "ec_change_pct": 1.88,
+      "solution_round": "รอบ 2",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "high_baseline"
+      ]
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-08T18:15:00",
+      "ec": 2.196,
+      "ph_before": null,
+      "ph_after": 6.28,
+      "temp": 30.0,
+      "ec_change_pct": 0.0,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-09T09:02:00",
+      "ec": 1.786,
+      "ph_before": null,
+      "ph_after": 6.41,
+      "temp": 28.5,
+      "ec_change_pct": -18.67,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-09T20:53:00",
+      "ec": 1.67,
+      "ph_before": null,
+      "ph_after": 6.36,
+      "temp": null,
+      "ec_change_pct": -23.95,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-10T08:00:00",
+      "ec": null,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": null,
+      "ec_change_pct": null,
+      "solution_round": "รอบ 1",
+      "image": "10_10_2026-time08_00.jpg",
+      "notes": "ไม่ได้วัด",
+      "quality_flag": [
+        "transplant_shock",
+        "missing_ec",
+        "missing_ph",
+        "missed_measurement"
+      ]
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-10T16:22:00",
+      "ec": 1.362,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": 30.0,
+      "ec_change_pct": -37.98,
+      "solution_round": "รอบ 1",
+      "image": "10_10_2026-time16_22.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock",
+        "missing_ph"
+      ]
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-11T10:00:00",
+      "ec": 1.32,
+      "ph_before": null,
+      "ph_after": 6.45,
+      "temp": 27.5,
+      "ec_change_pct": -39.89,
+      "solution_round": "รอบ 1",
+      "image": "11_10_2026-time10_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-11T17:00:00",
+      "ec": 1.38,
+      "ph_before": 6.47,
+      "ph_after": 6.47,
+      "temp": 27.0,
+      "ec_change_pct": -37.16,
+      "solution_round": "รอบ 1",
+      "image": "11_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-12T08:30:00",
+      "ec": 1.276,
+      "ph_before": 6.29,
+      "ph_after": 6.29,
+      "temp": 28.0,
+      "ec_change_pct": -41.89,
+      "solution_round": "รอบ 1",
+      "image": "12_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-12T16:30:00",
+      "ec": 1.254,
+      "ph_before": 6.11,
+      "ph_after": 6.11,
+      "temp": 30.0,
+      "ec_change_pct": -42.9,
+      "solution_round": "รอบ 1",
+      "image": "12_10_2026-time16_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-13T07:00:00",
+      "ec": 1.282,
+      "ph_before": 6.09,
+      "ph_after": 6.09,
+      "temp": 26.5,
+      "ec_change_pct": -41.62,
+      "solution_round": "รอบ 1",
+      "image": "13_10_2026-time07_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-13T17:00:00",
+      "ec": null,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": null,
+      "ec_change_pct": null,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": "ไม่ได้วัด",
+      "quality_flag": [
+        "missing_ec",
+        "missing_ph",
+        "missed_measurement"
+      ]
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-14T07:00:00",
+      "ec": null,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": null,
+      "ec_change_pct": null,
+      "solution_round": "รอบ 1",
+      "image": null,
+      "notes": "ไม่ได้วัด",
+      "quality_flag": [
+        "missing_ec",
+        "missing_ph",
+        "missed_measurement"
+      ]
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-14T17:00:00",
+      "ec": 1.28,
+      "ph_before": 6.03,
+      "ph_after": 6.03,
+      "temp": 28.0,
+      "ec_change_pct": -41.71,
+      "solution_round": "รอบ 1",
+      "image": "14_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-15T08:00:00",
+      "ec": 1.66,
+      "ph_before": 6.58,
+      "ph_after": 6.29,
+      "temp": null,
+      "ec_change_pct": 0.0,
+      "solution_round": "รอบ 2",
+      "image": "15_10_2026-time08_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-15T17:30:00",
+      "ec": 1.642,
+      "ph_before": 7.31,
+      "ph_after": 6.28,
+      "temp": 27.0,
+      "ec_change_pct": -1.08,
+      "solution_round": "รอบ 2",
+      "image": "15_10_2026-time17_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-16T08:30:00",
+      "ec": 1.364,
+      "ph_before": 7.34,
+      "ph_after": 6.07,
+      "temp": 28.5,
+      "ec_change_pct": -17.83,
+      "solution_round": "รอบ 2",
+      "image": "16_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-16T16:30:00",
+      "ec": 1.3,
+      "ph_before": 6.52,
+      "ph_after": 5.36,
+      "temp": 30.6,
+      "ec_change_pct": -21.69,
+      "solution_round": "รอบ 2",
+      "image": "16_10_2026-time16_30.jpg",
+      "notes": "เติมสารปรับ pH ฟอสฟอริกเข้าไป 1 ml",
+      "quality_flag": [
+        "acid_addition"
+      ]
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-17T08:30:00",
+      "ec": 1.284,
+      "ph_before": 5.78,
+      "ph_after": 5.65,
+      "temp": 28.0,
+      "ec_change_pct": -22.65,
+      "solution_round": "รอบ 2",
+      "image": "17_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-17T17:00:00",
+      "ec": 1.312,
+      "ph_before": 5.71,
+      "ph_after": 5.71,
+      "temp": 30.0,
+      "ec_change_pct": -20.96,
+      "solution_round": "รอบ 2",
+      "image": "17_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-18T07:30:00",
+      "ec": 1.346,
+      "ph_before": 5.58,
+      "ph_after": 5.58,
+      "temp": 27.6,
+      "ec_change_pct": -18.92,
+      "solution_round": "รอบ 2",
+      "image": "18_10_2026-time07_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-18T17:00:00",
+      "ec": 1.312,
+      "ph_before": 5.58,
+      "ph_after": 5.58,
+      "temp": 30.0,
+      "ec_change_pct": -20.96,
+      "solution_round": "รอบ 2",
+      "image": "18_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-19T08:30:00",
+      "ec": 1.332,
+      "ph_before": 5.56,
+      "ph_after": 5.56,
+      "temp": 28.0,
+      "ec_change_pct": -19.76,
+      "solution_round": "รอบ 2",
+      "image": "19_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-19T17:00:00",
+      "ec": 1.332,
+      "ph_before": 5.56,
+      "ph_after": 5.56,
+      "temp": 29.6,
+      "ec_change_pct": -19.76,
+      "solution_round": "รอบ 2",
+      "image": "19_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-20T08:30:00",
+      "ec": 1.35,
+      "ph_before": 5.63,
+      "ph_after": 5.63,
+      "temp": 27.6,
+      "ec_change_pct": -18.67,
+      "solution_round": "รอบ 2",
+      "image": "20_10_2026-time08_30.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-20T17:00:00",
+      "ec": 1.278,
+      "ph_before": 5.9,
+      "ph_after": 5.9,
+      "temp": 30.6,
+      "ec_change_pct": -23.01,
+      "solution_round": "รอบ 2",
+      "image": "20_10_2026-time17_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-21T08:00:00",
+      "ec": 1.336,
+      "ph_before": 5.59,
+      "ph_after": 5.59,
+      "temp": 27.3,
+      "ec_change_pct": -19.52,
+      "solution_round": "รอบ 2",
+      "image": "21_10_2026-time08_00.jpg",
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-21T18:00:00",
+      "ec": 1.342,
+      "ph_before": 5.7,
+      "ph_after": 5.7,
+      "temp": 28.0,
+      "ec_change_pct": -19.16,
+      "solution_round": "รอบ 2",
+      "image": null,
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "K",
+      "system": "tank_23L",
+      "group": "K",
+      "ts": "2026-10-22T09:00:00",
+      "ec": 1.308,
+      "ph_before": 5.73,
+      "ph_after": 5.73,
+      "temp": 29.5,
+      "ec_change_pct": -21.2,
+      "solution_round": "รอบ 2",
+      "image": null,
+      "notes": null,
+      "quality_flag": null
+    },
+    {
+      "tank": "Cup1",
+      "system": "cup_750ml",
+      "group": "Control",
+      "ts": "2026-10-20T16:00:00",
+      "ec": 1.808,
+      "ph_before": 5.75,
+      "ph_after": 5.75,
+      "temp": null,
+      "ec_change_pct": 0.0,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup1_20261020_1600.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup1",
+      "system": "cup_750ml",
+      "group": "Control",
+      "ts": "2026-10-21T08:00:00",
+      "ec": 1.806,
+      "ph_before": 6.15,
+      "ph_after": 6.15,
+      "temp": null,
+      "ec_change_pct": -0.11,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup1_20261021_0800.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup1",
+      "system": "cup_750ml",
+      "group": "Control",
+      "ts": "2026-10-21T18:00:00",
+      "ec": 1.946,
+      "ph_before": 6.21,
+      "ph_after": 6.21,
+      "temp": null,
+      "ec_change_pct": 7.63,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup1",
+      "system": "cup_750ml",
+      "group": "Control",
+      "ts": "2026-10-22T09:00:00",
+      "ec": 2.018,
+      "ph_before": 6.43,
+      "ph_after": 6.43,
+      "temp": null,
+      "ec_change_pct": 11.62,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup2",
+      "system": "cup_750ml",
+      "group": "Control",
+      "ts": "2026-10-20T16:00:00",
+      "ec": 1.996,
+      "ph_before": 5.58,
+      "ph_after": 5.58,
+      "temp": null,
+      "ec_change_pct": 0.0,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup2_20261020_1600.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup2",
+      "system": "cup_750ml",
+      "group": "Control",
+      "ts": "2026-10-21T08:00:00",
+      "ec": 1.92,
+      "ph_before": 6.12,
+      "ph_after": 6.12,
+      "temp": null,
+      "ec_change_pct": -3.81,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup2_20261021_0800.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup2",
+      "system": "cup_750ml",
+      "group": "Control",
+      "ts": "2026-10-21T18:00:00",
+      "ec": 2.078,
+      "ph_before": 6.15,
+      "ph_after": 6.15,
+      "temp": null,
+      "ec_change_pct": 4.11,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup2",
+      "system": "cup_750ml",
+      "group": "Control",
+      "ts": "2026-10-22T09:00:00",
+      "ec": 1.956,
+      "ph_before": 6.3,
+      "ph_after": 6.3,
+      "temp": null,
+      "ec_change_pct": -2.0,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup3",
+      "system": "cup_750ml",
+      "group": "N",
+      "ts": "2026-10-20T16:00:00",
+      "ec": 1.13,
+      "ph_before": 5.7,
+      "ph_after": 5.7,
+      "temp": null,
+      "ec_change_pct": 0.0,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup3_20261020_1600.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup3",
+      "system": "cup_750ml",
+      "group": "N",
+      "ts": "2026-10-21T08:00:00",
+      "ec": 1.16,
+      "ph_before": 6.56,
+      "ph_after": 6.35,
+      "temp": null,
+      "ec_change_pct": 2.65,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup3_20261021_0800.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup3",
+      "system": "cup_750ml",
+      "group": "N",
+      "ts": "2026-10-21T18:00:00",
+      "ec": 1.228,
+      "ph_before": 6.48,
+      "ph_after": 6.48,
+      "temp": null,
+      "ec_change_pct": 8.67,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup3",
+      "system": "cup_750ml",
+      "group": "N",
+      "ts": "2026-10-22T09:00:00",
+      "ec": 1.456,
+      "ph_before": 5.82,
+      "ph_after": 5.82,
+      "temp": null,
+      "ec_change_pct": 0.0,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": "หยดสารปรับ pH ฟอสฟอริก 1 หยด (0.05cc) ค่า pH ดิ่งลง 1.58 เปลี่ยนสารละลายใหม่",
+      "quality_flag": [
+        "transplant_shock",
+        "solution_replaced",
+        "acid_error",
+        "acid_addition"
+      ]
+    },
+    {
+      "tank": "Cup4",
+      "system": "cup_750ml",
+      "group": "N",
+      "ts": "2026-10-20T16:00:00",
+      "ec": 1.144,
+      "ph_before": 5.8,
+      "ph_after": 5.8,
+      "temp": null,
+      "ec_change_pct": 0.0,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup4_20261020_1600.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup4",
+      "system": "cup_750ml",
+      "group": "N",
+      "ts": "2026-10-21T08:00:00",
+      "ec": 1.184,
+      "ph_before": 6.56,
+      "ph_after": 6.25,
+      "temp": null,
+      "ec_change_pct": 3.5,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup4_20261021_0800.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup4",
+      "system": "cup_750ml",
+      "group": "N",
+      "ts": "2026-10-21T18:00:00",
+      "ec": 1.208,
+      "ph_before": 6.44,
+      "ph_after": 6.44,
+      "temp": null,
+      "ec_change_pct": 5.59,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup4",
+      "system": "cup_750ml",
+      "group": "N",
+      "ts": "2026-10-22T09:00:00",
+      "ec": 0.916,
+      "ph_before": 6.56,
+      "ph_after": 6.56,
+      "temp": null,
+      "ec_change_pct": -19.93,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup5",
+      "system": "cup_750ml",
+      "group": "P",
+      "ts": "2026-10-20T16:00:00",
+      "ec": 1.086,
+      "ph_before": 6.51,
+      "ph_after": 6.51,
+      "temp": null,
+      "ec_change_pct": 0.0,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup5_20261020_1600.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup5",
+      "system": "cup_750ml",
+      "group": "P",
+      "ts": "2026-10-21T08:00:00",
+      "ec": 1.092,
+      "ph_before": 7.2,
+      "ph_after": 6.11,
+      "temp": null,
+      "ec_change_pct": 0.55,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup5_20261021_0800.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup5",
+      "system": "cup_750ml",
+      "group": "P",
+      "ts": "2026-10-21T18:00:00",
+      "ec": 1.116,
+      "ph_before": 6.23,
+      "ph_after": 6.23,
+      "temp": null,
+      "ec_change_pct": 2.76,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup5",
+      "system": "cup_750ml",
+      "group": "P",
+      "ts": "2026-10-22T09:00:00",
+      "ec": 1.108,
+      "ph_before": 6.14,
+      "ph_after": 6.14,
+      "temp": null,
+      "ec_change_pct": 2.03,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup6",
+      "system": "cup_750ml",
+      "group": "P",
+      "ts": "2026-10-20T16:00:00",
+      "ec": 1.15,
+      "ph_before": 6.18,
+      "ph_after": 6.18,
+      "temp": null,
+      "ec_change_pct": 0.0,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup6_20261020_1600.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup6",
+      "system": "cup_750ml",
+      "group": "P",
+      "ts": "2026-10-21T08:00:00",
+      "ec": 1.13,
+      "ph_before": 7.08,
+      "ph_after": 6.43,
+      "temp": null,
+      "ec_change_pct": -1.74,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup6_20261021_0800.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup6",
+      "system": "cup_750ml",
+      "group": "P",
+      "ts": "2026-10-21T18:00:00",
+      "ec": 1.182,
+      "ph_before": 6.48,
+      "ph_after": 6.48,
+      "temp": null,
+      "ec_change_pct": 2.78,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup6",
+      "system": "cup_750ml",
+      "group": "P",
+      "ts": "2026-10-22T09:00:00",
+      "ec": 1.132,
+      "ph_before": 6.41,
+      "ph_after": 6.41,
+      "temp": null,
+      "ec_change_pct": -1.57,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup7",
+      "system": "cup_750ml",
+      "group": "K",
+      "ts": "2026-10-20T16:00:00",
+      "ec": 0.938,
+      "ph_before": 7.44,
+      "ph_after": 6.15,
+      "temp": null,
+      "ec_change_pct": 0.0,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup7_20261020_1600.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup7",
+      "system": "cup_750ml",
+      "group": "K",
+      "ts": "2026-10-21T08:00:00",
+      "ec": 0.91,
+      "ph_before": 6.86,
+      "ph_after": 6.4,
+      "temp": null,
+      "ec_change_pct": -2.99,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup7_20261021_0800.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup7",
+      "system": "cup_750ml",
+      "group": "K",
+      "ts": "2026-10-21T18:00:00",
+      "ec": 0.946,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": null,
+      "ec_change_pct": 0.85,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock",
+        "missing_ph"
+      ]
+    },
+    {
+      "tank": "Cup7",
+      "system": "cup_750ml",
+      "group": "K",
+      "ts": "2026-10-22T09:00:00",
+      "ec": 1.226,
+      "ph_before": null,
+      "ph_after": null,
+      "temp": null,
+      "ec_change_pct": 0.0,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": "หยดสารปรับ pH ฟอสฟอริก 1 หยด (0.05cc) ค่า pH ดิ่งลง 1.58 เปลี่ยนสารละลายใหม่",
+      "quality_flag": [
+        "transplant_shock",
+        "missing_ph",
+        "solution_replaced",
+        "acid_error",
+        "acid_addition"
+      ]
+    },
+    {
+      "tank": "Cup8",
+      "system": "cup_750ml",
+      "group": "K",
+      "ts": "2026-10-20T16:00:00",
+      "ec": 1.02,
+      "ph_before": 6.34,
+      "ph_after": 6.34,
+      "temp": null,
+      "ec_change_pct": 0.0,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup8_20261020_1600.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup8",
+      "system": "cup_750ml",
+      "group": "K",
+      "ts": "2026-10-21T08:00:00",
+      "ec": 0.99,
+      "ph_before": 6.97,
+      "ph_after": 6.41,
+      "temp": null,
+      "ec_change_pct": -2.94,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": "Cup8_20261021_0800.jpg",
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup8",
+      "system": "cup_750ml",
+      "group": "K",
+      "ts": "2026-10-21T18:00:00",
+      "ec": 1.032,
+      "ph_before": 6.62,
+      "ph_after": 6.62,
+      "temp": null,
+      "ec_change_pct": 1.18,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": null,
+      "quality_flag": [
+        "transplant_shock"
+      ]
+    },
+    {
+      "tank": "Cup8",
+      "system": "cup_750ml",
+      "group": "K",
+      "ts": "2026-10-22T09:00:00",
+      "ec": 1.196,
+      "ph_before": 6.36,
+      "ph_after": 6.36,
+      "temp": null,
+      "ec_change_pct": 0.0,
+      "solution_round": "ชุดแก้ว 750ml",
+      "image": null,
+      "notes": "หยดสารปรับ pH ฟอสฟอริก 1 หยด (0.05cc) ค่า pH ดิ่งลง 1.58 เปลี่ยนสารละลายใหม่",
+      "quality_flag": [
+        "transplant_shock",
+        "solution_replaced",
+        "acid_error",
+        "acid_addition"
+      ]
+    }
+  ],
+  "quality_events": [
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "ts": "2026-10-11T17:00:00",
+      "type": "ph_jump",
+      "detail": "pH jumped from 5.67 to 8.09"
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "ts": "2026-10-12T08:30:00",
+      "type": "ph_jump",
+      "detail": "pH jumped from 5.6 to 7.52"
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "ts": "2026-10-16T08:30:00",
+      "type": "ph_jump",
+      "detail": "pH jumped from 6.25 to 7.82"
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "ts": "2026-10-16T16:30:00",
+      "type": "ph_jump",
+      "detail": "pH jumped from 6.32 to 7.96"
+    },
+    {
+      "tank": "Control",
+      "system": "tank_23L",
+      "ts": "2026-10-17T08:30:00",
+      "type": "ph_jump",
+      "detail": "pH jumped from 5.15 to 6.8"
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "ts": "2026-10-15T08:00:00",
+      "type": "ph_jump",
+      "detail": "pH jumped from 5.54 to 7.36"
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "ts": "2026-10-16T08:30:00",
+      "type": "ph_jump",
+      "detail": "pH jumped from 6.34 to 8.62"
+    },
+    {
+      "tank": "P",
+      "system": "tank_23L",
+      "ts": "2026-10-16T16:30:00",
+      "type": "ph_jump",
+      "detail": "pH jumped from 6.09 to 8.22"
+    },
+    {
+      "tank": "Cup3",
+      "system": "cup_750ml",
+      "ts": "2026-10-22T09:00:00",
+      "type": "solution_replaced",
+      "detail": "หยดสารปรับ pH ฟอสฟอริก 1 หยด (0.05cc) ค่า pH ดิ่งลง 1.58 เปลี่ยนสารละลายใหม่"
+    },
+    {
+      "tank": "Cup7",
+      "system": "cup_750ml",
+      "ts": "2026-10-22T09:00:00",
+      "type": "solution_replaced",
+      "detail": "หยดสารปรับ pH ฟอสฟอริก 1 หยด (0.05cc) ค่า pH ดิ่งลง 1.58 เปลี่ยนสารละลายใหม่"
+    },
+    {
+      "tank": "Cup8",
+      "system": "cup_750ml",
+      "ts": "2026-10-22T09:00:00",
+      "type": "solution_replaced",
+      "detail": "หยดสารปรับ pH ฟอสฟอริก 1 หยด (0.05cc) ค่า pH ดิ่งลง 1.58 เปลี่ยนสารละลายใหม่"
+    }
+  ]
+}

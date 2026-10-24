@@ -1,0 +1,71 @@
+# ==============================================================================
+# .gitignore — Autonomous NPK Deficiency Diagnosis & Closed-Loop Dosing System
+# Project: A.E.G.I.S. (Suwannaphum Phitthayaphasan School)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Python Virtual Environments, Distributions & Caches
+# ------------------------------------------------------------------------------
+ai-env312/
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.keras_cache/
+
+# ------------------------------------------------------------------------------
+# 2. Node.js & Package Managers
+# ------------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ------------------------------------------------------------------------------
+# 3. Hardware Credentials & Local Environment Files (Zero-Leak Security)
+# Keep config.example.h tracked, but ignore real hardware configs with Wi-Fi passwords
+# ------------------------------------------------------------------------------
+firmware/**/config.h
+firmware/esp32_cam/config.h
+firmware/esp32_main/config.h
+.env
+*.env
+*.code-workspace
+
+# ------------------------------------------------------------------------------
+# 4. Agent Assistants, Scratchpads & Temporary Workspaces
+# ------------------------------------------------------------------------------
+scratch/
+.agent/
+.agents/
+.claude/
+.gemini/
+.impeccable/
+sandbox/
+
+# ------------------------------------------------------------------------------
+# 5. Raw & Heavy Image Datasets (Keep tabular logs & models, exclude 500MB photos)
+# ------------------------------------------------------------------------------
+Ai มหาปลัย/dataset_real/images/
+Ai มหาปลัย/dataset_real/images_cropped/
+server/static/images_real/
+test_captures/
+*.log
+
+# ------------------------------------------------------------------------------
+# 6. Operating System & IDE Specific Files
+# ------------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+.vscode/
+.idea/

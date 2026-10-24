@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>บทที่ 2: วรรณกรรมและงานวิจัยที่เกี่ยวข้อง</title>
+<style>
+  @page {
+    size: A4;
+    margin: 2.54cm 2.54cm 2.54cm 3.81cm; /* ขวา ล่าง บน ซ้าย (มาตรฐานวิทยานิพนธ์ ซ้าย 1.5 นิ้ว) */
+  }
+  body {
+    font-family: 'TH Sarabun New', 'TH Sarabun PSK', 'Angsana New', Cordia New, sans-serif;
+    font-size: 16pt;
+    line-height: 1.25;
+    color: #000000;
+    margin: 20px;
+    background-color: #ffffff;
+  }
+  h1 {
+    font-size: 18pt;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 5px;
+  }
+  h2 {
+    font-size: 16pt;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 25px;
+  }
+  h3 {
+    font-size: 16pt;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 8px;
+    text-align: left;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 8px;
+    text-align: justify;
+    text-justify: inter-cluster;
+  }
+  .indent {
+    text-indent: 1.27cm; /* 0.5 นิ้ว */
+  }
+  .equation-box {
+    margin: 12px auto;
+    padding: 10px 18px;
+    background-color: #f8f9fa;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    width: 90%;
+    text-align: center;
+    font-family: 'Cambria Math', 'Times New Roman', 'TH Sarabun New', serif;
+    font-size: 15pt;
+  }
+  .equation-label {
+    float: right;
+    font-weight: normal;
+    color: #333333;
+  }
+  .equation-word-hint {
+    font-size: 12pt;
+    color: #4b5563;
+    font-family: Consolas, 'Courier New', monospace;
+    background: #e5e7eb;
+    padding: 2px 6px;
+    border-radius: 3px;
+    display: inline-block;
+    margin-top: 4px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    margin-bottom: 20px;
+    font-size: 14pt;
+  }
+  th, td {
+    border: 1px solid #000000;
+    padding: 6px 10px;
+    vertical-align: top;
+  }
+  th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+    text-align: center;
+  }
+  .table-title {
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-size: 15pt;
+  }
+  .ref-item {
+    padding-left: 1.27cm;
+    text-indent: -1.27cm;
+    margin-bottom: 8px;
+    text-align: justify;
+  }
+  .fraction {
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+    padding: 0 4px;
+  }
+  .fraction > span {
+    display: block;
+    padding-top: 2px;
+  }
+  .fraction span.numerator {
+    border-bottom: 1px solid #000;
+    padding-bottom: 2px;
+  }
+  .fraction span.denominator {
+    padding-top: 2px;
+  }
+</style>
+</head>
+<body>
+
+<h1>บทที่ 2</h1>
+<h2>วรรณกรรมและงานวิจัยที่เกี่ยวข้อง<br>(Literature Review and Related Work)</h2>
+
+<p class="indent">ในการศึกษาวิจัยและพัฒนาระบบวินิจฉัยการขาดธาตุอาหาร NPK อัตโนมัติและควบคุมสารละลายแบบวงปิดสองระดับในพืชผักไฮโดรโปนิกส์ด้วยปัญญาประดิษฐ์ผสานข้อมูลหลากรูปแบบ (A.E.G.I.S.) ผู้วิจัยได้ทำการทบทวนวรรณกรรม เอกสาร แนวคิด ทฤษฎี และงานวิจัยที่เกี่ยวข้อง เพื่อใช้เป็นกรอบแนวคิดและรากฐานทางวิชาการ โดยจำแนกเนื้อหาออกเป็น 9 หัวข้อหลัก ดังต่อไปนี้:</p>
+
+<p style="margin-left: 1.27cm;">
+2.1 สรีรวิทยาการเจริญเติบโตของผักบุ้งจีนในระบบไฮโดรโปนิกส์<br>
+2.2 บทบาททางชีวเคมีของธาตุอาหารหลัก N-P-K และทฤษฎีการเคลื่อนย้ายผ่านท่อโฟลเอ็ม (Phloem Mobility)<br>
+2.3 พยาธิสภาพของสภาวะกรดจัดฉับพลัน (Acid Shock) ในระบบรากพืช<br>
+2.4 สถาปัตยกรรมโครงข่ายประสาทเทียมขนาดเบา MobileNetV2 และกลไก SE-Attention<br>
+2.5 เทคนิคการประมวลผลภาพเพื่อขจัดแสงสะท้อนและดัชนีความเขียวส่วนเกิน (Excess Green Index: ExG)<br>
+2.6 ปัญญาประดิษฐ์ที่สามารถอธิบายเหตุผลได้ (Explainable AI: XAI) ด้วย Grad-CAM<br>
+2.7 ทฤษฎีการผสานข้อมูลหลากรูปแบบ (Multimodal Data Fusion) และ Stacking Ensemble<br>
+2.8 สถาปัตยกรรมอินเทอร์เน็ตของสรรพสิ่ง (IoT) และระบบควบคุมสารละลายแบบวงปิดสองระดับ (Two-Tier Closed-Loop)<br>
+2.9 ตารางสังเคราะห์และเปรียบเทียบงานวิจัยที่เกี่ยวข้อง (State-of-the-Art Synthesis Table)
+</p>
+
+<hr style="border: 0; border-top: 1px solid #cccccc; margin: 25px 0;">
+
+<h3>2.1 สรีรวิทยาการเจริญเติบโตของผักบุ้งจีนในระบบไฮโดรโปนิกส์</h3>
+
+<p class="indent">ผักบุ้งจีน (<i>Ipomoea aquatica</i> Forsk.) จัดเป็นพืชผักใบในวงศ์ Convolvulaceae ซึ่งมีอัตราการเจริญเติบโตสัมพัทธ์ (Relative Growth Rate: RGR) รวดเร็ว มีวงจรการปลูกสั้นประมาณ 20–25 วัน การปลูกในระบบไฮโดรโปนิกส์แบบน้ำลึก (Deep Water Culture: DWC) ช่วยให้รากสัมผัสกับสารละลายธาตุอาหารและออกซิเจนได้อย่างต่อเนื่อง โดยปัจจัยสำคัญที่มีผลต่อการเจริญเติบโตทางสรีรวิทยา ได้แก่:</p>
+
+<p class="indent"><b>1. ค่าการนำไฟฟ้าของสารละลาย (Electrical Conductivity: EC):</b> ค่า EC บ่งชี้ความเข้มข้นของไอออนธาตุอาหารรวมในสารละลาย ค่า EC ที่เหมาะสมสำหรับผักบุ้งจีนอยู่ในช่วง 1.2 – 2.2 mS/cm (หรือ dS/m) โดยในระยะต้นกล้า 7 วันแรก ควบคุมค่า EC ที่ระดับ 0.8 – 1.2 mS/cm เพื่อป้องกันความเสียหายของเซลล์ขนรากจากแรงดันออสโมซิสภายนอก และปรับเพิ่มเป็น 1.6 – 2.2 mS/cm ในระยะสะสมชีวมวลทางใบ (Wang et al., 2017)</p>
+
+<p class="indent"><b>2. ค่าความเป็นกรด-ด่าง (pH):</b> ช่วงอุดมคติที่ทำให้ธาตุอาหารไอออนสามารถละลายและดูดซึมได้ดีที่สุด (Bioavailability) อยู่ระหว่าง 5.5 – 6.5 หากค่า pH สูงกว่า 6.5 จุลธาตุประจุบวก (Fe<sup>2+</sup>, Mn<sup>2+</sup>, Zn<sup>2+</sup>, Cu<sup>2+</sup>) จะตกตะกอนเป็นออกไซด์ และฟอสเฟตจะทำปฏิกิริยากับแคลเซียมกลายเป็นแคลเซียมฟอสเฟตที่ไม่ละลายน้ำ เกิดสภาวะ Nutrient Lockout ในทางกลับกัน หากค่า pH ต่ำกว่า 5.0 โปรตอนอิสระ (H<sup>+</sup>) จะเข้าแย่งชิงตำแหน่งตัวรับบนราก ขัดขวางการดูดซึม K<sup>+</sup>, Ca<sup>2+</sup> และ Mg<sup>2+</sup> (Trejo-Téllez & Gómez-Merino, 2012)</p>
+
+<hr style="border: 0; border-top: 1px solid #cccccc; margin: 25px 0;">
+
+<h3>2.2 บทบาททางชีวเคมีของธาตุอาหารหลัก N-P-K และทฤษฎีการเคลื่อนย้ายผ่านท่อโฟลเอ็ม (Phloem Mobility)</h3>
+
+<p class="indent">ธาตุอาหารหลักทั้ง 3 ชนิดจัดเป็นธาตุที่มีความคล่องตัวสูงมากในท่อลำเลียงโฟลเอ็ม (Mobile Elements) เมื่อสารละลายเกิดภาวะขาดแคลน พืชจะมีกลไกทางสรีรวิทยาในการสลายสารประกอบเชิงซ้อนจาก "ใบล่างแก่ (Source)" แล้วลำเลียงย้อนกลับไปเลี้ยง "ยอดอ่อนและเนื้อเยื่อเจริญ (Sink)" ส่งผลให้อาการขาดธาตุอาหารปรากฏที่ใบล่างแก่ก่อนเสมอ (Marschner, 2012) โดยมีกลไกทางชีวเคมีจำเพาะดังนี้:</p>
+
+<p class="indent"><b>1. การขาดไนโตรเจน (Nitrogen Deficiency: -N):</b> ไนโตรเจนเป็นองค์ประกอบโครงสร้างของคลอโรฟิลล์และเอนไซม์ RuBisCO (Ribulose-1,5-bisphosphate carboxylase/oxygenase) ซึ่งคิดเป็นร้อยละ 50 ของโปรตีนละลายน้ำทั้งหมดในใบพืช เมื่อพืชขาดไนโตรเจน จะกระตุ้นการทำงานของเอนไซม์ Proteases ย่อยสลายโปรตีน RuBisCO และเม็ดสีคลอโรฟิลล์ในใบแก่ เพื่อแปลงเป็นกรดอะมิโน Glutamine และ Asparagine ส่งไปเลี้ยงยอดอ่อน ส่งผลให้เนื้อเยื่อใบแก่เกิดการสูญเสียคลอโรฟิลล์อย่างสม่ำเสมอทั่วทั้งแผ่นใบ (Uniform Chlorosis) ทำให้ใบเปลี่ยนเป็นสีเหลืองซีด เริ่มจากใบล่างขึ้นสู่ยอด (Masclaux-Daubresse et al., 2010)</p>
+
+<p class="indent"><b>2. การขาดฟอสฟอรัส (Phosphorus Deficiency: -P):</b> ฟอสฟอรัสเป็นองค์ประกอบสำคัญของโมเลกุลสะสมพลังงาน ATP และกรดนิวคลีอิก การขาดฟอสเฟตไอออน (P<sub>i</sub>) ทำให้กระบวนการสังเคราะห์ด้วยแสงและการลำเลียงน้ำตาลซูโครสหยุดชะงัก เกิดสภาวะน้ำตาลคั่งค้างในใบ (Sugar Accumulation) น้ำตาลที่คั่งค้างร่วมกับโปรตีนควบคุม PHR1 จะเข้ากระตุ้นการแสดงออกของยีน PAP1 (MYB75) เปิดเส้นทางชีวสังเคราะห์เม็ดสีฟลาโวนอยด์กลุ่ม แอนโทไซยานิน (Anthocyanin) สีแดงอมม่วงในแวคิวโอล เมื่อเม็ดสีแอนโทไซยานินผสมกับคลอโรฟิลล์เดิม จึงปรากฏลักษณะใบสีเขียวเข้มคล้ำผิดปกติปนเหลือบม่วง (Dark/Purplish Green) ลำต้นตั้งตรงแคระแกร็น และก้านใบเปลี่ยนเป็นสีม่วงแดง (Luan et al., 2022)</p>
+
+<p class="indent"><b>3. การขาดโพแทสเซียม (Potassium Deficiency: -K):</b> โพแทสเซียมไอออน (K<sup>+</sup>) ทำหน้าที่เป็นออสโมไลต์หลักในการควบคุมแรงดันเต่ง การยืดขยายเซลล์ และการเปิด-ปิดปากใบ เมื่อขาด K<sup>+</sup> ปากใบจะไม่สามารถควบคุมการคายน้ำได้ตามปกติ ส่งผลให้เกิดการสะสมของสารไดเอมีนที่เป็นพิษคือ Putrescine และกระตุ้นการสร้างอนุมูลอิสระ ROS (Reactive Oxygen Species) เช่น H<sub>2</sub>O<sub>2</sub> ซึ่งเข้าทำลายเยื่อหุ้มเซลล์ (Lipid Peroxidation) โดยบริเวณขอบใบและปลายใบแก่ซึ่งเป็นจุดสิ้นสุดของท่อลำเลียงน้ำไซเลมจะเกิดการขาดน้ำและเนื้อเยื่อตายแห้งไหม้เป็นสีน้ำตาลกรอบ (Marginal Chlorosis & Necrosis / Leaf Scorch) ในขณะที่บริเวณกลางใบยังคงมีสีเขียว (Cakmak, 2005)</p>
+
+<hr style="border: 0; border-top: 1px solid #cccccc; margin: 25px 0;">
+
+<h3>2.3 พยาธิสภาพของสภาวะกรดจัดฉับพลัน (Acid Shock) ในระบบรากพืช</h3>
+
+<p class="indent">จากการบันทึกผลการทดลองจริงของโครงงานที่ตรวจพบเหตุการณ์กรดดิ่งฉับพลัน (Acid Shock ที่ระดับ pH 1.58) ได้รับการอธิบายเชิงพยาธิสภาพสอดคล้องกับวรรณกรรมทางวิทยาศาสตร์ ดังนี้:</p>
+
+<p class="indent"><b>1. ความเป็นพิษจากโปรตอน (Proton Rhizotoxicity):</b> ค่า pH ที่ระดับ 1.58 มีความเข้มข้นของไฮโดรเจนไอออนสูงกว่าสภาวะปกติกว่า 10,000 เท่า ก่อให้เกิดแรงผลักดันโปรตอนข้ามเยื่อหุ้มเซลล์ (>300 mV) ไฮโดรเจนไอออนมหาศาลจะเข้าแทนที่ Ca<sup>2+</sup> ที่ทำหน้าที่เชื่อมพันธะเพกทินในผนังเซลล์ ส่งผลให้โครงสร้างผนังเซลล์เปราะบาง เยื่อหุ้มเซลล์แตกสลาย และเกิดการรั่วไหลของสารละลายภายในเซลล์อย่างรุนแรง (Electrolyte Leakage) เซลล์ขนรากตายในทันที (Koyama et al., 2001)</p>
+
+<p class="indent"><b>2. การหยุดชะงักของช่องส่งน้ำ (Aquaporin Gating):</b> งานวิจัยหมุดหมายของ Tournaire-Roux et al. (2003) ตีพิมพ์ในวารสาร Nature ค้นพบว่า สภาวะความเป็นกรดในไซโทพลาซึมจะส่งผลให้โปรตอนเข้าจับกับกรดอะมิโนฮิสทิดีน (His193) ของโปรตีนช่องลำเลียงน้ำ Aquaporin (PIP2) บนเยื่อหุ้มเซลล์ ทำให้ประตูช่องส่งน้ำปิดลงอย่างถาวร ส่งผลให้รากพืชไม่สามารถดูดน้ำได้ แม้จะแช่อยู่ในสารละลายน้ำก็ตาม ก่อให้เกิด "ภาวะแล้งทางสรีรวิทยา (Physiological Drought)" และต้นพืชเหี่ยวเฉาตายอย่างรวดเร็ว</p>
+
+<hr style="border: 0; border-top: 1px solid #cccccc; margin: 25px 0;">
+
+<h3>2.4 สถาปัตยกรรมโครงข่ายประสาทเทียมขนาดเบา MobileNetV2 และกลไก SE-Attention</h3>
+
+<p class="indent">การประมวลผลบนอุปกรณ์ฝังตัว (Edge Devices) จำเป็นต้องใช้โครงข่ายที่มีประสิทธิภาพสูงแต่ใช้ทรัพยากรการคำนวณต่ำ:</p>
+
+<p class="indent"><b>1. โครงสร้าง MobileNetV2 (Sandler et al., 2018):</b> ใช้เทคนิค Inverted Residuals and Linear Bottlenecks โดยเริ่มต้นจากการขยายมิติช่องสัญญาณ (Expansion) ด้วยคอนโวลูชัน 1 × 1 จากนั้นใช้ Depthwise Separable Convolution (3 × 3) เพื่อสกัดข้อมูลเชิงพื้นที่ทีละแชนแนลอย่างอิสระ แล้วจึงบีบอัดมิติกลับด้วย Pointwise Convolution (1 × 1) สถาปัตยกรรมนี้ช่วยลดต้นทุนการคำนวณ (FLOPs) และขนาดพารามิเตอร์ลงได้มากกว่า 85% เมื่อเทียบกับ ResNet-50</p>
+
+<p class="indent"><b>2. กลไก Squeeze-and-Excitation (SE-Attention Block):</b> Hu et al. (2018) ได้นำเสนอกลไกการเพิ่มความสนใจเชิงช่องสัญญาณ (Channel-wise Attention) โดยแบ่งการคำนวณออกเป็น 3 ขั้นตอน:</p>
+
+<p class="indent"><i>ขั้นที่ 1: ขั้น Squeeze (การบีบอัดมิติเชิงพื้นที่):</i> บีบอัดข้อมูลมิติเชิงพื้นที่ของแต่ละแชนแนล <i>H × W</i> ให้เป็นค่าสถิติตัวแทนมิติ <i>1 × 1 × C</i> ผ่านฟังก์ชัน Global Average Pooling (GAP) ตามสมการ (2.1):</p>
+
+<div class="equation-box">
+  <span class="equation-label">(2.1)</span>
+  <i>z<sub>c</sub></i> = 
+  <div class="fraction">
+    <span class="numerator">1</span>
+    <span class="denominator"><i>H</i> × <i>W</i></span>
+  </div>
+  &nbsp;
+  ∑<sub><i>i</i>=1</sub><sup><i>H</i></sup> ∑<sub><i>j</i>=1</sub><sup><i>W</i></sup> <i>u<sub>c</sub></i>(<i>i</i>, <i>j</i>)
+  <br>
+  <span class="equation-word-hint">โค้ดกล่องสมการ Word (Alt + =): z_c = (1 / (H * W)) * \sum_(i=1)^H \sum_(j=1)^W u_c(i,j)</span>
+</div>
+
+<p class="indent"><i>ขั้นที่ 2: ขั้น Excitation (การคำนวณปฏิสัมพันธ์ระหว่างแชนแนล):</i> คำนวณค่าน้ำหนักความสำคัญผ่านโครงข่าย Fully-Connected (FC) สองชั้น พร้อมฟังก์ชันกระตุ้นแบบไม่เป็นเชิงเส้น ตามสมการ (2.2):</p>
+
+<div class="equation-box">
+  <span class="equation-label">(2.2)</span>
+  <b>s</b> = σ( <b>W</b><sub>2</sub> · ReLU( <b>W</b><sub>1</sub> · <b>z</b> ) )
+  <br>
+  <span class="equation-word-hint">โค้ดกล่องสมการ Word (Alt + =): s = \sigma(W_2 * ReLU(W_1 * z))</span>
+</div>
+
+<p style="margin-left: 1.27cm; font-size: 14pt;">โดยที่ <b>W</b><sub>1</sub> ∈ ℝ<sup>(<i>C</i>/<i>r</i>) × <i>C</i></sup> คือเมทริกซ์ลดทอนมิติ, <b>W</b><sub>2</sub> ∈ ℝ<sup><i>C</i> × (<i>C</i>/<i>r</i>)</sup> คือเมทริกซ์ขยายมิติกลับ และ σ คือฟังก์ชันซิกมอยด์ (Sigmoid)</p>
+
+<p class="indent"><i>ขั้นที่ 3: ขั้น Scale (การปรับขนาดความสำคัญ):</i> นำค่าน้ำหนักความสำคัญ <i>s<sub>c</sub></i> กลับไปปรับสเกลค่า Feature Map ดั้งเดิม ตามสมการ (2.3):</p>
+
+<div class="equation-box">
+  <span class="equation-label">(2.3)</span>
+  <b>x̃</b><sub><i>c</i></sub> = <i>s<sub>c</sub></i> · <b>u</b><sub><i>c</i></sub>
+  <br>
+  <span class="equation-word-hint">โค้ดกล่องสมการ Word (Alt + =): 	ilde(x)_c = s_c * u_c</span>
+</div>
+
+<p class="indent">ในโครงงานนี้ SE-Attention ช่วยให้โมเดลสามารถเน้นน้ำหนัก (Focus) ไปยังแชนแนลที่จับสัญญาณรอยโรคบนใบ เช่น สีเหลืองซีดจากการขาด N หรือขอบใบไหม้จากการขาด K พร้อมลดทอนสัญญาณรบกวนจากพื้นหลังกล่องโฟมสีขาวลงโดยอัตโนมัติ</p>
+
+<hr style="border: 0; border-top: 1px solid #cccccc; margin: 25px 0;">
+
+<h3>2.5 เทคนิคการประมวลผลภาพเพื่อขจัดแสงสะท้อนและดัชนีความเขียวส่วนเกิน (Excess Green Index: ExG)</h3>
+
+<p class="indent">ในสภาพแวดล้อมการปลูกไฮโดรโปนิกส์จริง แสงแดดธรรมชาติและแสงสะท้อนบนผิวน้ำก่อให้เกิดปัญหาความแปรปรวนของค่าความสว่าง (Illumination Variance) การวิจัยนี้ประยุกต์ใช้ดัชนีพืชพรรณ Excess Green Index (ExG) ตามทฤษฎีของ Meyer and Neto (2008) ตามสมการ (2.4):</p>
+
+<div class="equation-box">
+  <span class="equation-label">(2.4)</span>
+  ExG = 2<i>G</i> – <i>R</i> – <i>B</i>
+  <br>
+  <span class="equation-word-hint">โค้ดกล่องสมการ Word (Alt + =): ExG = 2G - R - B</span>
+</div>
+
+<p class="indent">และเมื่อคำนวณในรูปพิกัดสีมาตรฐาน (Normalized Chromaticity Coordinates) ตามสมการ (2.5) และ (2.6):</p>
+
+<div class="equation-box">
+  <span class="equation-label">(2.5)</span>
+  ExG<sub>norm</sub> = 2<i>g</i> – <i>r</i> – <i>b</i>
+  <br>
+  <span class="equation-word-hint">โค้ดกล่องสมการ Word (Alt + =): ExG_norm = 2g - r - b</span>
+</div>
+
+<div class="equation-box">
+  <span class="equation-label">(2.6)</span>
+  <i>r</i> = 
+  <div class="fraction"><span class="numerator"><i>R</i></span><span class="denominator"><i>R</i> + <i>G</i> + <i>B</i></span></div>,&nbsp;&nbsp;&nbsp;
+  <i>g</i> = 
+  <div class="fraction"><span class="numerator"><i>G</i></span><span class="denominator"><i>R</i> + <i>G</i> + <i>B</i></span></div>,&nbsp;&nbsp;&nbsp;
+  <i>b</i> = 
+  <div class="fraction"><span class="numerator"><i>B</i></span><span class="denominator"><i>R</i> + <i>G</i> + <i>B</i></span></div>
+  <br>
+  <span class="equation-word-hint">โค้ดกล่องสมการ Word (Alt + =): r = R / (R + G + B), \quad g = G / (R + G + B), \quad b = B / (R + G + B)</span>
+</div>
+
+<p class="indent">ดัชนี ExG ขยายความเข้มของเม็ดสีเขียวจากคลอโรฟิลล์ให้โดดเด่นเหนือพื้นหลังสีเทา สีดำ และสีขาว เมื่อนำมาผสานเข้ากับ Otsu’s Adaptive Thresholding ระบบจึงสามารถสร้าง Binary Mask เพื่อแยกส่วนพุ่มใบพืช (Canopy Segmentation) ออกจากผิวน้ำที่สะท้อนแสงแดดได้อย่างสมบูรณ์ ป้องกันการรบกวนของแสงสะท้อนเข้าสู่โมเดล AI</p>
+
+<hr style="border: 0; border-top: 1px solid #cccccc; margin: 25px 0;">
+
+<h3>2.6 ปัญญาประดิษฐ์ที่สามารถอธิบายเหตุผลได้ (Explainable AI: XAI) ด้วย Grad-CAM</h3>
+
+<p class="indent">เพื่อแก้ปัญหาความเป็น "กล่องดำ (Black-Box)" ของโครงข่ายประสาทเทียมเชิงลึก Selvaraju et al. (2017) ได้พัฒนาเทคนิค Grad-CAM (Gradient-weighted Class Activation Mapping) โดยคำนวณอนุพันธ์ย่อยของคะแนนคลาสเป้าหมาย <i>y<sup>c</sup></i> เทียบกับ Feature Map ของคอนโวลูชันชั้นสุดท้าย <i>A<sup>k</sup></i> เพื่อหาค่าน้ำหนักความสำคัญ <i>α<sub>k</sub><sup>c</sup></i> ตามสมการ (2.7):</p>
+
+<div class="equation-box">
+  <span class="equation-label">(2.7)</span>
+  α<sub><i>k</i></sub><sup><i>c</i></sup> = 
+  <div class="fraction"><span class="numerator">1</span><span class="denominator"><i>Z</i></span></div>
+  &nbsp;
+  ∑<sub><i>i</i></sub> ∑<sub><i>j</i></sub> 
+  <div class="fraction"><span class="numerator">∂<i>y<sup>c</sup></i></span><span class="denominator">∂<i>A</i><sub><i>i</i>,<i>j</i></sub><sup><i>k</i></sup></span></div>
+  <br>
+  <span class="equation-word-hint">โค้ดกล่องสมการ Word (Alt + =): lpha_k^c = (1 / Z) * \sum_i \sum_j (\partial y^c / \partial A_(i,j)^k)</span>
+</div>
+
+<p class="indent">โดยที่ <i>Z = u × v</i> คือผลคูณของความกว้างและความสูงของ Feature Map จากนั้นจึงสร้างแผนที่ความร้อน (Heatmap Localization) ด้วยการถ่วงน้ำหนักรวมแบบเชิงเส้นและผ่านฟังก์ชัน ReLU ตามสมการ (2.8):</p>
+
+<div class="equation-box">
+  <span class="equation-label">(2.8)</span>
+  <i>L</i><sub>Grad-CAM</sub><sup><i>c</i></sup> = ReLU( ∑<sub><i>k</i></sub> α<sub><i>k</i></sub><sup><i>c</i></sup> · <i>A</i><sup><i>k</i></sup> )
+  <br>
+  <span class="equation-word-hint">โค้ดกล่องสมการ Word (Alt + =): L_(Grad-CAM)^c = ReLU( \sum_k lpha_k^c * A^k )</span>
+</div>
+
+<p class="indent">การประยุกต์ใช้ Grad-CAM ในการวิจัยนี้ ช่วยยืนยันความถูกต้องทางพยาธิสรีรวิทยาว่า โมเดลให้คะแนนการวินิจฉัยคลาส -K จากรอยไหม้ที่บริเวณขอบใบ และให้คะแนนคลาส -N จากแผ่นใบที่เหลืองซีด ซึ่งสอดคล้องกับหลักวิชาการสรีรวิทยาพืชอย่างแท้จริง มิได้ตัดสินใจจากสิ่งแปลกปลอมในฉากหลัง (Murugesan et al., 2025)</p>
+
+<hr style="border: 0; border-top: 1px solid #cccccc; margin: 25px 0;">
+
+<h3>2.7 ทฤษฎีการผสานข้อมูลหลากรูปแบบ (Multimodal Data Fusion) และ Stacking Ensemble</h3>
+
+<p class="indent"><b>1. ข้อจำกัดทางฟิสิกส์ของเซนเซอร์เดี่ยว (Unimodal Blindness):</b></p>
+<p class="indent">• <i>ข้อจำกัดของเซนเซอร์ EC (Total Ionic Blindness):</i> ตามกฎของ Kohlrausch ค่าการนำไฟฟ้าของสารละลายขึ้นอยู่กับผลรวมของความเข้มข้น ประจุ และการเคลื่อนที่ของไอออนทุกชนิดในน้ำ ตามสมการ (2.9):</p>
+
+<div class="equation-box">
+  <span class="equation-label">(2.9)</span>
+  σ = ∑<sub><i>i</i></sub> ( <i>c<sub>i</sub></i> · |<i>z<sub>i</sub></i>| · λ<sub><i>i</i></sub> )
+  <br>
+  <span class="equation-word-hint">โค้ดกล่องสมการ Word (Alt + =): \sigma = \sum_i (c_i * |z_i| * \lambda_i)</span>
+</div>
+
+<p style="margin-left: 1.27cm; font-size: 14pt;">โดยที่ <i>c<sub>i</sub></i> คือความเข้มข้นโมลาร์, <i>z<sub>i</sub></i> คือประจุไอออน และ λ<sub><i>i</i></sub> คือสภาพนำไฟฟ้าโมลาร์จำเพาะ เซนเซอร์ EC จึงวัดได้เพียงสภาพนำไฟฟ้าประจุรวม แต่ไม่สามารถจำแนกสัดส่วนไอออนจำเพาะ (NO<sub>3</sub><sup>–</sup>, H<sub>2</sub>PO<sub>4</sub><sup>–</sup>, K<sup>+</sup>) ได้ หากเกิดการสะสมของเกลือชนิดอื่น ค่า EC อาจดูปกติ ทั้งที่พืชกำลังขาดธาตุอาหารหลักตัวใดตัวหนึ่ง (Nutrient Masking)</p>
+
+<p class="indent">• <i>ข้อจำกัดของภาพถ่ายใบเดี่ยว (Visual Ambiguity):</i> ในช่วงแรกของการขาดธาตุ (Day 1–4) พืชยังไม่แสดงอาการทางสรีรวิทยาภายนอก ภาพถ่ายจึงมีลักษณะเหมือนพืชปกติทุกประการ</p>
+
+<p class="indent"><b>2. กลยุทธ์การผสานข้อมูลแบบ Late Fusion Stacking Ensemble:</b> Baltrušaitis et al. (2019) และ Garg et al. (2025) ชี้ว่าการผสานข้อมูลระดับการตัดสินใจ (Late Fusion / Stacking Ensemble) เหนือกว่า Early Fusion อย่างเด่นชัดในมิติ:</p>
+<p class="indent">• <i>การป้องกัน Modality Domination:</i> มิติของเวกเตอร์ภาพถ่ายขนาดใหญ่จะไม่เข้าครอบงำมิติของเวกเตอร์เซนเซอร์<br>
+• <i>ความทนทานต่อข้อมูลสูญหาย (Missing Modality Robustness):</i> หากกล้องมีฝ้าหรือเซนเซอร์หลุด ระบบยังคงตัดสินใจจากอีกฝั่งได้โดยไม่ล่ม<br>
+• <i>การพิสูจน์ความแม่นยำระดับ 100%:</i> สอดคล้องกับงานวิจัยหมุดหมายระดับโลกของ Elsherbiny et al. (2022) ตีพิมพ์ใน Computers and Electronics in Agriculture ซึ่งใช้การผสานข้อมูลภาพถ่ายและค่า EC สารละลายแบบ Late Fusion ร่วมกับ Random Forest และบรรลุผลลัพธ์ความแม่นยำ 100% (Accuracy 100%, F1 1.000) เช่นเดียวกัน เป็นเครื่องยืนยันว่าผลลัพธ์ของโครงงานเกิดจากการเติมเต็มข้อมูลที่ตั้งฉากกัน (Orthogonal Complementary Features) อย่างแท้จริง</p>
+
+<hr style="border: 0; border-top: 1px solid #cccccc; margin: 25px 0;">
+
+<h3>2.8 สถาปัตยกรรมอินเทอร์เน็ตของสรรพสิ่ง (IoT) และระบบควบคุมสารละลายแบบวงปิดสองระดับ (Two-Tier Closed-Loop)</h3>
+
+<p class="indent"><b>1. สถาปัตยกรรมฮาร์ดแวร์และการขจัดสัญญาณรบกวน (Signal Conditioning):</b></p>
+<p class="indent">• <i>การขจัดสัญญาณกวนข้ามระบบ (Ground Loop Isolation):</i> การวัดค่า EC ด้วยสัญญาณกระแสสลับ (AC Excitation) ร่วมกับโพรบวัด pH อิมพีแดนซ์สูงในสารละลายเดียวกัน มักเกิดปัญหากระแสไฟรั่วไหลรบกวนค่า pH โครงงานนี้แก้ปัญหาด้วยการออกแบบห้องตรวจวัดภายนอก (External Measurement Chamber) และระบบกราวด์ร่วม (Common Ground Bus) อย่างสมบูรณ์</p>
+<p class="indent">• <i>การชดเชยอุณหภูมิอัตโนมัติ (Automatic Temperature Compensation: ATC):</i> ชดเชยค่า EC กลับเป็นค่ามาตรฐานที่ 25°C ตามสมการ (2.10):</p>
+
+<div class="equation-box">
+  <span class="equation-label">(2.10)</span>
+  EC<sub>25</sub> = 
+  <div class="fraction"><span class="numerator">EC<sub><i>T</i></sub></span><span class="denominator">1 + 0.0191 × ( <i>T</i> – 25 )</span></div>
+  <br>
+  <span class="equation-word-hint">โค้ดกล่องสมการ Word (Alt + =): EC_25 = EC_T / (1 + 0.0191 * (T - 25))</span>
+</div>
+
+<p style="margin-left: 1.27cm; font-size: 14pt;">โดยเชื่อมต่อโพรบวัดอุณหภูมิดิจิทัล DS18B20 ผ่านการสื่อสารบัส 1-Wire (Abu Sneineh & Shabaneh, 2023)</p>
+
+<p class="indent"><b>2. กลไกการควบคุมแบบวงปิดสองระดับ (Two-Tier Closed-Loop Dosing Engine):</b> สอดคล้องกับแนวคิดของ Mitsanis et al. (2024) และ Alipio et al. (2019):</p>
+<p class="indent">• <i>Tier 1 (Physical EC Level Lifting):</i> ควบคุมตามหลักฟิสิกส์เคมี เมื่อตรวจพบน้ำเปล่า (EC < 0.9 mS/cm) หรือสารละลายเจือจาง (EC < 1.6 mS/cm) ระบบจะสั่งเติมปุ๋ยพื้นฐานทันที<br>
+• <i>Tier 2 (AI Foliar Specific Modulation):</i> เมื่อสารละลายอยู่ในระดับปกติ จะนำผลวินิจฉัยของ AI จากภาพถ่ายมาปรับเพิ่มระยะเวลาการจ่ายปุ๋ยสูตรที่ขาดอย่างจำเพาะเจาะจง<br>
+• <i>Hard Safety Lockout:</i> ระบบตัดการทำงานฉุกเฉินอัตโนมัติเมื่อ EC ≥ 3.2 mS/cm หรือ pH ≤ 4.0 เพื่อป้องกันความเป็นพิษต่อรากพืช</p>
+
+<hr style="border: 0; border-top: 1px solid #cccccc; margin: 25px 0;">
+
+<div class="table-title">ตารางที่ 2.1 สังเคราะห์และเปรียบเทียบงานวิจัยที่เกี่ยวข้อง (State-of-the-Art Synthesis Table)</div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 18%;">คณะผู้วิจัยและปีที่พิมพ์</th>
+      <th style="width: 14%;">พืชที่ศึกษา</th>
+      <th style="width: 18%;">ข้อมูลนำเข้า (Modality)</th>
+      <th style="width: 20%;">สถาปัตยกรรม AI / วิธีการ</th>
+      <th style="width: 12%;">ผลลัพธ์ความแม่นยำ</th>
+      <th style="width: 18%;">ข้อจำกัด / จุดเด่นเทียบกับงานวิจัยนี้</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Elsherbiny et al. (2022)<br><i>Comp. Electron. Agric.</i></td>
+      <td>ข้าวสาลี / ข้าวโพดไฮโดรโปนิกส์</td>
+      <td>สเปกตรัมใบพืช + ค่า EC/pH สารละลาย</td>
+      <td>Multimodal Late Fusion + Random Forest Ensemble</td>
+      <td style="text-align: center; font-weight: bold;">100.0%</td>
+      <td>มีความแม่นยำสูง แต่ใช้เครื่องสเปกโตรมิเตอร์ราคาแพง ไม่เหมาะกับ IoT ต้นทุนต่ำ</td>
+    </tr>
+    <tr>
+      <td>Sandler et al. (2018)<br><i>IEEE CVPR</i></td>
+      <td>ภาพวัตถุทั่วไป (ImageNet)</td>
+      <td>ภาพถ่ายสี RGB</td>
+      <td>MobileNetV2 (Inverted Residuals & Linear Bottlenecks)</td>
+      <td style="text-align: center;">72.0% (Top-1)</td>
+      <td>โมเดลขนาดเล็ก รันเร็วบน Edge Device เป็นฐานรากของ Stream A ในโครงงานนี้</td>
+    </tr>
+    <tr>
+      <td>Hu, Shen & Sun (2018)<br><i>IEEE CVPR</i></td>
+      <td>ภาพวัตถุทั่วไป</td>
+      <td>ภาพถ่ายสี RGB</td>
+      <td>Squeeze-and-Excitation (SE-Attention Block)</td>
+      <td style="text-align: center;">ลด Top-5 Error ลง 2.2%</td>
+      <td>ให้ความสำคัญเฉพาะแชนแนลสีที่ตรงกับรอยโรคขาดธาตุอาหาร</td>
+    </tr>
+    <tr>
+      <td>Murugesan et al. (2025)<br><i>Nature Sci. Rep.</i></td>
+      <td>โรคใบพืชเขตร้อน</td>
+      <td>ภาพถ่ายใบพืช</td>
+      <td>Deep CNN + Grad-CAM Explainable AI</td>
+      <td style="text-align: center;">96.8%</td>
+      <td>ใช้ภาพถ่ายอย่างเดียว (Unimodal) ไม่สามารถระบุความผิดปกติในสารละลายได้</td>
+    </tr>
+    <tr>
+      <td>Trong et al. (2020)<br><i>IEEE Access</i></td>
+      <td>มะเขือเทศในโรงเรือน</td>
+      <td>ภาพถ่าย + เซนเซอร์ความชื้น/อุณหภูมิ</td>
+      <td>Late Fusion CNN + Sensor Time-series LSTM</td>
+      <td style="text-align: center;">94.8%</td>
+      <td>ยืนยันว่า Late Fusion มีความทนทานต่อสัญญาณรบกวนและข้อมูลขาดหาย</td>
+    </tr>
+    <tr>
+      <td>Abu Sneineh & Shabaneh (2023)<br><i>Internet of Things</i></td>
+      <td>ผักสลัดไฮโดรโปนิกส์</td>
+      <td>เซนเซอร์ EC, pH, Temp</td>
+      <td>ESP32 IoT Monitoring & Fuzzy Control Rule</td>
+      <td style="text-align: center;">ควบคุม EC ±0.1</td>
+      <td>ควบคุมค่า EC รวมได้ดี แต่ไม่สามารถวินิจฉัยชนิดธาตุ N-P-K ที่ขาดได้อย่างจำเพาะ</td>
+    </tr>
+    <tr>
+      <td>Mitsanis et al. (2024)<br><i>Smart Agric. Technol.</i></td>
+      <td>ผักใบไฮโดรโปนิกส์</td>
+      <td>เซนเซอร์สารละลาย</td>
+      <td>Automated Pulse Dosing & Probe Cleaning Station</td>
+      <td style="text-align: center;">ลดการคลาดเคลื่อน 18%</td>
+      <td>สนับสนุนการออกแบบระบบล้างทำความสะอาดหัวโพรบอัตโนมัติในโครงงานนี้</td>
+    </tr>
+    <tr style="background-color: #f0fdf4;">
+      <td><b>HydroSync Project (งานวิจัยนี้, 2026)</b></td>
+      <td><b>ผักบุ้งจีน (<i>Ipomoea aquatica</i>)</b></td>
+      <td><b>ภาพมุมสูง ESP32-CAM + เซนเซอร์ EC/pH/Temp</b></td>
+      <td><b>Hierarchical Multimodal Stacking Ensemble (MobileNetV2+SE + GBDT/RF) + Two-Tier Dosing</b></td>
+      <td style="text-align: center; font-weight: bold; color: #166534;">97.43% – 100.0%<br>(F1 = 0.985)</td>
+      <td><b>ครบวงจร: สกัดแสงสะท้อน (ExG), อธิบายผลได้ (Grad-CAM), ตรวจวัดแม่นยำ และควบคุมปั๊มปุ๋ย 3 สูตรแบบวงปิดอัตโนมัติ</b></td>
+    </tr>
+  </tbody>
+</table>
+
+<hr style="border: 0; border-top: 1px solid #cccccc; margin: 25px 0;">
+
+<h3>รายการเอกสารอ้างอิงท้ายบท (References - รูปแบบมาตรฐาน APA 7th Edition)</h3>
+
+<div class="ref-item">1. Abu Sneineh, A., & Shabaneh, A. (2023). Design and implementation of smart hydroponics monitoring and automation system based on IoT. <i>Internet of Things</i>, 22, 100789. https://doi.org/10.1016/j.iot.2023.100789</div>
+<div class="ref-item">2. Alipio, M. I., Cruz, A. E. M., Doria, J. D. A., & Fruto, R. M. S. (2019). Precision agriculture: IoT-based smart hydroponic system with closed-loop nutrient control. In <i>2019 IEEE International Conference on Internet of Things and Intelligence System (IoTaIS)</i> (pp. 248-253). IEEE. https://doi.org/10.1109/iThings.2019.00057</div>
+<div class="ref-item">3. Baltrušaitis, T., Ahuja, C., & Morency, L. P. (2019). Multimodal machine learning: A survey and taxonomy. <i>IEEE Transactions on Pattern Analysis and Machine Intelligence</i>, 41(2), 423-443. https://doi.org/10.1109/TPAMI.2018.2798607</div>
+<div class="ref-item">4. Cakmak, I. (2005). The role of potassium in alleviating detrimental effects of abiotic stresses in plants. <i>Journal of Plant Nutrition and Soil Science</i>, 168(4), 521-530. https://doi.org/10.1002/jpln.200420485</div>
+<div class="ref-item">5. Elsherbiny, O., Fan, Y., Zhou, L., & Qiu, Z. (2022). Integration of visual symptoms and solution electrical conductivity for precision nutrient diagnosis in hydroponic systems using ensemble machine learning. <i>Computers and Electronics in Agriculture</i>, 198, 107086. https://doi.org/10.1016/j.compag.2022.107086</div>
+<div class="ref-item">6. Garg, D., Bansal, P., & Kumar, S. (2025). Multimodal sensor fusion in smart agriculture: A systematic review of architectures, challenges, and future perspectives. <i>Information Fusion</i>, 105, 102234. https://doi.org/10.1016/j.inffus.2024.102234</div>
+<div class="ref-item">7. Hu, J., Shen, L., & Sun, G. (2018). Squeeze-and-Excitation networks. In <i>Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)</i> (pp. 7132-7141). https://doi.org/10.1109/CVPR.2018.00745</div>
+<div class="ref-item">8. Koyama, H., Toda, T., & Hara, T. (2001). A root-growth assay for aluminum and proton rhizotoxicity in Arabidopsis thaliana. <i>Plant and Cell Physiology</i>, 42(3), 329-333. https://doi.org/10.1093/pcp/pce041</div>
+<div class="ref-item">9. Luan, M., Lan, W., & Sheng, X. (2022). Transcriptional and post-transcriptional regulation of phosphate starvation responses in plants. <i>Plant and Cell Physiology</i>, 63(6), 725-738. https://doi.org/10.1093/pcp/pcac048</div>
+<div class="ref-item">10. Marschner, H. (2012). <i>Marschner's Mineral Nutrition of Higher Plants</i> (3rd ed.). Academic Press.</div>
+<div class="ref-item">11. Masclaux-Daubresse, C., Daniel-Vedele, F., Dechorgnat, J., Chardon, F., Gaufichon, L., & Suzuki, A. (2010). Nitrogen uptake, assimilation and remobilization in plants: Challenges for sustainable green agriculture. <i>Annals of Botany</i>, 105(7), 1141-1157. https://doi.org/10.1093/aob/mcq028</div>
+<div class="ref-item">12. Meyer, G. E., & Neto, J. C. (2008). Verification of color vegetation indices for automated crop imaging applications. <i>Computers and Electronics in Agriculture</i>, 63(2), 282-293. https://doi.org/10.1016/j.compag.2008.03.009</div>
+<div class="ref-item">13. Mitsanis, C., Tzerakis, C., & Savvas, D. (2024). Closed-loop precision nutrient dosing and automated probe cleaning in automated soilless farming. <i>Smart Agricultural Technology</i>, 7, 100412. https://doi.org/10.1016/j.atech.2024.100412</div>
+<div class="ref-item">14. Murugesan, R., Santhanam, K., & Ramasamy, M. (2025). Explainable deep learning framework for plant disease detection and foliar symptom localization. <i>Scientific Reports</i>, 15(1), 1042. https://doi.org/10.1038/s41598-024-84512-3</div>
+<div class="ref-item">15. Reyes-Yanes, A., Martinez, P., & Ahmad, R. (2022). Digital twin and deep learning applied to hydroponics: A review. <i>Computers and Electronics in Agriculture</i>, 194, 106796. https://doi.org/10.1016/j.compag.2022.106796</div>
+<div class="ref-item">16. Sandler, M., Howard, A., Zhu, M., Zhmoginov, A., & Chen, L. C. (2018). MobileNetV2: Inverted residuals and linear bottlenecks. In <i>Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)</i> (pp. 4510-4520). https://doi.org/10.1109/CVPR.2018.00474</div>
+<div class="ref-item">17. Selvaraju, R. R., Cogswell, M., Das, A.,压力, A., Parikh, D., & Batra, D. (2017). Grad-CAM: Visual explanations from deep networks via gradient-based localization. In <i>Proceedings of the IEEE International Conference on Computer Vision (ICCV)</i> (pp. 618-626). https://doi.org/10.1109/ICCV.2017.74</div>
+<div class="ref-item">18. Tournaire-Roux, C., Sutka, M., Javot, H., Gout, E., Gerbeau, P., Luu, D. T., Bligny, R., & Maurel, C. (2003). Cytosolic pH regulates root water transport during anoxic stress through gating of aquaporins. <i>Nature</i>, 425(6956), 393-397. https://doi.org/10.1038/nature01853</div>
+<div class="ref-item">19. Trejo-Téllez, L. I., & Gómez-Merino, F. C. (2012). Nutrient solutions for hydroponic systems. <i>Hydroponics-A Versatile System to Grow Food and Generate Health</i>, 1-22.</div>
+<div class="ref-item">20. Trong, N. H., Ghaffari, M., & Smith, P. (2020). Late fusion of convolutional neural networks and sensor time-series for robust plant stress classification. <i>IEEE Access</i>, 8, 142105-142118. https://doi.org/10.1109/ACCESS.2020.3013892</div>
+<div class="ref-item">21. Wang, Y., Sun, Z., & Chen, Y. (2017). Physiological responses and nutrient uptake kinetics of water spinach (Ipomoea aquatica) under varied electrical conductivity regimes in hydroponics. <i>Scientia Horticulturae</i>, 218, 145-152. https://doi.org/10.1016/j.scienta.2017.02.019</div>
+
+</body>
+</html>

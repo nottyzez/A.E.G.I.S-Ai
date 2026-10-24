@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>ตารางที่ 4.3 สำหรับ Microsoft Word</title>
+<style>
+  @page {
+    size: A4;
+    margin: 2.54cm 2.54cm 2.54cm 3.81cm;
+  }
+  body {
+    font-family: 'TH Sarabun New', 'TH Sarabun PSK', sans-serif;
+    font-size: 16pt;
+    line-height: 1.25;
+    color: #000;
+  }
+  h2 {
+    font-size: 16pt;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  p {
+    margin-bottom: 12px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 25px;
+    font-size: 14pt;
+  }
+  th, td {
+    border: 1px solid #333;
+    padding: 6px 8px;
+    vertical-align: middle;
+  }
+  th {
+    background-color: #f2f2f2;
+    text-align: center;
+    font-weight: bold;
+  }
+  .group-header {
+    background-color: #e5e7eb;
+    font-weight: bold;
+    text-align: left;
+    padding-left: 10px;
+  }
+  .highlight-row {
+    background-color: #f0fdf4;
+    font-weight: bold;
+  }
+  .text-center {
+    text-align: center;
+  }
+  .text-left {
+    text-align: left;
+  }
+  .note {
+    font-size: 12pt;
+    color: #4b5563;
+    margin-top: -15px;
+    margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+
+<h2>รูปแบบที่ 1: ตารางเดี่ยวจัดกลุ่มตามประเภทข้อมูล (Spacious Grouped Table - 6 คอลัมน์)</h2>
+<p><b>ตารางที่ 4.3: ผลการเปรียบเทียบประสิทธิภาพความแม่นยำ (Accuracy) และคะแนน Macro F1-Score ของโมเดลย่อยในสถาปัตยกรรม A.E.G.I.S.</b></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="width: 32%;">โมเดล / สถาปัตยกรรม (Model Component)</th>
+      <th style="width: 18%;">ความแม่นยำ Acc (%)<br><small style="font-weight:normal;">(หลังคัดกรอง / เดิม)</small></th>
+      <th style="width: 12%;">Precision<br>(%)</th>
+      <th style="width: 12%;">Recall<br>(%)</th>
+      <th style="width: 12%;">Macro<br>F1-Score</th>
+      <th style="width: 14%;">ช่วงความเชื่อมั่น<br>95% CI</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan="6" class="group-header">1. เกณฑ์เปรียบเทียบพื้นฐาน (Baseline)</td>
+    </tr>
+    <tr>
+      <td>Naive Majority Baseline</td>
+      <td class="text-center">46.34%</td>
+      <td class="text-center">11.59%</td>
+      <td class="text-center">25.00%</td>
+      <td class="text-center">0.1583</td>
+      <td class="text-center">[31.7%, 61.0%]</td>
+    </tr>
+    <tr>
+      <td colspan="6" class="group-header">2. สายข้อมูลเซนเซอร์สารละลายธาตุอาหาร (Stream B: Solution Sensors)</td>
+    </tr>
+    <tr>
+      <td>Sensor B0: Logistic Regression (Baseline)</td>
+      <td class="text-center">82.93%</td>
+      <td class="text-center">82.02%</td>
+      <td class="text-center">80.98%</td>
+      <td class="text-center">0.8141</td>
+      <td class="text-center">[70.7%, 92.7%]</td>
+    </tr>
+    <tr>
+      <td>Sensor B1: Gradient Boosting (GBDT)</td>
+      <td class="text-center">100.00%</td>
+      <td class="text-center">100.00%</td>
+      <td class="text-center">100.00%</td>
+      <td class="text-center">1.0000</td>
+      <td class="text-center">[100.0%, 100.0%]</td>
+    </tr>
+    <tr>
+      <td>Sensor B2: Random Forest</td>
+      <td class="text-center">97.56%</td>
+      <td class="text-center">97.50%</td>
+      <td class="text-center">96.88%</td>
+      <td class="text-center">0.9702</td>
+      <td class="text-center">[92.6%, 100.0%]</td>
+    </tr>
+    <tr>
+      <td>Sensor B3: Extra Trees</td>
+      <td class="text-center">92.68%</td>
+      <td class="text-center">92.68%</td>
+      <td class="text-center">88.75%</td>
+      <td class="text-center">0.9027</td>
+      <td class="text-center">[82.9%, 100.0%]</td>
+    </tr>
+    <tr style="background-color: #f8fafc; font-weight: bold;">
+      <td>Stream B: Sensor Ensemble (Soft Vote)</td>
+      <td class="text-center">97.56%</td>
+      <td class="text-center">97.50%</td>
+      <td class="text-center">96.88%</td>
+      <td class="text-center">0.9702</td>
+      <td class="text-center">[92.6%, 100.0%]</td>
+    </tr>
+    <tr>
+      <td colspan="6" class="group-header">3. สายข้อมูลภาพถ่ายพุ่มใบ (Stream A: Computer Vision)</td>
+    </tr>
+    <tr>
+      <td>Vision A1: MobileNetV2 (Two-Stage FT)</td>
+      <td class="text-center">85.37% <small style="color:#666;">(เดิม 65.91%)</small></td>
+      <td class="text-center">84.13%</td>
+      <td class="text-center">79.59%</td>
+      <td class="text-center">0.8097</td>
+      <td class="text-center">[73.2%, 95.1%]</td>
+    </tr>
+    <tr>
+      <td>Vision A2: Multi-Scale SE-Attention CNN</td>
+      <td class="text-center">90.24% <small style="color:#666;">(เดิม 50.00%)</small></td>
+      <td class="text-center">86.25%</td>
+      <td class="text-center">87.37%</td>
+      <td class="text-center">0.8618</td>
+      <td class="text-center">[80.5%, 97.6%]</td>
+    </tr>
+    <tr>
+      <td>Vision A3: Foliar Color-Texture Expert</td>
+      <td class="text-center">87.80% <small style="color:#666;">(เดิม 61.36%)</small></td>
+      <td class="text-center">92.87%</td>
+      <td class="text-center">79.44%</td>
+      <td class="text-center">0.8231</td>
+      <td class="text-center">[75.6%, 97.6%]</td>
+    </tr>
+    <tr style="background-color: #f8fafc; font-weight: bold;">
+      <td>Stream A: Vision Ensemble (A1+A2+A3)</td>
+      <td class="text-center">95.12% <small style="color:#666;">(เดิม 72.73%)</small></td>
+      <td class="text-center">97.62%</td>
+      <td class="text-center">90.00%</td>
+      <td class="text-center">0.9250</td>
+      <td class="text-center">[87.8%, 100.0%]</td>
+    </tr>
+    <tr>
+      <td colspan="6" class="group-header">4. สถาปัตยกรรมผสานข้อมูลหลากรูปแบบ (Multimodal Late-Fusion)</td>
+    </tr>
+    <tr class="highlight-row">
+      <td>A.E.G.I.S. Hierarchical Late-Fusion</td>
+      <td class="text-center">100.00% <small style="color:#166534;">(+27.27%)</small></td>
+      <td class="text-center">100.00%</td>
+      <td class="text-center">100.00%</td>
+      <td class="text-center">1.0000</td>
+      <td class="text-center">[100.0%, 100.0%]</td>
+    </tr>
+  </tbody>
+</table>
+
+<hr style="border: 0; border-top: 1px dashed #aaa; margin: 30px 0;">
+
+<h2>รูปแบบที่ 2: แยกเป็น 2 ตารางย่อย (Sub-tables ก และ ข - มาตรฐานวิทยานิพนธ์ อ่านง่าย โล่งที่สุด)</h2>
+
+<p><b>ตารางที่ 4.3 (ก): ผลของการคัดกรองอาการระยะแฝง (Symptom-Gated Filtering) ต่อโมเดลภาพถ่าย Stream A</b></p>
+<table>
+  <thead>
+    <tr>
+      <th style="width: 38%;">โมเดลวิทัศน์คอมพิวเตอร์ (Stream A)</th>
+      <th style="width: 20%;">ความแม่นยำเดิม<br>(ก่อนคัดกรอง Ungated)</th>
+      <th style="width: 20%;">ความแม่นยำใหม่<br>(หลังคัดกรอง Gated)</th>
+      <th style="width: 22%;">ผลต่างความแม่นยำที่เพิ่มขึ้น (Δ %)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Vision A1: MobileNetV2 (Two-Stage FT)</td>
+      <td class="text-center">65.91%</td>
+      <td class="text-center" style="font-weight: bold;">85.37%</td>
+      <td class="text-center" style="color: #166534; font-weight: bold;">+19.46%</td>
+    </tr>
+    <tr>
+      <td>Vision A2: Multi-Scale SE-Attention CNN</td>
+      <td class="text-center">50.00%</td>
+      <td class="text-center" style="font-weight: bold;">90.24%</td>
+      <td class="text-center" style="color: #166534; font-weight: bold;">+40.24%</td>
+    </tr>
+    <tr>
+      <td>Vision A3: Foliar Color-Texture (44-D LAB/ExG)</td>
+      <td class="text-center">61.36%</td>
+      <td class="text-center" style="font-weight: bold;">87.80%</td>
+      <td class="text-center" style="color: #166534; font-weight: bold;">+26.44%</td>
+    </tr>
+    <tr class="highlight-row">
+      <td>Stream A: Vision Ensemble (A1+A2+A3)</td>
+      <td class="text-center">72.73%</td>
+      <td class="text-center">95.12%</td>
+      <td class="text-center" style="color: #166534;">+22.39%</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><b>ตารางที่ 4.3 (ข): การเปรียบเทียบประสิทธิภาพขั้นสุดท้ายระหว่างโมเดลเดี่ยวและสถาปัตยกรรม A.E.G.I.S.</b></p>
+<table>
+  <thead>
+    <tr>
+      <th style="width: 35%;">สถาปัตยกรรมโมเดล (Model Architecture)</th>
+      <th style="width: 13%;">Accuracy (%)</th>
+      <th style="width: 13%;">Precision (%)</th>
+      <th style="width: 13%;">Recall (%)</th>
+      <th style="width: 13%;">Macro F1</th>
+      <th style="width: 13%;">95% CI</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Naive Majority Baseline</td>
+      <td class="text-center">46.34%</td>
+      <td class="text-center">11.59%</td>
+      <td class="text-center">25.00%</td>
+      <td class="text-center">0.1583</td>
+      <td class="text-center">[31.7%, 61.0%]</td>
+    </tr>
+    <tr>
+      <td>Sensor B0: Logistic Regression (Baseline)</td>
+      <td class="text-center">82.93%</td>
+      <td class="text-center">82.02%</td>
+      <td class="text-center">80.98%</td>
+      <td class="text-center">0.8141</td>
+      <td class="text-center">[70.7%, 92.7%]</td>
+    </tr>
+    <tr>
+      <td>Sensor B1: Gradient Boosting (GBDT)</td>
+      <td class="text-center">100.00%</td>
+      <td class="text-center">100.00%</td>
+      <td class="text-center">100.00%</td>
+      <td class="text-center">1.0000</td>
+      <td class="text-center">[100.0%, 100.0%]</td>
+    </tr>
+    <tr>
+      <td>Sensor B2: Random Forest</td>
+      <td class="text-center">97.56%</td>
+      <td class="text-center">97.50%</td>
+      <td class="text-center">96.88%</td>
+      <td class="text-center">0.9702</td>
+      <td class="text-center">[92.6%, 100.0%]</td>
+    </tr>
+    <tr style="background-color: #f8fafc; font-weight: bold;">
+      <td>Stream B: Sensor Ensemble (Soft Vote)</td>
+      <td class="text-center">97.56%</td>
+      <td class="text-center">97.50%</td>
+      <td class="text-center">96.88%</td>
+      <td class="text-center">0.9702</td>
+      <td class="text-center">[92.6%, 100.0%]</td>
+    </tr>
+    <tr style="background-color: #f8fafc; font-weight: bold;">
+      <td>Stream A: Vision Ensemble (Gated)</td>
+      <td class="text-center">95.12%</td>
+      <td class="text-center">97.62%</td>
+      <td class="text-center">90.00%</td>
+      <td class="text-center">0.9250</td>
+      <td class="text-center">[87.8%, 100.0%]</td>
+    </tr>
+    <tr class="highlight-row">
+      <td>A.E.G.I.S. Multimodal Late-Fusion</td>
+      <td class="text-center">100.00%</td>
+      <td class="text-center">100.00%</td>
+      <td class="text-center">100.00%</td>
+      <td class="text-center">1.0000</td>
+      <td class="text-center">[100.0%, 100.0%]</td>
+    </tr>
+  </tbody>
+</table>
+
+</body>
+</html>

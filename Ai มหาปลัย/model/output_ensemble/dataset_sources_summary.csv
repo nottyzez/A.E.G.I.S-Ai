@@ -1,0 +1,6 @@
+﻿source_id,source_name,crop_species,license,healthy_count,nitrogen_count,phosphorus_count,potassium_count,total_images,symptom_verified_count,pre_symptomatic_filtered
+SRC-01,Hydroponic Water Spinach 23.3L DWC Foam Tanks (3-Layer Cropped),Ipomoea aquatica (ผักบุ้งจีนไฮโดรโปนิกส์),Project Primary Experimental Dataset (2026),19,19,19,19,76,30,46
+SRC-02,Hydroponic Water Spinach 750ml Cup Replicates (3-Layer Cropped),Ipomoea aquatica (ผักบุ้งจีนไฮโดรโปนิกส์),Project Primary Experimental Dataset (2026),4,4,4,4,16,9,7
+SRC-03,External Open-Access Plant Nutrient Deficiency Dataset,Leafy Green Reference,CC-BY / Open Access Academic,22,14,12,18,66,35,31
+SRC-04,High-Res Individual Plant-Hole Foliage Sub-Patches (ExG Segmented),Single-Hole Foliage Sub-Patch (Ipomoea aquatica),Project Internal Research Data,18,20,9,19,66,28,38
+SRC-05,Agronomic CIELAB/HSV Symptom-Calibrated Leaf Reference Set,Calibrated Water Spinach Leaf (Ipomoea aquatica),Academic Reference Synthesis (Derived from Plant Physiology Standards),20,20,20,20,80,80,0

@@ -1,0 +1,12 @@
+﻿model_name,key,ungated_acc,combined_acc,combined_f1,combined_precision,combined_recall,ci95_low,ci95_high,real_holdout_acc,real_holdout_f1
+Naive Majority Baseline,naive,0.4634,0.4634,0.1583,0.1159,0.25,0.3171,0.6104,0.2381,0.0962
+Sensor B0: Logistic Regression (Baseline),P_B0,0.8293,0.8293,0.8141,0.8202,0.8098,0.7073,0.9268,0.7619,0.7636
+Sensor B1: Gradient Boosting,P_B1,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+Sensor B2: Random Forest,P_B2,0.9756,0.9756,0.9702,0.975,0.9688,0.9262,1.0,1.0,1.0
+Sensor B3: Extra Trees,P_B3,0.9268,0.9268,0.9027,0.9268,0.8875,0.8293,1.0,0.9048,0.904
+Stream B: Sensor Ensemble (Soft Vote),P_sen_ens,0.9756,0.9756,0.9702,0.975,0.9688,0.9262,1.0,1.0,1.0
+Vision A1: MobileNetV2 (Symptom-Gated FT),P_A1,0.6591,0.8537,0.8097,0.8413,0.7959,0.7317,0.9512,0.619,0.6074
+Vision A2: Multi-Scale SE-Attention CNN,P_A2,0.5,0.9024,0.8618,0.8625,0.8737,0.8049,0.9756,0.381,0.322
+Vision A3: Foliar Color-Texture Expert (44-D LAB/ExG),P_A3,0.6136,0.878,0.8231,0.9287,0.7944,0.7561,0.9756,0.381,0.3279
+Stream A: Vision Ensemble (A1+A2+A3 Symptom-Gated),P_img_ens,0.7273,0.9512,0.925,0.9762,0.9,0.878,1.0,0.381,0.322
+Hierarchical Multimodal Late-Fusion (w=0.55/0.45),P_fusion,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.7143,0.7326

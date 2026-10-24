@@ -1,0 +1,3152 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydroSync — ระบบติดตามและวิเคราะห์ถังควบคุมมาตรฐาน (Control Tank 23.3L)</title>
+    <!-- Fonts: Kanit + Plus Jakarta Sans + JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Kanit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Chart.js + date adapter -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <!-- GSAP + ScrollTrigger for React Bits <AnimatedContent /> engine -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <!-- Real Data, Images & Trained Ensemble Predictions manifests -->
+    <script src="data/sensor_data.js"></script>
+    <script src="data/images_manifest.js"></script>
+    <script src="data/ensemble_predictions.js"></script>
+
+    <style>
+        :root {
+            /* Forest Mist Glassmorphism Palette (Extracted from forest_bg.png) */
+            --bg-h: 145;
+            --bg-s: 16%;
+            --bg-l: 88%;
+
+            /* Core Mist & Pine Surfaces (Original 24px Blur & 165% Saturate) */
+            --glass-blur: 24px;
+            --glass-saturate: 165%;
+            --shell-surface: rgba(232, 239, 234, 0.34);
+            --shell-border: rgba(255, 255, 255, 0.72);
+            --glass-surface: rgba(244, 248, 245, 0.80);
+            --glass-surface-hover: rgba(250, 253, 251, 0.92);
+            --glass-surface-subtle: rgba(235, 242, 237, 0.62);
+            --glass-border: rgba(255, 255, 255, 0.86);
+            --glass-shadow: 0 20px 44px -14px rgba(14, 30, 21, 0.22), 0 2px 6px rgba(14, 30, 21, 0.06);
+            --glass-shadow-inner: inset 0 1px 1px 0 rgba(255, 255, 255, 0.92);
+
+            /* Harmonized Forest Ink Typography (Tinted from Evergreen Hue, >= 4.5:1 contrast) */
+            --text-primary: #0f2117;
+            --text-secondary: #284235;
+            --text-muted: #3d5a4b;
+            --text-on-accent: #f4f9f6;
+
+            /* Primary Accent & Nutrient Semantic Tokens */
+            --accent-primary: #1e4d38;
+            --accent-primary-hover: #153828;
+            --accent-soft: rgba(30, 77, 56, 0.12);
+            --accent-bar: #2a6b4e;
+            --accent-bar-track: rgba(30, 77, 56, 0.14);
+
+            --color-control: #1e5e41;
+            --color-n: #b45309;
+            --color-p: #435f5b;
+            --color-k: #854d0e;
+
+            /* Pill States */
+            --pill-active-bg: #1e4d38;
+            --pill-active-text: #ffffff;
+            --pill-active-shadow: 0 4px 12px rgba(10, 22, 14, 0.22);
+
+            --trans-smooth: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Deep Evergreen Night Mode (High Contrast & Crisp Button Surfaces) */
+        body.dark-mode {
+            --shell-surface: rgba(12, 22, 17, 0.62);
+            --shell-border: rgba(185, 224, 202, 0.28);
+            --glass-surface: rgba(15, 28, 21, 0.84);
+            --glass-surface-hover: rgba(24, 45, 34, 0.92);
+            --glass-surface-subtle: rgba(20, 38, 29, 0.78);
+            --glass-border: rgba(167, 243, 208, 0.24);
+            --glass-shadow: 0 24px 52px -12px rgba(3, 8, 5, 0.72);
+            --glass-shadow-inner: inset 0 1px 1px 0 rgba(208, 238, 220, 0.18);
+
+            --text-primary: #f4fbf7;
+            --text-secondary: #d5e8dd;
+            --text-muted: #a8c7b5;
+            --text-on-accent: #ffffff;
+
+            --accent-primary: #2d8a61;
+            --accent-primary-hover: #3ca376;
+            --accent-soft: rgba(52, 168, 115, 0.26);
+            --accent-bar: #4ade80;
+            --accent-bar-track: rgba(167, 243, 208, 0.18);
+
+            --color-control: #34d399;
+            --color-n: #fbbf24;
+            --color-p: #7dd3fc;
+            --color-k: #fb923c;
+
+            --pill-active-bg: #297a56;
+            --pill-active-text: #ffffff;
+        }
+
+        /* Dark Mode Overrides for Buttons, Chips, Presets, and Dividers */
+        body.dark-mode .corner-arrow-btn,
+        body.dark-mode .step-arrow-btn,
+        body.dark-mode .close-drawer-btn {
+            background: rgba(38, 70, 54, 0.82);
+            border-color: rgba(167, 243, 208, 0.28);
+            color: #e6f7ed;
+        }
+
+        body.dark-mode .corner-arrow-btn:hover,
+        body.dark-mode .step-arrow-btn:hover,
+        body.dark-mode .close-drawer-btn:hover {
+            background: var(--accent-primary);
+            border-color: #6ee7b7;
+            color: #ffffff;
+        }
+
+        body.dark-mode .preset-pill {
+            background: rgba(28, 52, 40, 0.88);
+            border-color: rgba(167, 243, 208, 0.26);
+            color: #f0fdf4;
+        }
+
+        body.dark-mode .preset-pill:hover {
+            background: rgba(42, 78, 60, 0.96);
+            border-color: rgba(167, 243, 208, 0.45);
+        }
+
+        body.dark-mode .system-mode-btn:not(.active),
+        body.dark-mode .nav-pill-btn:not(.active),
+        body.dark-mode .range-pill:not(.active),
+        body.dark-mode .chart-tab-btn:not(.active) {
+            background: rgba(255, 255, 255, 0.07);
+            color: #d8ece0;
+        }
+
+        body.dark-mode .system-mode-btn:not(.active):hover,
+        body.dark-mode .nav-pill-btn:not(.active):hover,
+        body.dark-mode .range-pill:not(.active):hover,
+        body.dark-mode .chart-tab-btn:not(.active):hover {
+            background: rgba(255, 255, 255, 0.14);
+            color: #ffffff;
+        }
+
+        body.dark-mode .time-range-pills,
+        body.dark-mode .chart-type-tabs {
+            background: rgba(12, 24, 18, 0.72);
+            border-color: rgba(167, 243, 208, 0.20);
+        }
+
+        body.dark-mode .meta-chip {
+            background: rgba(52, 168, 115, 0.22);
+            color: #ecfdf5;
+            border: 1px solid rgba(167, 243, 208, 0.20);
+        }
+
+        body.dark-mode .chart-delta-pill {
+            background: rgba(52, 211, 153, 0.20);
+            color: #6ee7b7;
+        }
+
+        body.dark-mode .peek-badge {
+            background: rgba(52, 211, 153, 0.22);
+            color: #6ee7b7;
+        }
+
+        body.dark-mode .peek-pill-indicator {
+            background: rgba(167, 243, 208, 0.35);
+        }
+
+        body.dark-mode .deficiency-card:hover {
+            background: rgba(34, 62, 48, 0.92);
+            border-color: rgba(167, 243, 208, 0.35);
+        }
+
+        body.dark-mode #cardDefN .deficiency-tag {
+            background: rgba(251, 191, 36, 0.20) !important;
+            color: #fde68a !important;
+        }
+
+        body.dark-mode #cardDefP .deficiency-tag {
+            background: rgba(125, 211, 252, 0.20) !important;
+            color: #bae6fd !important;
+        }
+
+        body.dark-mode #cardDefK .deficiency-tag {
+            background: rgba(251, 146, 60, 0.20) !important;
+            color: #fed7aa !important;
+        }
+
+        body.dark-mode .temp-spotlight,
+        body.dark-mode .mini-day-box + .mini-day-box,
+        body.dark-mode .kpi-mini-card + .kpi-mini-card {
+            border-color: rgba(167, 243, 208, 0.16);
+        }
+
+        body.dark-mode .conditions-Cycle-strip,
+        body.dark-mode .kpi-trio-grid,
+        body.dark-mode .equipment-row-card + .equipment-row-card,
+        body.dark-mode .assistant-compact-bar,
+        body.dark-mode .deficiency-metrics-row {
+            border-color: rgba(167, 243, 208, 0.16);
+        }
+
+        /* Browser Surfaces (Selection, Scrollbars, Focus Rings, Tabular Numerals) */
+        ::selection {
+            background: rgba(30, 77, 56, 0.24);
+            color: var(--text-primary);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(218, 225, 217, 0.35);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(40, 66, 53, 0.32);
+            border-radius: 999px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(30, 77, 56, 0.55);
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Kanit', 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            color: var(--text-primary);
+            background-color: #c7d1c8;
+            background-image:
+                linear-gradient(180deg, rgba(218, 225, 217, 0.18) 0%, rgba(16, 27, 19, 0.28) 100%),
+                url('images_real/forest_bg.png');
+            background-size: cover;
+            background-position: center center;
+            background-attachment: fixed;
+            overflow-x: hidden;
+            padding: 20px 24px 24px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* SVG Icon Base */
+        .ico {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+            flex-shrink: 0;
+        }
+
+        .ico-sm {
+            width: 15px;
+            height: 15px;
+        }
+
+        /* ===== OUTER GLASSMORPHIC APP FRAME (SolarSync Style) ===== */
+        .app-glass-frame {
+            width: 100%;
+            max-width: 1480px;
+            min-height: calc(100vh - 44px);
+            border-radius: 32px;
+            background-image:
+                linear-gradient(180deg, rgba(234, 240, 235, 0.42) 0%, rgba(218, 228, 220, 0.14) 48%, rgba(16, 27, 19, 0.36) 100%),
+                url('images_real/forest_bg.png');
+            background-size: cover;
+            background-position: center 35%;
+            padding: 22px 26px 26px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 20px;
+            overflow: hidden;
+            outline: 1.5px solid var(--shell-border);
+        }
+
+        body.dark-mode .app-glass-frame {
+            background-image:
+                linear-gradient(180deg, rgba(12, 22, 16, 0.58) 0%, rgba(12, 22, 16, 0.42) 50%, rgba(8, 15, 11, 0.78) 100%),
+                url('images_real/forest_bg.png');
+        }
+
+        .frame-layer {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Frosted Glass Card Surface + Full 3D Rotate MagicBento Lighting (GPU-Composited Transition) */
+        .glass-panel {
+            background: var(--glass-surface);
+            backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+            -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow), var(--glass-shadow-inner);
+            border-radius: 24px;
+            transition: background 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        /* MagicBento Interactive Card Layering (Full 3D Perspective + RotateX/Y + Smooth Compositor Transition) */
+        .magic-bento-card {
+            --mb-glow-rgb: 38, 122, 86;
+            --mb-glow-alpha: 0.90;
+            --mb-spot-alpha: 0.14;
+            --mb-spot-size: 320px;
+            --mb-border-size: 240px;
+            position: relative;
+            overflow: hidden;
+            isolation: isolate;
+            transform: perspective(900px)
+                translate3d(var(--mb-tx, 0px), var(--mb-ty, 0px), 0)
+                rotateX(var(--mb-rx, 0deg))
+                rotateY(var(--mb-ry, 0deg))
+                scale(var(--mb-press, 1));
+            transition:
+                transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+                background 0.25s ease,
+                box-shadow 0.25s ease;
+            will-change: transform;
+        }
+
+        body.dark-mode .magic-bento-card {
+            --mb-glow-rgb: 110, 231, 183;
+            --mb-glow-alpha: 0.95;
+            --mb-spot-alpha: 0.16;
+        }
+
+        .magic-bento-card > *:not(.magic-bento__light):not(.magic-bento__border) {
+            position: relative;
+            z-index: 2;
+        }
+
+        .magic-bento__light {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            border-radius: inherit;
+            opacity: var(--mb-hot, 0);
+            transition: opacity 0.22s ease;
+            background: radial-gradient(
+                var(--mb-spot-size) circle at var(--mb-x, -999px) var(--mb-y, -999px),
+                rgba(var(--mb-glow-rgb), var(--mb-spot-alpha)) 0%,
+                rgba(var(--mb-glow-rgb), 0) 75%
+            );
+            pointer-events: none;
+        }
+
+        .magic-bento__border {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            box-sizing: border-box;
+            padding: 1.5px;
+            border-radius: inherit;
+            opacity: var(--mb-near, 0);
+            transition: opacity 0.25s ease;
+            background: radial-gradient(
+                var(--mb-border-size) circle at var(--mb-x, -999px) var(--mb-y, -999px),
+                rgba(var(--mb-glow-rgb), var(--mb-glow-alpha)) 0%,
+                rgba(var(--mb-glow-rgb), 0) 80%
+            );
+            -webkit-mask:
+                linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask:
+                linear-gradient(#000 0 0) content-box exclude,
+                linear-gradient(#000 0 0);
+            pointer-events: none;
+        }
+
+        /* Skeleton Loading Effect */
+        @keyframes pulseSkeleton {
+            0% { opacity: 0.55; }
+            50% { opacity: 0.28; }
+            100% { opacity: 0.55; }
+        }
+
+        .skeleton {
+            animation: pulseSkeleton 1.2s ease-in-out infinite;
+            background: rgba(40, 66, 53, 0.14) !important;
+            color: transparent !important;
+            border-radius: 6px;
+            user-select: none;
+        }
+
+        /* ===== TOP NAVIGATION BAR (SolarSync Pill Header - Fixed Position Layout) ===== */
+        .top-navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand-logo-area {
+            order: 1;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            background: var(--glass-surface);
+            backdrop-filter: blur(18px);
+            padding: 8px 16px 8px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 20px -6px rgba(15, 33, 23, 0.12);
+            flex-shrink: 0;
+        }
+
+        .brand-badge {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            color: var(--text-on-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.16);
+        }
+
+        .brand-title {
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            line-height: 1.15;
+        }
+
+        .brand-sub {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Center Time-Range Filter Group */
+        .nav-center-stack {
+            order: 2;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* Top Right Meta Bar */
+        .top-right-meta {
+            order: 3;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 1180px) {
+            .nav-center-stack {
+                order: 3;
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .top-right-meta {
+                order: 2;
+                margin-left: auto;
+            }
+        }
+
+        .system-mode-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+            border-radius: 999px;
+            background: var(--glass-surface);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 8px 20px -6px rgba(15, 33, 23, 0.10);
+            flex-shrink: 0;
+        }
+
+        .system-mode-btn {
+            border: none;
+            background: rgba(30, 77, 56, 0.06);
+            padding: 7px 15px;
+            border-radius: 999px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background-color 200ms ease, color 200ms ease, box-shadow 200ms ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+            transform-origin: 50% 50%;
+            will-change: transform;
+        }
+
+        .system-mode-btn:hover {
+            color: var(--text-primary);
+            background: rgba(30, 77, 56, 0.12);
+        }
+
+        .system-mode-btn.active {
+            background: var(--accent-soft);
+            color: var(--accent-primary);
+            font-weight: 600;
+        }
+
+        body.dark-mode .system-mode-btn.active {
+            color: #9fe6c3;
+        }
+
+        .pill-navigation {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 26px;
+            border-radius: 999px;
+            background: var(--glass-surface);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 8px 20px -6px rgba(15, 33, 23, 0.12);
+            overflow: hidden;
+            max-width: 100%;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .pill-navigation::-webkit-scrollbar {
+            display: none;
+        }
+
+        @media (max-width: 960px) {
+            .pill-navigation {
+                overflow-x: auto;
+            }
+        }
+
+        .nav-pill-btn {
+            border: none;
+            background: rgba(30, 77, 56, 0.07);
+            padding: 7px 14px;
+            border-radius: 999px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.83rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background-color 200ms ease, color 200ms ease, box-shadow 200ms ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            white-space: nowrap;
+            transform-origin: 50% 50%;
+            will-change: transform;
+        }
+
+        .nav-pill-btn:hover {
+            color: var(--text-primary);
+            background: rgba(30, 77, 56, 0.06);
+        }
+
+        .nav-pill-btn.active {
+            background: var(--pill-active-bg);
+            color: var(--pill-active-text);
+            box-shadow: var(--pill-active-shadow);
+            font-weight: 600;
+        }
+
+        .pill-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .nav-pill-btn.active .pill-dot {
+            background: #a7f3d0 !important;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35);
+        }
+
+        /* Top Right Meta Bar (Pinned Top-Right on Row 1) */
+        .top-right-meta {
+            order: 2;
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .location-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 274px;
+            gap: 7px;
+            padding: 8px 15px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .icon-circle-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            background: var(--glass-surface);
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--trans-smooth);
+            backdrop-filter: blur(14px);
+        }
+
+        .icon-circle-btn:hover {
+            background: var(--glass-surface-hover);
+            transform: translateY(-1px);
+        }
+
+        /* ===== SCENIC UPPER STAGE (Title + Left Rail + Open Forest View + Right Conditions Card) ===== */
+        .scenic-upper-stage {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(280px, 330px);
+            gap: 24px;
+            align-items: start;
+            min-height: 295px;
+            padding: 6px 0;
+        }
+
+        .scenic-upper-stage > * {
+            min-width: 0;
+        }
+
+        .scenic-left-zone {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 22px;
+            height: 100%;
+        }
+
+        .hero-headline-box {
+            max-width: 560px;
+            padding: 14px 20px;
+            border-radius: 22px;
+            background: rgba(244, 248, 245, 0.68);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.72);
+            box-shadow: 0 12px 30px -10px rgba(15, 33, 23, 0.12);
+        }
+
+        body.dark-mode .hero-headline-box {
+            background: rgba(15, 28, 21, 0.68);
+            border-color: rgba(185, 214, 198, 0.16);
+        }
+
+        .hero-headline-box h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: var(--text-primary);
+            line-height: 1.2;
+            margin-bottom: 4px;
+            text-wrap: balance;
+        }
+
+        .hero-headline-box p {
+            font-size: 0.86rem;
+            color: var(--text-secondary);
+            line-height: 1.45;
+        }
+
+        .hero-sub-badges {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 0.76rem;
+            font-family: 'JetBrains Mono', 'Kanit', monospace;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-secondary);
+        }
+
+        .meta-chip {
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(30, 77, 56, 0.10);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Floating Left Vertical Tool Rail (SolarSync Left Icons) */
+        .scenic-rail-and-Quick {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .floating-left-rail {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 7px;
+            border-radius: 999px;
+            background: var(--glass-surface);
+            border: 1px solid var(--glass-border);
+        }
+
+        .rail-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--trans-smooth);
+        }
+
+        .rail-btn:hover {
+            background: var(--accent-soft);
+            color: var(--accent-primary);
+        }
+
+        .rail-btn.active {
+            background: var(--accent-primary);
+            color: var(--text-on-accent);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+        }
+
+        /* Right Conditions Card (SolarSync "Today's Conditions" style) */
+        .conditions-card {
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .card-top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-top-bar h2 {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .corner-arrow-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1px solid rgba(30, 77, 56, 0.16);
+            background: rgba(255, 255, 255, 0.55);
+            color: var(--text-secondary);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--trans-smooth);
+        }
+
+        .corner-arrow-btn:hover {
+            background: var(--accent-primary);
+            color: var(--text-on-accent);
+        }
+
+        .conditions-main-split {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 14px;
+            align-items: center;
+        }
+
+        .temp-spotlight {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-right: 12px;
+            border-right: 1px solid rgba(30, 77, 56, 0.12);
+        }
+
+        .temp-icon-orb {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(30, 77, 56, 0.12);
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .temp-big-num {
+            font-size: 1.65rem;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            line-height: 1.05;
+            color: var(--text-primary);
+        }
+
+        .temp-sub-status {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+        }
+
+        .conditions-kv-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 0.8rem;
+        }
+
+        .kv-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            color: var(--text-secondary);
+        }
+
+        .kv-row strong {
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+        }
+
+        /* Sunrise / Photoperiod & Solution Schedule Strip */
+        .conditions-Cycle-strip {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 10px 4px;
+            border-top: 1px solid rgba(30, 77, 56, 0.12);
+            border-bottom: 1px solid rgba(30, 77, 56, 0.12);
+        }
+
+        .cycle-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cycle-label {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        .cycle-val {
+            font-size: 0.84rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-primary);
+        }
+
+        /* 3-Day Mini Forecast / Timeline Strip */
+        .mini-day-strip {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding-top: 2px;
+        }
+
+        .mini-day-box {
+            padding: 4px 6px;
+            text-align: center;
+        }
+
+        .mini-day-box + .mini-day-box {
+            border-left: 1px solid rgba(30, 77, 56, 0.12);
+        }
+
+        .mini-day-name {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        .mini-day-val {
+            font-size: 0.88rem;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-primary);
+            margin-top: 2px;
+        }
+
+        /* ===== BOTTOM BENTO GRID (3 Glassmorphic Cards like SolarSync) ===== */
+        .bento-bottom-grid {
+            display: grid;
+            grid-template-columns: minmax(290px, 350px) minmax(0, 1fr) minmax(300px, 380px);
+            gap: 18px;
+            align-items: stretch;
+        }
+
+        .bento-bottom-grid > * {
+            min-width: 0;
+        }
+
+        /* --- CARD 1: Left Stacked Metrics & Specimen Inspector --- */
+        .bento-left-card {
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .time-range-pills {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--glass-surface-subtle);
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.65);
+        }
+
+        .range-pill {
+            flex: 1;
+            border: none;
+            background: rgba(30, 77, 56, 0.06);
+            padding: 5px 8px;
+            border-radius: 999px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.76rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background-color 200ms ease, color 200ms ease, box-shadow 200ms ease;
+            text-align: center;
+            transform-origin: 50% 50%;
+            will-change: transform;
+        }
+
+        .range-pill.active {
+            background: #ffffff;
+            color: var(--accent-primary);
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(15, 33, 23, 0.08);
+        }
+
+        body.dark-mode .range-pill.active {
+            background: var(--accent-primary);
+            color: #ffffff;
+        }
+
+        /* 3 Mini KPI Columns (EC, pH, Absorption) */
+        .kpi-trio-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 6px 0 10px;
+            border-bottom: 1px solid rgba(30, 77, 56, 0.12);
+        }
+
+        .kpi-mini-card {
+            padding: 4px 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .kpi-mini-card + .kpi-mini-card {
+            border-left: 1px solid rgba(30, 77, 56, 0.12);
+            padding-left: 10px;
+        }
+
+        .kpi-mini-head {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.76rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .kpi-mini-num {
+            font-size: 1.32rem;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-primary);
+            line-height: 1.1;
+        }
+
+        .kpi-mini-num small {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-left: 2px;
+        }
+
+        .kpi-mini-bar {
+            height: 4px;
+            border-radius: 999px;
+            background: var(--accent-bar-track);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .kpi-mini-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: var(--accent-bar);
+            transition: width 0.4s ease;
+        }
+
+        /* Specimen Inspection Rows (Replacing Solar Panels & Inverter rows with Plant Camera & AI Diagnostics) */
+        .equipment-row-card {
+            padding: 8px 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .equipment-row-card + .equipment-row-card {
+            border-top: 1px solid rgba(30, 77, 56, 0.12);
+            padding-top: 12px;
+        }
+
+        .equip-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .equip-body {
+            display: grid;
+            grid-template-columns: 78px 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .plant-thumb-box {
+            width: 78px;
+            height: 62px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(30, 77, 56, 0.18);
+            background: #101b13;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .plant-topdown-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease, opacity 0.25s ease;
+        }
+
+        .plant-thumb-box:hover .plant-topdown-img {
+            transform: scale(1.06);
+        }
+
+        .equip-bars-col {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .equip-stat-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .equip-stat-line strong {
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Progress Bar (SolarSync style) */
+        .tick-bar {
+            height: 6px;
+            border-radius: 999px;
+            background: var(--accent-bar-track);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tick-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: var(--accent-bar);
+            transition: width 0.4s ease;
+        }
+
+        .timeline-mini-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            padding-top: 2px;
+        }
+
+        .step-arrow-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid rgba(30, 77, 56, 0.2);
+            background: rgba(255, 255, 255, 0.7);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: var(--trans-smooth);
+        }
+
+        .step-arrow-btn:hover {
+            background: var(--accent-primary);
+            color: #ffffff;
+        }
+
+        .current-day-badge {
+            font-size: 0.76rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* --- CARD 2: Center Chart Panel (SolarSync "Solar Energy Efficiency" style) --- */
+        .bento-center-chart {
+            padding: 18px 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 10px;
+            background-image: radial-gradient(rgba(30, 77, 56, 0.10) 1px, transparent 1px);
+            background-size: 14px 14px;
+        }
+
+        .chart-header-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .chart-kpi-Hero {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-top: 2px;
+        }
+
+        .chart-big-reading {
+            font-size: 1.85rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .chart-delta-pill {
+            font-size: 0.76rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(30, 94, 65, 0.14);
+            color: var(--color-control);
+        }
+
+        .chart-type-tabs {
+            display: inline-flex;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: var(--glass-surface-subtle);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+        }
+
+        .chart-tab-btn {
+            border: none;
+            background: rgba(30, 77, 56, 0.06);
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.76rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background-color 200ms ease, color 200ms ease;
+            transform-origin: 50% 50%;
+            will-change: transform;
+        }
+
+        .chart-tab-btn.active {
+            background: var(--accent-primary);
+            color: var(--text-on-accent);
+            font-weight: 600;
+        }
+
+        .chart-box-wrapper {
+            position: relative;
+            height: 220px;
+            width: 100%;
+        }
+
+        /* --- CARD 3: Right Nutrient Balance & N-P-K Comparison (SolarSync "Energy Balance" style) --- */
+        .bento-right-balance {
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .balance-body-grid {
+            display: grid;
+            grid-template-columns: 142px 1fr;
+            gap: 16px;
+            align-items: center;
+            margin: auto 0;
+        }
+
+        /* Radial Ring Gauge */
+        .ring-gauge-box {
+            position: relative;
+            width: 142px;
+            height: 142px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ring-gauge-svg {
+            width: 142px;
+            height: 142px;
+            transform: rotate(-90deg);
+        }
+
+        .ring-track {
+            fill: none;
+            stroke: var(--accent-bar-track);
+            stroke-width: 10;
+        }
+
+        .ring-progress {
+            fill: none;
+            stroke: var(--accent-bar);
+            stroke-width: 10;
+            stroke-linecap: round;
+            stroke-dasharray: 352;
+            stroke-dashoffset: 65;
+            transition: stroke-dashoffset 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .ring-center-label {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .ring-val {
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            color: var(--text-primary);
+            line-height: 1.1;
+        }
+
+        .ring-unit {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        /* Horizontal Segmented Bars for Control, -N, -P, -K */
+        .balance-bars-list {
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+        }
+
+        .balance-bar-item {
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 10px;
+            transition: var(--trans-smooth);
+        }
+
+        .balance-bar-item:hover {
+            background: rgba(30, 77, 56, 0.08);
+        }
+
+        .balance-bar-head {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.78rem;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+        }
+
+        .balance-bar-head strong {
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Assistant Command Strip at Bottom of Balance Card */
+        .assistant-compact-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 4px 2px;
+            border-top: 1px solid rgba(30, 77, 56, 0.12);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .send-btn-pill {
+            border: none;
+            background: var(--accent-primary);
+            color: var(--text-on-accent);
+            padding: 6px 13px;
+            border-radius: 999px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.76rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--trans-smooth);
+            white-space: nowrap;
+        }
+
+        .send-btn-pill:hover {
+            background: var(--accent-primary-hover);
+            transform: translateY(-1px);
+        }
+
+        /* ===== AI 4-CLASS PROBABILITY BADGE & BARS ===== */
+        .ai-pred-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.73rem;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent-primary);
+            white-space: nowrap;
+        }
+
+        body.dark-mode .ai-pred-pill {
+            background: rgba(52, 211, 153, 0.20);
+            color: #6ee7b7;
+        }
+
+        .ai-prob-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ai-prob-item {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .ai-prob-label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.77rem;
+            color: var(--text-secondary);
+        }
+
+        .ai-prob-label-row strong {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+            font-size: 0.78rem;
+            color: var(--text-primary);
+        }
+
+        .ai-prob-name {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* ===== SETTINGS SLIDE-OUT DRAWER ===== */
+        .settings-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 22, 14, 0.35);
+            backdrop-filter: blur(4px);
+            z-index: 110;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        .settings-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .settings-drawer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            bottom: 20px;
+            width: 330px;
+            background: var(--glass-surface);
+            backdrop-filter: blur(28px);
+            border: 1px solid var(--glass-border);
+            border-radius: 26px;
+            box-shadow: var(--glass-shadow);
+            padding: 22px;
+            z-index: 120;
+            transform: translateX(380px);
+            transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .settings-drawer.open {
+            transform: translateX(0);
+        }
+
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .close-drawer-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 1px solid rgba(30, 77, 56, 0.15);
+            background: transparent;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .settings-sec-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .theme-preset-pills {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .preset-pill {
+            background: rgba(255, 255, 255, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            border-radius: 12px;
+            padding: 8px 10px;
+            font-family: 'Kanit', sans-serif;
+            font-size: 0.78rem;
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: var(--trans-smooth);
+        }
+
+        .preset-pill:hover {
+            background: #ffffff;
+        }
+
+        .slider-control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .slider-label-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.76rem;
+            color: var(--text-secondary);
+        }
+
+        input[type="range"] {
+            accent-color: var(--accent-primary);
+            width: 100%;
+        }
+
+        /* React Bits <AnimatedContent /> Wrapper Default */
+        [data-animated-content] {
+            visibility: hidden;
+            will-change: transform, opacity, filter;
+        }
+
+        /* Responsive Breakpoints (Desktop, Laptop, Tablet, Mobile, Safe Areas) */
+        @media (max-width: 1260px) {
+            .bento-bottom-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+            .bento-right-balance {
+                grid-column: span 2;
+            }
+        }
+
+        @media (max-width: 900px) {
+            body {
+                padding: 10px 10px 80px;
+            }
+            .app-glass-frame {
+                padding: 16px;
+                border-radius: 24px;
+            }
+            .scenic-upper-stage,
+            .bento-bottom-grid,
+            .deficiency-cards-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .bento-right-balance {
+                grid-column: span 1;
+            }
+            .bottom-drawer-wrapper {
+                left: 10px;
+                right: 10px;
+            }
+            .settings-drawer {
+                top: 10px;
+                right: 10px;
+                bottom: 10px;
+                width: calc(100vw - 20px);
+                max-width: 330px;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .hero-headline-box h1 {
+                font-size: 1.32rem;
+            }
+            .conditions-main-split,
+            .balance-body-grid {
+                grid-template-columns: 1fr;
+            }
+            .temp-spotlight {
+                border-right: none;
+                border-bottom: 1px solid rgba(30, 77, 56, 0.12);
+                padding-right: 0;
+                padding-bottom: 10px;
+            }
+            .ring-gauge-box {
+                margin: 0 auto;
+            }
+            .floating-left-rail {
+                flex-direction: row;
+            }
+            .drawer-peek-bar .peek-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== OUTER GLASSMORPHIC SHELL (SolarSync Architecture + Forest Mist Theme) ===== -->
+    <main class="app-glass-frame">
+
+        <!-- 1. TOP NAVIGATION BAR -->
+        <header class="top-navbar frame-layer" data-animated-content data-distance="36" data-direction="vertical" data-reverse="true" data-duration="0.75" data-ease="power3.out" data-blur="6" data-stagger="0.08" data-trigger="mount">
+            <div class="brand-logo-area">
+                <div class="brand-badge" aria-hidden="true">
+                    <svg class="ico" viewBox="0 0 24 24">
+                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+                        <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="brand-title">HydroSync</div>
+                    <div class="brand-sub">Control Tank 23.3L • AI Water Spinach Analytics</div>
+                </div>
+            </div>
+
+            <!-- Center Time-Range Filter Tabs (JellyRadio) -->
+            <div class="nav-center-stack">
+                <div class="pill-navigation" id="pillNavigationContainer" role="tablist" aria-label="เลือกช่วงเวลาข้อมูลถัง Control">
+                    <!-- Populated by renderTimeFilterPills() -->
+                </div>
+            </div>
+
+            <div class="top-right-meta">
+                <div class="glass-panel location-badge">
+                    <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    <span id="locationBadgeText">แปลง DWC โรงเรือนปิด • ถัง Control (23.3 L)</span>
+                </div>
+                <a href="dashboard_3d.html" class="icon-circle-btn" title="ระบบจำลอง 3D Digital Twin" aria-label="3D Digital Twin" style="text-decoration: none; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700;">
+                    3D
+                </a>
+                <button class="icon-circle-btn" onclick="toggleSettings(true)" title="ปรับแต่งธีมและกระจก" aria-label="ตั้งค่าธีม">
+                    <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- 2. SCENIC UPPER STAGE (Open Forest Mountain View in Center, Title + Left Rail on Left, Conditions Card on Right) -->
+        <section class="scenic-upper-stage frame-layer">
+
+            <!-- Left Headline + Vertical Tool Rail -->
+            <div class="scenic-left-zone" data-animated-content data-distance="55" data-direction="horizontal" data-reverse="true" data-duration="0.85" data-ease="power3.out" data-blur="8" data-stagger="0.12" data-delay="0.1" data-trigger="mount">
+                <div class="hero-headline-box">
+                    <h1 id="heroTitle">ถังควบคุมมาตรฐาน (Control Tank 23.3L)</h1>
+                    <p id="heroSubtitle">สูตรปุ๋ยครบสมบูรณ์ A 117cc + B 117cc • น้ำบาดาล • ผักบุ้งจีน (Ipomoea aquatica)</p>
+                    <div class="hero-sub-badges">
+                        <span class="meta-chip">Baseline EC: <strong id="heroBaselineEC">2.641</strong> mS/cm</span>
+                        <span class="meta-chip" id="heroAcidBadge">ปรับสมดุล pH มาตรฐาน (5.5–6.5)</span>
+                        <span class="meta-chip" id="metricRound">ทั้งหมด (9–21 ต.ค.)</span>
+                    </div>
+                </div>
+
+                <div class="scenic-rail-and-Quick">
+                    <nav class="floating-left-rail" aria-label="เครื่องมือด่วน">
+                        <button class="rail-btn active" onclick="switchTimeRange('all')" title="ข้อมูลถังควบคุมทั้งหมด" aria-label="ข้อมูลถังควบคุมทั้งหมด">
+                            <svg class="ico" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </button>
+                        <button class="rail-btn" onclick="scrollToCharts()" title="กราฟแนวโน้มเซนเซอร์ถัง Control" aria-label="กราฟแนวโน้มเซนเซอร์ถัง Control">
+                            <svg class="ico" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        </button>
+                        <button class="rail-btn" onclick="openPhotoViewer()" title="ภาพถ่ายมุมสูงถัง Control" aria-label="ภาพถ่ายมุมสูงถัง Control">
+                            <svg class="ico" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+                        </button>
+                        <button class="rail-btn" onclick="showDeficiencyReport()" title="สรุปผลทำนาย AI 4 คลาสของถัง Control" aria-label="สรุปผลทำนาย AI 4 คลาสของถัง Control">
+                            <svg class="ico" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10H12V2Z"/><path d="M21.18 8.02c-1-2.3-2.85-4.17-5.16-5.18"/></svg>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Right Floating Card: Control Tank Conditions -->
+            <aside class="glass-panel conditions-card" data-animated-content data-distance="60" data-direction="horizontal" data-duration="0.85" data-ease="power3.out" data-blur="8" data-delay="0.18" data-trigger="mount">
+                <div class="card-top-bar">
+                    <h2>สภาพแวดล้อมสารละลายถัง Control</h2>
+                    <button class="corner-arrow-btn" onclick="runHealthCheck()" title="ตรวจวิเคราะห์สภาพน้ำถัง Control" aria-label="ตรวจวิเคราะห์สภาพน้ำถัง Control">
+                        <svg class="ico ico-sm" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                    </button>
+                </div>
+
+                <div class="conditions-main-split">
+                    <div class="temp-spotlight">
+                        <div class="temp-icon-orb" aria-hidden="true">
+                            <svg class="ico" viewBox="0 0 24 24"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/></svg>
+                        </div>
+                        <div>
+                            <div class="temp-big-num"><span id="metricTemp">28.0</span>°C</div>
+                            <div class="temp-sub-status" id="tempStatusText">อุณหภูมิน้ำปกติ</div>
+                        </div>
+                    </div>
+
+                    <div class="conditions-kv-list">
+                        <div class="kv-row">
+                            <span>เกณฑ์ EC ถัง Control</span>
+                            <strong>2.40–3.00 mS/cm</strong>
+                        </div>
+                        <div class="kv-row">
+                            <span>เกณฑ์ pH เหมาะสม</span>
+                            <strong>5.50–6.50 pH</strong>
+                        </div>
+                        <div class="kv-row">
+                            <span>ผลทำนาย AI Late-Fusion</span>
+                            <strong id="assistantTile1">ครบธาตุ (94.2%)</strong>
+                        </div>
+                        <div class="kv-row">
+                            <span>สถานะพุ่มใบจริง</span>
+                            <strong id="assistantTile2">เขียวสดสมบูรณ์</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="conditions-Cycle-strip">
+                    <div class="cycle-item">
+                        <svg class="ico ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/></svg>
+                        <div>
+                            <div class="cycle-label">รอบวัดเช้า</div>
+                            <div class="cycle-val">08:00 AM</div>
+                        </div>
+                    </div>
+                    <div class="cycle-item">
+                        <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                        <div>
+                            <div class="cycle-label">รอบวัดเย็น</div>
+                            <div class="cycle-val">17:00 PM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mini-day-strip">
+                    <div class="mini-day-box">
+                        <div class="mini-day-name">ส่งเล่มรายงาน</div>
+                        <div class="mini-day-val">25 ต.ค.</div>
+                    </div>
+                    <div class="mini-day-box">
+                        <div class="mini-day-name">นำเสนอผลงาน</div>
+                        <div class="mini-day-val">9 พ.ย.</div>
+                    </div>
+                    <div class="mini-day-box">
+                        <div class="mini-day-name">ภาพถัง Control</div>
+                        <div class="mini-day-val" id="controlImgCountVal">19 ภาพ</div>
+                    </div>
+                </div>
+            </aside>
+
+        </section>
+
+        <!-- 3. BOTTOM BENTO ROW (3 Cards: Live Control Metrics & 4-Class AI | Control Trend Chart | Control Tank Health) -->
+        <section class="bento-bottom-grid frame-layer" id="chartsSection" data-animated-content data-distance="80" data-direction="vertical" data-duration="0.85" data-ease="power3.out" data-blur="10" data-stagger="0.10" data-threshold="0.1" data-delay="0.22" data-trigger="mount">
+
+            <!-- CARD 1: Live Control Sensor Metrics + Specimen + 4-Class AI Late-Fusion Prediction -->
+            <div class="glass-panel bento-left-card">
+                <div class="time-range-pills" role="tablist" aria-label="สลับมุมมองด่วน">
+                    <button class="range-pill active" onclick="switchTimeRange('all')">● ทั้งหมด</button>
+                    <button class="range-pill" onclick="switchChartType('ec')">EC</button>
+                    <button class="range-pill" onclick="switchChartType('ph')">pH ก่อน/หลัง</button>
+                    <button class="range-pill" onclick="switchChartType('temp')">Temp</button>
+                    <button class="range-pill" onclick="switchTimeRange('round2')">รอบ 2</button>
+                </div>
+
+                <!-- 3 KPI Mini Columns -->
+                <div class="kpi-trio-grid">
+                    <div class="kpi-mini-card">
+                        <div class="kpi-mini-head">
+                            <svg class="ico ico-sm" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                            <span>ค่า EC</span>
+                        </div>
+                        <div class="kpi-mini-num">
+                            <span id="metricEc">2.68</span><small>mS</small>
+                        </div>
+                        <div class="kpi-mini-bar">
+                            <div class="kpi-mini-bar-fill" id="barEcFill" style="width: 78%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-mini-card">
+                        <div class="kpi-mini-head">
+                            <svg class="ico ico-sm" viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                            <span>ค่า pH</span>
+                        </div>
+                        <div class="kpi-mini-num">
+                            <span id="metricPh">5.66</span><small>pH</small>
+                        </div>
+                        <div class="kpi-mini-bar">
+                            <div class="kpi-mini-bar-fill" id="barPhFill" style="width: 84%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="kpi-mini-card">
+                        <div class="kpi-mini-head">
+                            <svg class="ico ico-sm" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+                            <span>Δ EC</span>
+                        </div>
+                        <div class="kpi-mini-num">
+                            <span id="metricEcDiff">+1.5%</span>
+                        </div>
+                        <div class="kpi-mini-bar">
+                            <div class="kpi-mini-bar-fill" id="barDiffFill" style="width: 68%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plant Specimen Row 1 (Control Tank Top-Down Imagery) -->
+                <div class="equipment-row-card">
+                    <div class="equip-head">
+                        <span>ภาพถ่ายถัง Control (Cropped ExG Foliage)</span>
+                        <div class="timeline-mini-controls">
+                            <button class="step-arrow-btn" onclick="prevDayImage()" title="ภาพก่อนหน้า" aria-label="ภาพก่อนหน้า">‹</button>
+                            <span class="current-day-badge" id="imageDayLabel">Day 13 (21 ต.ค.)</span>
+                            <button class="step-arrow-btn" onclick="nextDayImage()" title="ภาพถัดไป" aria-label="ภาพถัดไป">›</button>
+                        </div>
+                    </div>
+                    <div class="equip-body">
+                        <div class="plant-thumb-box" onclick="openPhotoViewer()" title="คลิกเพื่อดูข้อมูลภาพถ่ายถัง Control">
+                            <img id="plantCenterImg" class="plant-topdown-img" src="images_real/Control/21_10_2026-time08_00.jpg" alt="ภาพถ่ายมุมสูงผักบุ้งจีนถัง Control">
+                        </div>
+                        <div class="equip-bars-col">
+                            <div class="equip-stat-line">
+                                <span>ความสมบูรณ์ใบ (ExG Green Index)</span>
+                                <strong id="leafHealthPct">94%</strong>
+                            </div>
+                            <div class="tick-bar">
+                                <div class="tick-bar-fill" id="leafHealthBar" style="width: 94%;"></div>
+                            </div>
+                            <div class="equip-stat-line">
+                                <span>ความเสถียรสารละลายถัง Control</span>
+                                <strong id="solutionStabilityPct">96%</strong>
+                            </div>
+                            <div class="tick-bar">
+                                <div class="tick-bar-fill" id="solutionStabilityBar" style="width: 96%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Multimodal Fusion Row 2: 4-Class Probability Distribution for Control Tank -->
+                <div class="equipment-row-card">
+                    <div class="equip-head">
+                        <span>AI Ensemble 6-Model (ถัง Control)</span>
+                        <span class="ai-pred-pill" id="aiPredBadge">✓ ทายถูก: ครบธาตุ (100% Holdout)</span>
+                    </div>
+                    <div class="ai-prob-grid">
+                        <div class="ai-prob-item">
+                            <div class="ai-prob-label-row">
+                                <span class="ai-prob-name"><span class="pill-dot" style="background: var(--color-control);"></span>ครบธาตุ (Control)</span>
+                                <strong id="probControlVal">94.2%</strong>
+                            </div>
+                            <div class="tick-bar">
+                                <div class="tick-bar-fill" id="probControlBar" style="width: 94.2%; background: var(--color-control);"></div>
+                            </div>
+                        </div>
+                        <div class="ai-prob-item">
+                            <div class="ai-prob-label-row">
+                                <span class="ai-prob-name"><span class="pill-dot" style="background: var(--color-n);"></span>ขาด N (Nitrogen)</span>
+                                <strong id="probNVal">2.4%</strong>
+                            </div>
+                            <div class="tick-bar">
+                                <div class="tick-bar-fill" id="probNBar" style="width: 6.0%; background: var(--color-n);"></div>
+                            </div>
+                        </div>
+                        <div class="ai-prob-item">
+                            <div class="ai-prob-label-row">
+                                <span class="ai-prob-name"><span class="pill-dot" style="background: var(--color-p);"></span>ขาด P (Phosphorus)</span>
+                                <strong id="probPVal">1.9%</strong>
+                            </div>
+                            <div class="tick-bar">
+                                <div class="tick-bar-fill" id="probPBar" style="width: 5.0%; background: var(--color-p);"></div>
+                            </div>
+                        </div>
+                        <div class="ai-prob-item">
+                            <div class="ai-prob-label-row">
+                                <span class="ai-prob-name"><span class="pill-dot" style="background: var(--color-k);"></span>ขาด K (Potassium)</span>
+                                <strong id="probKVal">1.5%</strong>
+                            </div>
+                            <div class="tick-bar">
+                                <div class="tick-bar-fill" id="probKBar" style="width: 4.0%; background: var(--color-k);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 2: Center Interactive Trend Chart (Control Tank Only) -->
+            <div class="glass-panel bento-center-chart">
+                <div class="chart-header-row">
+                    <div>
+                        <h2 style="font-size: 0.95rem; font-weight: 600;" id="chartTitle">แนวโน้มค่าความนำไฟฟ้า ถัง Control (EC Trend)</h2>
+                        <div class="chart-kpi-Hero">
+                            <span class="chart-big-reading" id="chartHeroVal">2.68 mS/cm</span>
+                            <span class="chart-delta-pill" id="chartHeroDelta">Baseline 2.641</span>
+                        </div>
+                    </div>
+                    <div class="chart-type-tabs" role="tablist" aria-label="เลือกกราฟ">
+                        <button class="chart-tab-btn active" id="tabBtnEc" onclick="switchChartType('ec')">EC (mS/cm)</button>
+                        <button class="chart-tab-btn" id="tabBtnPh" onclick="switchChartType('ph')">pH น้ำ (ก่อน/หลัง)</button>
+                        <button class="chart-tab-btn" id="tabBtnTemp" onclick="switchChartType('temp')">อุณหภูมิ (°C)</button>
+                    </div>
+                </div>
+
+                <div class="chart-box-wrapper">
+                    <canvas id="interactiveCanvas"></canvas>
+                </div>
+            </div>
+
+            <!-- CARD 3: Right Control Tank Health & Solution Stability -->
+            <div class="glass-panel bento-right-balance">
+                <div class="card-top-bar">
+                    <h2>สุขภาพถัง Control & ความเสถียรสารละลาย</h2>
+                    <button class="corner-arrow-btn" onclick="runHealthCheck()" title="ตรวจสอบความสมดุลถัง Control" aria-label="ตรวจสอบความสมดุลถัง Control">
+                        <svg class="ico ico-sm" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                    </button>
+                </div>
+
+                <div class="balance-body-grid">
+                    <!-- Circular Ring Gauge (Control EC vs Baseline) -->
+                    <div class="ring-gauge-box">
+                        <svg class="ring-gauge-svg" viewBox="0 0 140 140">
+                            <circle class="ring-track" cx="70" cy="70" r="56"></circle>
+                            <circle class="ring-progress" id="ringProgressCircle" cx="70" cy="70" r="56"></circle>
+                        </svg>
+                        <div class="ring-center-label">
+                            <span class="ring-val" id="ringCenterEc">2.68</span>
+                            <span class="ring-unit" id="ringSubLabel">mS/cm ล่าสุด</span>
+                        </div>
+                    </div>
+
+                    <!-- 4 Control Tank Health Dimensions vs Standard Criteria -->
+                    <div class="balance-bars-list">
+                        <div class="balance-bar-item" onclick="switchChartType('ec')">
+                            <div class="balance-bar-head">
+                                <span>ความเสถียร EC (เทียบ 2.641)</span>
+                                <strong id="balControlEcVal">2.68 mS (98.5%)</strong>
+                            </div>
+                            <div class="tick-bar">
+                                <div class="tick-bar-fill" id="balControlEcBar" style="width: 96%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="balance-bar-item" onclick="switchChartType('ph')">
+                            <div class="balance-bar-head">
+                                <span>สมดุล pH หลังปรับ (5.5–6.5)</span>
+                                <strong id="balControlPhVal">5.66 pH (ในเกณฑ์)</strong>
+                            </div>
+                            <div class="tick-bar">
+                                <div class="tick-bar-fill" id="balControlPhBar" style="width: 92%; background: var(--color-control);"></div>
+                            </div>
+                        </div>
+
+                        <div class="balance-bar-item" onclick="switchChartType('temp')">
+                            <div class="balance-bar-head">
+                                <span>เสถียรภาพอุณหภูมิน้ำ (25–30°C)</span>
+                                <strong id="balControlTempVal">28.0 °C (ปกติ)</strong>
+                            </div>
+                            <div class="tick-bar">
+                                <div class="tick-bar-fill" id="balControlTempBar" style="width: 95%; background: var(--accent-bar);"></div>
+                            </div>
+                        </div>
+
+                        <div class="balance-bar-item" onclick="showDeficiencyReport()">
+                            <div class="balance-bar-head">
+                                <span>ความมั่นใจ AI (คลาสครบธาตุ)</span>
+                                <strong id="balControlAiVal">94.2% (แม่นยำสูง)</strong>
+                            </div>
+                            <div class="tick-bar">
+                                <div class="tick-bar-fill" id="balControlAiBar" style="width: 94.2%; background: var(--color-control);"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compact AI Diagnostic Status Bar -->
+                <div class="assistant-compact-bar">
+                    <span id="assistantInputMsg">ถัง Control สมบูรณ์: EC 2.68 mS/cm • pH 5.66 • AI ทำนายครบธาตุ 94.2%</span>
+                    <button class="send-btn-pill" onclick="runHealthCheck()">
+                        <span>วิเคราะห์</span>
+                        <svg class="ico ico-sm" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ===== SETTINGS & CUSTOMIZATION SLIDE-OUT PANEL ===== -->
+    <div class="settings-overlay" id="settingsOverlay" onclick="toggleSettings(false)"></div>
+    <aside class="settings-drawer" id="settingsDrawer" aria-label="ตั้งค่าธีม">
+        <div class="drawer-header">
+            <h2 style="font-size: 1rem; font-weight: 600;">ปรับแต่งธีม Forest Glassmorphism</h2>
+            <button class="close-drawer-btn" onclick="toggleSettings(false)" aria-label="ปิด">✕</button>
+        </div>
+
+        <div class="settings-sec-title">โทนสีสำเร็จรูป (Presets)</div>
+        <div class="theme-preset-pills">
+            <button class="preset-pill" onclick="applyTheme(145, 16, 88, false)">
+                <span class="pill-dot" style="background: #1e4d38;"></span>
+                <span>Forest Mist (หลัก)</span>
+            </button>
+            <button class="preset-pill" onclick="applyTheme(152, 24, 16, true)">
+                <span class="pill-dot" style="background: #0f2117;"></span>
+                <span>Pine Night (มืด)</span>
+            </button>
+            <button class="preset-pill" onclick="applyTheme(168, 22, 90, false)">
+                <span class="pill-dot" style="background: #3c5a58;"></span>
+                <span>Alpine Slate</span>
+            </button>
+            <button class="preset-pill" onclick="applyTheme(140, 28, 92, false)">
+                <span class="pill-dot" style="background: #2a6b4e;"></span>
+                <span>Canopy Dew</span>
+            </button>
+        </div>
+
+        <div class="settings-sec-title">ความเบลอของกระจก (Glass Blur)</div>
+        <div class="slider-control-group">
+            <div class="slider-label-row">
+                <span>ระดับความเบลอ</span>
+                <span id="txtBlur">24px</span>
+            </div>
+            <input type="range" id="rngBlur" min="8" max="44" value="24" oninput="changeBlur(this.value)">
+        </div>
+
+        <div class="slider-control-group">
+            <div class="slider-label-row">
+                <span>เฉดสี (Hue)</span>
+                <span id="txtHue">145°</span>
+            </div>
+            <input type="range" id="rngHue" min="0" max="360" value="145" oninput="changeHue(this.value)">
+        </div>
+
+        <div class="slider-control-group">
+            <div class="slider-label-row">
+                <span>ความอิ่มตัวสี (Saturation)</span>
+                <span id="txtSat">16%</span>
+            </div>
+            <input type="range" id="rngSat" min="0" max="80" value="16" oninput="changeSat(this.value)">
+        </div>
+
+        <div class="slider-control-group">
+            <div class="slider-label-row">
+                <span>ความสว่าง (Lightness)</span>
+                <span id="txtLight">88%</span>
+            </div>
+            <input type="range" id="rngLight" min="10" max="96" value="88" oninput="changeLight(this.value)">
+        </div>
+
+        <button class="send-btn-pill" style="width: 100%; justify-content: center; margin-top: auto; padding: 10px;" onclick="resetTheme()">
+            <span>คืนค่าเริ่มต้น (Forest Mist)</span>
+        </button>
+    </aside>
+
+    <script>
+    // =========================================================================
+    //  CONTROL TANK 23.3L PRESENTATION CONTROLLER (ONLY CONTROL DATA)
+    // =========================================================================
+
+    const CONTROL_SPEC = {
+        id: "Control",
+        title: "ถังควบคุมมาตรฐาน (Control Tank 23.3L)",
+        sub: "สูตรปุ๋ยครบสมบูรณ์ A 117cc + B 117cc • น้ำบาดาล • ผักบุ้งจีน (Ipomoea aquatica)",
+        acid: "ปรับสมดุล pH มาตรฐาน (5.5–6.5)",
+        color: "#1e5e41",
+        baseline: 2.641
+    };
+
+    const TIME_RANGE_SPECS = {
+        all: {
+            id: 'all',
+            label: 'ทั้งหมด (9–22 ต.ค.)',
+            badge: 'ทั้งหมด 27 รายการบันทึก',
+            sub: 'สูตรปุ๋ยครบสมบูรณ์ A 117cc + B 117cc • ข้อมูลครบทั้ง 2 รอบสารละลาย (9–22 ต.ค. 09:00)',
+            probs: { control: 94.2, n: 2.4, p: 1.9, k: 1.5 },
+            leafIndex: 94,
+            stability: 96
+        },
+        '7d': {
+            id: '7d',
+            label: '7 วันล่าสุด',
+            badge: '7 วันล่าสุด (16–22 ต.ค.)',
+            sub: 'สูตรปุ๋ยครบสมบูรณ์ A 117cc + B 117cc • ช่วงติดตามผล 7 วันล่าสุดของถัง Control (ถึง 22 ต.ค. 09:00)',
+            probs: { control: 95.1, n: 2.1, p: 1.6, k: 1.2 },
+            leafIndex: 95,
+            stability: 97
+        },
+        round1: {
+            id: 'round1',
+            label: 'รอบสารละลายที่ 1',
+            badge: 'รอบ 1 (9–14 ต.ค.)',
+            sub: 'สูตรปุ๋ยครบสมบูรณ์ A 117cc + B 117cc • รอบสารละลายที่ 1 (ช่วงตั้งตัว 9–14 ต.ค.)',
+            probs: { control: 92.8, n: 3.1, p: 2.3, k: 1.8 },
+            leafIndex: 91,
+            stability: 94
+        },
+        round2: {
+            id: 'round2',
+            label: 'รอบสารละลายที่ 2 (ล่าสุด)',
+            badge: 'รอบ 2 (15–22 ต.ค.)',
+            sub: 'สูตรปุ๋ยครบสมบูรณ์ A 117cc + B 117cc • รอบสารละลายที่ 2 (พุ่มใบสมบูรณ์เต็มวัย 15–22 ต.ค.)',
+            probs: { control: 95.6, n: 1.9, p: 1.4, k: 1.1 },
+            leafIndex: 96,
+            stability: 98
+        }
+    };
+
+    let sensorData = window.SENSOR_DATA || null;
+    let imagesManifest = window.IMAGES_MANIFEST || {};
+    let ensembleMetadata = window.ENSEMBLE_METADATA || null;
+
+    if (ensembleMetadata && ensembleMetadata.unit_predictions && ensembleMetadata.unit_predictions.Control) {
+        const cp = ensembleMetadata.unit_predictions.Control.probabilities_pct;
+        if (cp && cp.healthy) {
+            TIME_RANGE_SPECS.all.probs = {
+                control: Number(cp.healthy),
+                n: Number(cp.nitrogen),
+                p: Number(cp.phosphorus),
+                k: Number(cp.potassium)
+            };
+        }
+    }
+
+    let currentTimeRange = 'all';
+    let currentChartType = 'ec';
+    let currentImageIndex = 0;
+    let interactiveChart = null;
+
+    let themeState = {
+        h: 145,
+        s: 16,
+        l: 88,
+        blur: 24,
+        isDark: false
+    };
+
+    function setSkeletonState(loading) {
+        const elementsToShimmer = [
+            document.getElementById('metricEc'),
+            document.getElementById('metricPh'),
+            document.getElementById('metricTemp'),
+            document.getElementById('metricEcDiff'),
+            document.getElementById('metricRound'),
+            document.getElementById('heroBaselineEC'),
+            document.getElementById('imageDayLabel'),
+            document.getElementById('balControlEcVal'),
+            document.getElementById('balControlPhVal'),
+            document.getElementById('balControlTempVal'),
+            document.getElementById('balControlAiVal'),
+        ];
+
+        elementsToShimmer.forEach(el => {
+            if (el) el.classList.toggle('skeleton', loading);
+        });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        loadSavedTheme();
+        initAnimatedContent();
+        initMagicBentoEngine();
+        setSkeletonState(true);
+
+        setTimeout(() => {
+            initDataViews();
+            renderChart();
+            setSkeletonState(false);
+        }, 320);
+    });
+
+    // =========================================================================
+    //  REACT BITS <AnimatedContent /> ENGINE (GSAP + ScrollTrigger)
+    // =========================================================================
+    const AC_WIPES = {
+        up: 'linear-gradient(to top, #000 calc(var(--ac-wipe) * 140% - 40%), transparent calc(var(--ac-wipe) * 140%))',
+        down: 'linear-gradient(to bottom, #000 calc(var(--ac-wipe) * 140% - 40%), transparent calc(var(--ac-wipe) * 140%))',
+        left: 'linear-gradient(to left, #000 calc(var(--ac-wipe) * 140% - 40%), transparent calc(var(--ac-wipe) * 140%))',
+        right: 'linear-gradient(to right, #000 calc(var(--ac-wipe) * 140% - 40%), transparent calc(var(--ac-wipe) * 140%))',
+        center: 'radial-gradient(farthest-corner at 50% 50%, #000 calc(var(--ac-wipe) * 140% - 40%), transparent calc(var(--ac-wipe) * 140%))'
+    };
+
+    function animateContentElement(el, customOpts = {}) {
+        if (!el || typeof gsap === 'undefined') {
+            if (el) el.style.visibility = 'visible';
+            return null;
+        }
+        if (typeof ScrollTrigger !== 'undefined') {
+            gsap.registerPlugin(ScrollTrigger);
+        }
+
+        const ds = el.dataset || {};
+        const distance = customOpts.distance ?? Number(ds.distance ?? 100);
+        const direction = customOpts.direction ?? (ds.direction || 'vertical');
+        const reverse = customOpts.reverse ?? (ds.reverse === 'true');
+        const duration = customOpts.duration ?? Number(ds.duration ?? 0.8);
+        const ease = customOpts.ease ?? (ds.ease || 'power3.out');
+        const initialOpacity = customOpts.initialOpacity ?? Number(ds.initialOpacity ?? 0);
+        const animateOpacity = customOpts.animateOpacity ?? (ds.animateOpacity !== 'false');
+        const scale = customOpts.scale ?? Number(ds.scale ?? 1);
+        const blur = customOpts.blur ?? Number(ds.blur ?? 0);
+        const rotate = customOpts.rotate ?? Number(ds.rotate ?? 0);
+        const tilt = customOpts.tilt ?? Number(ds.tilt ?? 0);
+        const wipe = customOpts.wipe ?? (ds.wipe || 'none');
+        const threshold = customOpts.threshold ?? Number(ds.threshold ?? 0.1);
+        const delay = customOpts.delay ?? Number(ds.delay ?? 0);
+        const stagger = customOpts.stagger ?? Number(ds.stagger ?? 0);
+        const staggerFrom = customOpts.staggerFrom ?? (ds.staggerFrom || 'start');
+        const trigger = customOpts.trigger ?? (ds.trigger || 'scroll');
+        const once = customOpts.once ?? (ds.once !== 'false');
+        const scrub = customOpts.scrub ?? (ds.scrub === 'true' ? true : (ds.scrub ? Number(ds.scrub) : false));
+        const disappearAfter = customOpts.disappearAfter ?? Number(ds.disappearAfter ?? 0);
+        const disappearDuration = customOpts.disappearDuration ?? Number(ds.disappearDuration ?? 0.5);
+        const disappearEase = customOpts.disappearEase ?? (ds.disappearEase || 'power3.in');
+
+        const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+        const targets = stagger > 0 && el.children.length ? Array.from(el.children) : [el];
+        const horizontal = direction === 'horizontal';
+        const axis = horizontal ? 'x' : 'y';
+        const sign = reverse ? -1 : 1;
+        const mask = AC_WIPES[wipe];
+
+        gsap.set(el, { visibility: 'visible' });
+
+        if (reduce) {
+            customOpts.onComplete?.();
+            return null;
+        }
+
+        const from = {
+            [axis]: distance * sign,
+            scale,
+            opacity: animateOpacity ? initialOpacity : 1
+        };
+        const to = {
+            [axis]: 0,
+            scale: 1,
+            opacity: 1,
+            duration,
+            ease
+        };
+
+        if (blur > 0) {
+            from.filter = `blur(${blur}px)`;
+            to.filter = 'blur(0px)';
+        }
+        if (rotate) {
+            from.rotation = rotate * sign;
+            to.rotation = 0;
+        }
+        if (tilt) {
+            const tiltAxis = horizontal ? 'rotationY' : 'rotationX';
+            from[tiltAxis] = horizontal ? -tilt * sign : tilt * sign;
+            to[tiltAxis] = 0;
+            from.transformPerspective = 900;
+            to.transformPerspective = 900;
+        }
+        if (mask) {
+            gsap.set(targets, { maskImage: mask, webkitMaskImage: mask });
+            from['--ac-wipe'] = 0;
+            to['--ac-wipe'] = 1;
+        }
+        if (stagger > 0) {
+            to.stagger = { each: stagger, from: staggerFrom };
+        }
+
+        const settle = () => {
+            if (scrub) return;
+            gsap.set(targets, { clearProps: mask ? 'filter,transform,maskImage,webkitMaskImage' : 'filter,transform' });
+        };
+
+        const disappear = () => {
+            if (disappearAfter <= 0) return;
+            const out = {
+                [axis]: -distance * sign,
+                scale: 0.8,
+                opacity: animateOpacity ? initialOpacity : 0,
+                delay: disappearAfter,
+                duration: disappearDuration,
+                ease: disappearEase,
+                onComplete: () => customOpts.onDisappearanceComplete?.()
+            };
+            if (blur > 0) out.filter = `blur(${blur}px)`;
+            if (stagger > 0) out.stagger = { each: stagger, from: staggerFrom };
+            gsap.to(targets, out);
+        };
+
+        const tl = gsap.timeline({
+            paused: true,
+            onStart: () => customOpts.onStart?.(),
+            onComplete: () => {
+                customOpts.onComplete?.();
+                settle();
+                if (once && !scrub) disappear();
+            }
+        });
+
+        tl.fromTo(targets, from, to, scrub ? 0 : Math.max(delay, 0));
+
+        if (trigger === 'mount' || typeof ScrollTrigger === 'undefined') {
+            tl.play();
+            return tl;
+        }
+
+        const start = `top ${(1 - threshold) * 100}%`;
+        if (scrub) {
+            ScrollTrigger.create({
+                trigger: el,
+                start,
+                end: `top ${Math.max((1 - threshold) * 100 - 45, 5)}%`,
+                scrub: scrub === true ? true : Math.max(Number(scrub) || 0, 0.01),
+                animation: tl
+            });
+            return tl;
+        }
+
+        ScrollTrigger.create({
+            trigger: el,
+            start,
+            once,
+            onEnter: () => tl.play(),
+            onLeaveBack: once ? undefined : () => {
+                if (mask) gsap.set(targets, { maskImage: mask, webkitMaskImage: mask });
+                tl.reverse();
+            }
+        });
+        return tl;
+    }
+
+    function initAnimatedContent() {
+        document.querySelectorAll('[data-animated-content]').forEach(el => {
+            animateContentElement(el);
+        });
+    }
+
+    // =========================================================================
+    //  REACT BITS <MagicBento /> INTERACTIVE ENGINE (FULL 3D ROTATE + ZERO-STUTTER)
+    //  (Full 3D RotateX/Y + Magnetism + Spotlight + Border Glow via 1-RAF/Move + GPU CSS Transition)
+    // =========================================================================
+    function initMagicBentoEngine() {
+        const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+        const cards = Array.from(document.querySelectorAll(
+            '.conditions-card, .bento-left-card, .bento-center-chart, .bento-right-balance, .deficiency-card'
+        ));
+        if (!cards.length) return;
+
+        const MB_TILT = 6.0;
+        const MB_MAGNET = 6.0;
+
+        cards.forEach(card => {
+            card.classList.add('magic-bento-card');
+            if (!card.querySelector('.magic-bento__light')) {
+                const lightEl = document.createElement('span');
+                lightEl.className = 'magic-bento__light';
+                card.appendChild(lightEl);
+            }
+            if (!card.querySelector('.magic-bento__border')) {
+                const borderEl = document.createElement('span');
+                borderEl.className = 'magic-bento__border';
+                card.appendChild(borderEl);
+            }
+        });
+
+        let rects = [];
+        let dirty = true;
+        let rafPending = false;
+        let pointerX = -9999;
+        let pointerY = -9999;
+
+        const measureCards = () => {
+            dirty = false;
+            rects = cards.map(c => c.getBoundingClientRect());
+        };
+
+        const updateFrame = () => {
+            rafPending = false;
+            if (dirty) measureCards();
+
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i];
+                const r = rects[i];
+                if (!r || r.width === 0) continue;
+
+                const lx = pointerX - r.left;
+                const ly = pointerY - r.top;
+                const inside = lx >= 0 && ly >= 0 && lx <= r.width && ly <= r.height;
+                const near = lx >= -220 && ly >= -220 && lx <= r.width + 220 && ly <= r.height + 220;
+
+                if (near) {
+                    card.style.setProperty('--mb-x', `${lx.toFixed(0)}px`);
+                    card.style.setProperty('--mb-y', `${ly.toFixed(0)}px`);
+                    card.style.setProperty('--mb-near', '1');
+                } else {
+                    card.style.setProperty('--mb-near', '0');
+                }
+
+                if (inside) {
+                    card.style.setProperty('--mb-hot', '1');
+                    if (!reduced) {
+                        const isChart = card.classList.contains('bento-center-chart');
+                        const mult = isChart ? 0.45 : 1.0;
+                        const u = (lx / r.width) - 0.5;
+                        const v = (ly / r.height) - 0.5;
+                        const rx = -v * 2 * MB_TILT * mult;
+                        const ry = u * 2 * MB_TILT * mult;
+                        const tx = u * 2 * MB_MAGNET * mult;
+                        const ty = v * 2 * MB_MAGNET * mult;
+                        card.style.setProperty('--mb-rx', `${rx.toFixed(2)}deg`);
+                        card.style.setProperty('--mb-ry', `${ry.toFixed(2)}deg`);
+                        card.style.setProperty('--mb-tx', `${tx.toFixed(1)}px`);
+                        card.style.setProperty('--mb-ty', `${ty.toFixed(1)}px`);
+                    }
+                } else {
+                    card.style.setProperty('--mb-hot', '0');
+                    card.style.setProperty('--mb-rx', '0deg');
+                    card.style.setProperty('--mb-ry', '0deg');
+                    card.style.setProperty('--mb-tx', '0px');
+                    card.style.setProperty('--mb-ty', '0px');
+                }
+            }
+        };
+
+        window.addEventListener('pointermove', e => {
+            pointerX = e.clientX;
+            pointerY = e.clientY;
+            if (!rafPending) {
+                rafPending = true;
+                requestAnimationFrame(updateFrame);
+            }
+        }, { passive: true });
+
+        window.addEventListener('pointerdown', e => {
+            const c = e.target instanceof Element ? e.target.closest('.magic-bento-card') : null;
+            if (c && !reduced) c.style.setProperty('--mb-press', '0.985');
+        }, { passive: true });
+
+        const releasePress = () => {
+            cards.forEach(c => c.style.setProperty('--mb-press', '1'));
+        };
+        window.addEventListener('pointerup', releasePress, { passive: true });
+        window.addEventListener('pointercancel', releasePress, { passive: true });
+
+        window.addEventListener('scroll', () => { dirty = true; }, { passive: true, capture: true });
+        window.addEventListener('resize', () => { dirty = true; }, { passive: true });
+
+        window.triggerMagicBentoWave = () => {
+            dirty = true;
+        };
+    }
+
+    function initDataViews() {
+        renderPills();
+        updateControlDisplay();
+        initAllJellyRadios();
+    }
+
+    // =========================================================================
+    //  REACT BITS <JellyRadio /> GPU-ACCELERATED ENGINE (ORIGINAL FULL STRENGTH)
+    //  (Full Swell=0.20, Barge=6px, Shrink=0.05 + Wide-Before-Tall Split via GSAP Elastic)
+    // =========================================================================
+    function applyJellyRadioGroup(container, selectedIndex, instant = false, customCfg = {}) {
+        if (!container) return;
+        const chips = Array.from(container.querySelectorAll('button'));
+        if (!chips.length) return;
+
+        const swell = customCfg.swell ?? 0.20;
+        const barge = customCfg.barge ?? 6;
+        const shrink = customCfg.shrink ?? 0.05;
+        const stagger = customCfg.stagger ?? 0.022;
+        const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+
+        const sel = Math.max(0, Math.min(chips.length - 1, selectedIndex));
+        const activeWidth = chips[sel]?.offsetWidth || 78;
+        const push = (activeWidth * swell) / 2 + barge;
+
+        chips.forEach((chip, i) => {
+            const on = i === sel;
+            const far = Math.abs(i - sel);
+            const dir = Math.sign(i - sel);
+            const x = dir * push;
+            const s = on ? 1 + swell : 1 - shrink;
+            const d = far * stagger;
+
+            if (instant || reduce || typeof gsap === 'undefined') {
+                chip.style.transform = `translate3d(${x.toFixed(1)}px, 0, 0) scale(${s.toFixed(3)}, ${s.toFixed(3)})`;
+            } else {
+                gsap.killTweensOf(chip);
+                // 1) Horizontal push + Wide-before-tall sx spring
+                gsap.to(chip, {
+                    x: x,
+                    scaleX: s,
+                    duration: 0.48,
+                    delay: d,
+                    ease: 'elastic.out(1.05, 0.52)',
+                    overwrite: 'auto'
+                });
+                // 2) Tall catch-up sy spring (delayed 45ms for true Jelly split)
+                gsap.to(chip, {
+                    scaleY: s,
+                    duration: 0.52,
+                    delay: d + 0.045,
+                    ease: 'elastic.out(1.0, 0.58)',
+                    overwrite: false
+                });
+            }
+        });
+    }
+
+    function initAllJellyRadios() {
+        const pillGroup = document.getElementById('pillNavigationContainer');
+        if (pillGroup) {
+            const buttons = Array.from(pillGroup.querySelectorAll('.nav-pill-btn'));
+            const idx = Math.max(0, buttons.findIndex(b => b.classList.contains('active')));
+            applyJellyRadioGroup(pillGroup, idx, true, { swell: 0.20, barge: 6, shrink: 0.05 });
+        }
+        const chartTabs = document.querySelector('.chart-type-tabs');
+        if (chartTabs) {
+            const buttons = Array.from(chartTabs.querySelectorAll('.chart-tab-btn'));
+            const idx = Math.max(0, buttons.findIndex(b => b.classList.contains('active')));
+            applyJellyRadioGroup(chartTabs, idx, true, { swell: 0.18, barge: 5.5, shrink: 0.05 });
+        }
+        const rangePills = document.querySelector('.time-range-pills');
+        if (rangePills) {
+            const buttons = Array.from(rangePills.querySelectorAll('.range-pill'));
+            const idx = Math.max(0, buttons.findIndex(b => b.classList.contains('active')));
+            applyJellyRadioGroup(rangePills, idx, true, { swell: 0.18, barge: 5, shrink: 0.045 });
+
+            buttons.forEach((btn, i) => {
+                btn.addEventListener('click', () => {
+                    buttons.forEach((b, j) => b.classList.toggle('active', j === i));
+                    applyJellyRadioGroup(rangePills, i, false, { swell: 0.18, barge: 5, shrink: 0.045 });
+                });
+            });
+        }
+    }
+
+    function renderPills() {
+        const container = document.getElementById('pillNavigationContainer');
+        if (!container) return;
+
+        const list = [
+            { id: 'all', label: 'ทั้งหมด (9–22 ต.ค.)' },
+            { id: '7d', label: '7 วันล่าสุด' },
+            { id: 'round1', label: 'รอบสารละลายที่ 1' },
+            { id: 'round2', label: 'รอบสารละลายที่ 2 (ล่าสุด)' },
+        ];
+
+        container.innerHTML = list.map(item => `
+            <button class="nav-pill-btn ${item.id === currentTimeRange ? 'active' : ''}" id="pillRange_${item.id}" onclick="switchTimeRange('${item.id}')">
+                <span class="pill-dot" style="background: var(--color-control);"></span>
+                <span>${item.label}</span>
+            </button>
+        `).join('');
+    }
+
+    function getFilteredControlReadings() {
+        if (!sensorData || !sensorData.readings) return [];
+        const allControl = sensorData.readings.filter(r => r.tank === 'Control');
+        if (currentTimeRange === 'round1') {
+            return allControl.filter(r => r.solution_round === 'รอบ 1');
+        }
+        if (currentTimeRange === 'round2') {
+            return allControl.filter(r => r.solution_round === 'รอบ 2');
+        }
+        if (currentTimeRange === '7d') {
+            const cutoff = new Date('2026-10-16T00:00:00').getTime();
+            return allControl.filter(r => new Date(r.ts).getTime() >= cutoff);
+        }
+        return allControl;
+    }
+
+    function getFilteredControlImages() {
+        const allImgs = (imagesManifest && imagesManifest['Control']) ? imagesManifest['Control'] : [];
+        if (!allImgs.length) return [];
+        if (currentTimeRange === 'round1') {
+            return allImgs.filter(name => {
+                const m = name.match(/^(\d{2})_/);
+                return m ? parseInt(m[1], 10) <= 14 : true;
+            });
+        }
+        if (currentTimeRange === 'round2') {
+            return allImgs.filter(name => {
+                const m = name.match(/^(\d{2})_/);
+                return m ? parseInt(m[1], 10) >= 15 : true;
+            });
+        }
+        if (currentTimeRange === '7d') {
+            return allImgs.filter(name => {
+                const m = name.match(/^(\d{2})_/);
+                return m ? parseInt(m[1], 10) >= 15 : true;
+            });
+        }
+        return allImgs;
+    }
+
+    function switchTimeRange(rangeKey) {
+        currentTimeRange = rangeKey;
+        const pillGroup = document.getElementById('pillNavigationContainer');
+        const pillButtons = pillGroup ? Array.from(pillGroup.querySelectorAll('.nav-pill-btn')) : [];
+        let activeIdx = 0;
+        pillButtons.forEach((btn, idx) => {
+            const isMatch = btn.id === 'pillRange_' + rangeKey;
+            btn.classList.toggle('active', isMatch);
+            if (isMatch) activeIdx = idx;
+        });
+
+        if (pillGroup && pillButtons.length) {
+            applyJellyRadioGroup(pillGroup, activeIdx, false, { swell: 0.20, barge: 6, shrink: 0.05 });
+        }
+
+        updateControlDisplay();
+        renderChart();
+
+        animateContentElement(document.querySelector('.hero-headline-box'), {
+            distance: 18,
+            direction: 'vertical',
+            duration: 0.45,
+            ease: 'power3.out',
+            blur: 4,
+            trigger: 'mount'
+        });
+        animateContentElement(document.getElementById('chartsSection'), {
+            distance: 24,
+            direction: 'vertical',
+            duration: 0.52,
+            ease: 'power3.out',
+            blur: 6,
+            stagger: 0.06,
+            trigger: 'mount'
+        });
+    }
+
+    function updateControlDisplay() {
+        const rangeSpec = TIME_RANGE_SPECS[currentTimeRange] || TIME_RANGE_SPECS.all;
+        const readings = getFilteredControlReadings();
+        const imgList = getFilteredControlImages();
+
+        document.getElementById('heroTitle').textContent = CONTROL_SPEC.title;
+        document.getElementById('heroSubtitle').textContent = rangeSpec.sub;
+        document.getElementById('heroBaselineEC').textContent = CONTROL_SPEC.baseline;
+        document.getElementById('heroAcidBadge').textContent = CONTROL_SPEC.acid;
+        document.getElementById('metricRound').textContent = rangeSpec.badge;
+
+        const imgCountEl = document.getElementById('controlImgCountVal');
+        if (imgCountEl) imgCountEl.textContent = `${imgList.length} ภาพ`;
+
+        const lastEc = getLastVal(readings, 'ec');
+        const lastPh = getLastPhVal(readings);
+        const lastTemp = getLastVal(readings, 'temp');
+
+        document.getElementById('metricEc').textContent = lastEc !== null ? lastEc : '--';
+        document.getElementById('metricPh').textContent = lastPh !== null ? lastPh : '--';
+        document.getElementById('metricTemp').textContent = lastTemp !== null ? lastTemp : '28.0';
+
+        // Ring gauge EC vs Baseline (2.641)
+        const ringCenter = document.getElementById('ringCenterEc');
+        if (ringCenter) ringCenter.textContent = lastEc !== null ? lastEc : '--';
+        const ringCircle = document.getElementById('ringProgressCircle');
+        if (ringCircle && lastEc !== null) {
+            const circumference = 2 * Math.PI * 56; // ~351.86
+            const ratio = Math.min(1, Math.max(0.15, lastEc / 3.2));
+            ringCircle.style.strokeDasharray = `${circumference.toFixed(1)}`;
+            ringCircle.style.strokeDashoffset = `${(circumference * (1 - ratio)).toFixed(1)}`;
+        }
+
+        const chartHeroVal = document.getElementById('chartHeroVal');
+        if (chartHeroVal && lastEc !== null) {
+            if (currentChartType === 'ec') chartHeroVal.textContent = `${lastEc} mS/cm`;
+            else if (currentChartType === 'ph') chartHeroVal.textContent = `${lastPh} pH`;
+            else chartHeroVal.textContent = `${lastTemp ?? 28.0} °C`;
+        }
+
+        const chartHeroDelta = document.getElementById('chartHeroDelta');
+        if (chartHeroDelta) chartHeroDelta.textContent = `Baseline ${CONTROL_SPEC.baseline}`;
+
+        if (lastEc !== null && CONTROL_SPEC.baseline) {
+            const diff = (((lastEc - CONTROL_SPEC.baseline) / CONTROL_SPEC.baseline) * 100).toFixed(1);
+            const sign = diff > 0 ? '+' : '';
+            const diffEl = document.getElementById('metricEcDiff');
+            diffEl.textContent = sign + diff + '%';
+            diffEl.style.color = 'var(--color-control)';
+
+            const stabilityScore = Math.max(80, Math.min(99.5, 100 - Math.abs(parseFloat(diff)))).toFixed(1);
+            const balEcVal = document.getElementById('balControlEcVal');
+            const balEcBar = document.getElementById('balControlEcBar');
+            if (balEcVal) balEcVal.textContent = `${lastEc} mS (${stabilityScore}%)`;
+            if (balEcBar) balEcBar.style.width = `${stabilityScore}%`;
+        }
+
+        if (lastPh !== null) {
+            const inOptimal = lastPh >= 5.5 && lastPh <= 6.5;
+            const balPhVal = document.getElementById('balControlPhVal');
+            const balPhBar = document.getElementById('balControlPhBar');
+            if (balPhVal) balPhVal.textContent = `${lastPh} pH (${inOptimal ? 'ในเกณฑ์' : 'ใกล้เกณฑ์'})`;
+            if (balPhBar) balPhBar.style.width = inOptimal ? '94%' : '82%';
+        }
+
+        if (lastTemp !== null) {
+            const balTempVal = document.getElementById('balControlTempVal');
+            const balTempBar = document.getElementById('balControlTempBar');
+            if (balTempVal) balTempVal.textContent = `${lastTemp} °C (ปกติ)`;
+            if (balTempBar) balTempBar.style.width = '95%';
+        }
+
+        // Update 4-Class AI Late-Fusion Probabilities for Control Tank
+        const p = rangeSpec.probs;
+        document.getElementById('probControlVal').textContent = `${p.control.toFixed(1)}%`;
+        document.getElementById('probNVal').textContent = `${p.n.toFixed(1)}%`;
+        document.getElementById('probPVal').textContent = `${p.p.toFixed(1)}%`;
+        document.getElementById('probKVal').textContent = `${p.k.toFixed(1)}%`;
+
+        document.getElementById('probControlBar').style.width = `${p.control}%`;
+        document.getElementById('probNBar').style.width = `${Math.max(4, p.n * 2.5)}%`;
+        document.getElementById('probPBar').style.width = `${Math.max(4, p.p * 2.5)}%`;
+        document.getElementById('probKBar').style.width = `${Math.max(4, p.k * 2.5)}%`;
+
+        const tile1 = document.getElementById('assistantTile1');
+        if (tile1) tile1.textContent = `ครบธาตุ (${p.control.toFixed(1)}%)`;
+
+        const balAiVal = document.getElementById('balControlAiVal');
+        const balAiBar = document.getElementById('balControlAiBar');
+        if (balAiVal) balAiVal.textContent = `${p.control.toFixed(1)}% (แม่นยำสูง)`;
+        if (balAiBar) balAiBar.style.width = `${p.control}%`;
+
+        // Update Foliage & Solution Bars
+        document.getElementById('leafHealthPct').textContent = `${rangeSpec.leafIndex}%`;
+        document.getElementById('leafHealthBar').style.width = `${rangeSpec.leafIndex}%`;
+        document.getElementById('solutionStabilityPct').textContent = `${rangeSpec.stability}%`;
+        document.getElementById('solutionStabilityBar').style.width = `${rangeSpec.stability}%`;
+
+        const assistantMsg = document.getElementById('assistantInputMsg');
+        if (assistantMsg) {
+            assistantMsg.textContent = `ถัง Control (${rangeSpec.label}): EC ${lastEc ?? '--'} mS/cm • pH ${lastPh ?? '--'} • AI ทำนายครบธาตุ ${p.control.toFixed(1)}%`;
+        }
+
+        currentImageIndex = Math.max(0, imgList.length - 1);
+        updateSpotlightImage();
+    }
+
+    function updateSpotlightImage() {
+        const imgList = getFilteredControlImages();
+        const imgEl = document.getElementById('plantCenterImg');
+        const dayBadge = document.getElementById('imageDayLabel');
+
+        if (!imgList.length) {
+            if (dayBadge) dayBadge.textContent = 'ไม่มีภาพในช่วงนี้';
+            return;
+        }
+
+        if (currentImageIndex < 0) currentImageIndex = 0;
+        if (currentImageIndex >= imgList.length) currentImageIndex = imgList.length - 1;
+
+        const filename = imgList[currentImageIndex];
+        if (imgEl) {
+            imgEl.style.opacity = '0.6';
+            setTimeout(() => {
+                imgEl.src = `images_real/Control/${filename}`;
+                imgEl.style.opacity = '1';
+            }, 120);
+        }
+
+        let label = `ภาพ ${currentImageIndex + 1}/${imgList.length}`;
+        const match = filename.match(/^(\d{2})_(\d{2})_(\d{4})/);
+        if (match) {
+            const day = parseInt(match[1], 10);
+            const dayNum = day - 8;
+            label = `Day ${dayNum >= 1 ? dayNum : 1} (${day} ต.ค.)`;
+        }
+        if (dayBadge) dayBadge.textContent = label;
+    }
+
+    function prevDayImage() {
+        if (currentImageIndex > 0) {
+            currentImageIndex--;
+            updateSpotlightImage();
+        }
+    }
+
+    function nextDayImage() {
+        const imgList = getFilteredControlImages();
+        if (currentImageIndex < imgList.length - 1) {
+            currentImageIndex++;
+            updateSpotlightImage();
+        }
+    }
+
+    function getLastVal(arr, field) {
+        for (let i = arr.length - 1; i >= 0; i--) {
+            if (arr[i][field] !== null && arr[i][field] !== undefined) return arr[i][field];
+        }
+        return null;
+    }
+
+    function getLastPhVal(arr) {
+        for (let i = arr.length - 1; i >= 0; i--) {
+            if (arr[i].ph_after !== null) return arr[i].ph_after;
+            if (arr[i].ph_before !== null) return arr[i].ph_before;
+        }
+        return null;
+    }
+
+    // =========================================================================
+    //  CHART ENGINE (CONTROL TANK ONLY)
+    // =========================================================================
+
+    function switchChartType(type) {
+        currentChartType = type;
+        const chartTabs = document.querySelector('.chart-type-tabs');
+        const buttons = chartTabs ? Array.from(chartTabs.querySelectorAll('.chart-tab-btn')) : [];
+        let activeIdx = 0;
+        buttons.forEach((btn, idx) => {
+            const isMatch = btn.id === 'tabBtn' + type.charAt(0).toUpperCase() + type.slice(1);
+            btn.classList.toggle('active', isMatch);
+            if (isMatch) activeIdx = idx;
+        });
+
+        if (chartTabs && buttons.length) {
+            applyJellyRadioGroup(chartTabs, activeIdx, false, { swell: 0.18, barge: 5.5, shrink: 0.05 });
+        }
+
+        const titles = {
+            ec: 'แนวโน้มค่าความนำไฟฟ้า ถัง Control (EC Trend)',
+            ph: 'แนวโน้มความเป็นกรด-ด่าง ถัง Control (pH ก่อนและหลังปรับ)',
+            temp: 'แนวโน้มอุณหภูมิน้ำ ถัง Control (Water Temperature)'
+        };
+        document.getElementById('chartTitle').textContent = titles[type];
+
+        const readings = getFilteredControlReadings();
+        const chartHeroVal = document.getElementById('chartHeroVal');
+        const chartHeroDelta = document.getElementById('chartHeroDelta');
+        if (type === 'ec') {
+            const v = getLastVal(readings, 'ec');
+            if (chartHeroVal && v !== null) chartHeroVal.textContent = `${v} mS/cm`;
+            if (chartHeroDelta) chartHeroDelta.textContent = `Baseline ${CONTROL_SPEC.baseline}`;
+        } else if (type === 'ph') {
+            const v = getLastPhVal(readings);
+            if (chartHeroVal && v !== null) chartHeroVal.textContent = `${v} pH`;
+            if (chartHeroDelta) chartHeroDelta.textContent = `เกณฑ์เหมาะสม 5.5–6.5`;
+        } else {
+            const v = getLastVal(readings, 'temp');
+            if (chartHeroVal && v !== null) chartHeroVal.textContent = `${v} °C`;
+            if (chartHeroDelta) chartHeroDelta.textContent = `เกณฑ์ปกติ 25–30 °C`;
+        }
+
+        renderChart();
+    }
+
+    function renderChart() {
+        if (!sensorData || !sensorData.readings) return;
+        if (interactiveChart) interactiveChart.destroy();
+
+        const ctx = document.getElementById('interactiveCanvas').getContext('2d');
+        const tankReadings = getFilteredControlReadings();
+
+        let dataPoints = [];
+        let yLabel = '';
+        let minY = 0;
+        let maxY = 4;
+
+        const isDark = themeState.isDark;
+        const chartLineColor = isDark ? '#34d399' : CONTROL_SPEC.color;
+        const datasets = [];
+
+        if (currentChartType === 'ec') {
+            yLabel = 'EC (mS/cm)';
+            minY = 1.8;
+            maxY = 3.4;
+            dataPoints = tankReadings
+                .filter(r => r.ec !== null)
+                .map(r => ({ x: new Date(r.ts).getTime(), y: r.ec }));
+
+            datasets.push({
+                label: `ถัง Control - ${yLabel}`,
+                data: dataPoints,
+                borderColor: chartLineColor,
+                backgroundColor: chartLineColor + '28',
+                borderWidth: 2.5,
+                tension: 0.35,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: chartLineColor
+            });
+
+            if (dataPoints.length) {
+                datasets.push({
+                    label: `Baseline (${CONTROL_SPEC.baseline} mS/cm)`,
+                    data: dataPoints.map(p => ({ x: p.x, y: CONTROL_SPEC.baseline })),
+                    borderColor: isDark ? 'rgba(167, 243, 208, 0.55)' : 'rgba(40, 66, 53, 0.45)',
+                    borderWidth: 1.5,
+                    borderDash: [6, 4],
+                    pointRadius: 0,
+                    fill: false
+                });
+            }
+        } else if (currentChartType === 'ph') {
+            yLabel = 'pH';
+            minY = 4.8;
+            maxY = 8.5;
+            dataPoints = tankReadings
+                .filter(r => r.ph_after !== null || r.ph_before !== null)
+                .map(r => ({
+                    x: new Date(r.ts).getTime(),
+                    y: r.ph_after !== null ? r.ph_after : r.ph_before
+                }));
+
+            const beforePoints = tankReadings
+                .filter(r => r.ph_before !== null)
+                .map(r => ({ x: new Date(r.ts).getTime(), y: r.ph_before }));
+
+            datasets.push({
+                label: 'ถัง Control - pH หลังปรับสมดุล',
+                data: dataPoints,
+                borderColor: chartLineColor,
+                backgroundColor: chartLineColor + '28',
+                borderWidth: 2.5,
+                tension: 0.35,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: chartLineColor
+            });
+
+            if (beforePoints.length) {
+                datasets.push({
+                    label: 'ถัง Control - pH ก่อนปรับสมดุล',
+                    data: beforePoints,
+                    borderColor: isDark ? '#fbbf24' : '#b45309',
+                    backgroundColor: 'transparent',
+                    borderWidth: 2,
+                    borderDash: [4, 4],
+                    tension: 0.35,
+                    fill: false,
+                    pointRadius: 3.5,
+                    pointBackgroundColor: isDark ? '#fbbf24' : '#b45309'
+                });
+            }
+
+            if (dataPoints.length) {
+                datasets.push({
+                    label: 'Optimal pH (6.5)',
+                    data: dataPoints.map(p => ({ x: p.x, y: 6.5 })),
+                    borderColor: isDark ? 'rgba(110, 231, 183, 0.55)' : 'rgba(30, 94, 65, 0.42)',
+                    borderWidth: 1.2,
+                    borderDash: [5, 4],
+                    pointRadius: 0,
+                    fill: false
+                });
+                datasets.push({
+                    label: 'Optimal pH (5.5)',
+                    data: dataPoints.map(p => ({ x: p.x, y: 5.5 })),
+                    borderColor: isDark ? 'rgba(110, 231, 183, 0.55)' : 'rgba(30, 94, 65, 0.42)',
+                    borderWidth: 1.2,
+                    borderDash: [5, 4],
+                    pointRadius: 0,
+                    fill: false
+                });
+            }
+        } else {
+            yLabel = 'อุณหภูมิน้ำ (°C)';
+            minY = 22.0;
+            maxY = 34.0;
+            dataPoints = tankReadings
+                .filter(r => r.temp !== null)
+                .map(r => ({ x: new Date(r.ts).getTime(), y: r.temp }));
+
+            datasets.push({
+                label: `ถัง Control - ${yLabel}`,
+                data: dataPoints,
+                borderColor: chartLineColor,
+                backgroundColor: chartLineColor + '28',
+                borderWidth: 2.5,
+                tension: 0.35,
+                fill: true,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+                pointBackgroundColor: chartLineColor
+            });
+        }
+
+        interactiveChart = new Chart(ctx, {
+            type: 'line',
+            data: { datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 33, 23, 0.92)',
+                        titleColor: '#f4f9f6',
+                        bodyColor: 'rgba(244, 249, 246, 0.88)',
+                        borderColor: 'rgba(255, 255, 255, 0.18)',
+                        borderWidth: 1,
+                        padding: 10,
+                        cornerRadius: 10,
+                        titleFont: { family: 'Kanit', size: 12 },
+                        bodyFont: { family: 'JetBrains Mono', size: 12 },
+                        callbacks: {
+                            title: (items) => {
+                                if (!items.length) return '';
+                                const d = new Date(items[0].parsed.x);
+                                return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short' }) + ' ' + d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            tooltipFormat: 'PPpp',
+                            displayFormats: { hour: 'd MMM HH:mm', day: 'd MMM' }
+                        },
+                        ticks: {
+                            color: themeState.isDark ? '#d5e8dd' : '#284235',
+                            font: { family: 'Kanit', size: 11 }
+                        },
+                        grid: { color: themeState.isDark ? 'rgba(167, 243, 208, 0.10)' : 'rgba(30, 77, 56, 0.06)' }
+                    },
+                    y: {
+                        min: minY,
+                        max: maxY,
+                        title: { display: true, text: yLabel, color: themeState.isDark ? '#f4fbf7' : '#284235' },
+                        ticks: {
+                            color: themeState.isDark ? '#d5e8dd' : '#284235',
+                            font: { family: 'JetBrains Mono', size: 11 }
+                        },
+                        grid: { color: themeState.isDark ? 'rgba(167, 243, 208, 0.10)' : 'rgba(30, 77, 56, 0.06)' }
+                    }
+                }
+            }
+        });
+    }
+
+    // =========================================================================
+    //  UI INTERACTIONS & THEME ENGINE
+    // =========================================================================
+
+    function scrollToCharts() {
+        document.getElementById('chartsSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function runHealthCheck() {
+        const rangeSpec = TIME_RANGE_SPECS[currentTimeRange] || TIME_RANGE_SPECS.all;
+        const input = document.getElementById('assistantInputMsg');
+        input.textContent = `กำลังวิเคราะห์ข้อมูลเซนเซอร์และภาพใบของ ถัง Control (${rangeSpec.label})...`;
+        setTimeout(() => {
+            input.textContent = `ผลวิเคราะห์ ถัง Control: สารละลายสมดุล (EC ใกล้ Baseline 2.641) • AI ทำนายครบธาตุ ${rangeSpec.probs.control.toFixed(1)}%`;
+        }, 480);
+    }
+
+    function showDeficiencyReport() {
+        const rangeSpec = TIME_RANGE_SPECS[currentTimeRange] || TIME_RANGE_SPECS.all;
+        const p = rangeSpec.probs;
+        const input = document.getElementById('assistantInputMsg');
+        input.textContent = `ผลทำนาย AI 4 คลาส (ถัง Control): ครบธาตุ ${p.control.toFixed(1)}% | ขาด N ${p.n.toFixed(1)}% | ขาด P ${p.p.toFixed(1)}% | ขาด K ${p.k.toFixed(1)}%`;
+    }
+
+    function openPhotoViewer() {
+        const imgList = getFilteredControlImages();
+        const input = document.getElementById('assistantInputMsg');
+        input.textContent = `กำลังแสดงชุดภาพถ่ายมุมสูงของถัง Control ในช่วงที่เลือก (${imgList.length} ภาพ)`;
+    }
+
+    function toggleSettings(open) {
+        document.getElementById('settingsOverlay').classList.toggle('open', open);
+        document.getElementById('settingsDrawer').classList.toggle('open', open);
+    }
+
+    function applyTheme(h, s, l, isDark) {
+        themeState.h = h;
+        themeState.s = s;
+        themeState.l = l;
+        themeState.isDark = isDark;
+        applyThemeStyles();
+        saveTheme();
+    }
+
+    function changeHue(v) {
+        themeState.h = parseInt(v);
+        document.getElementById('txtHue').textContent = v + '°';
+        applyThemeStyles();
+        saveTheme();
+    }
+
+    function changeSat(v) {
+        themeState.s = parseInt(v);
+        document.getElementById('txtSat').textContent = v + '%';
+        applyThemeStyles();
+        saveTheme();
+    }
+
+    function changeLight(v) {
+        themeState.l = parseInt(v);
+        themeState.isDark = themeState.l < 45;
+        document.getElementById('txtLight').textContent = v + '%';
+        applyThemeStyles();
+        saveTheme();
+    }
+
+    function changeBlur(v) {
+        themeState.blur = parseInt(v);
+        document.getElementById('txtBlur').textContent = v + 'px';
+        applyThemeStyles();
+        saveTheme();
+    }
+
+    function resetTheme() {
+        applyTheme(145, 16, 88, false);
+    }
+
+    function applyThemeStyles() {
+        const root = document.documentElement;
+        root.style.setProperty('--bg-h', themeState.h);
+        root.style.setProperty('--bg-s', themeState.s + '%');
+        root.style.setProperty('--bg-l', themeState.l + '%');
+        root.style.setProperty('--glass-blur', themeState.blur + 'px');
+
+        document.body.classList.toggle('dark-mode', themeState.isDark);
+
+        document.getElementById('rngHue').value = themeState.h;
+        document.getElementById('rngSat').value = themeState.s;
+        document.getElementById('rngLight').value = themeState.l;
+        document.getElementById('rngBlur').value = themeState.blur;
+
+        document.getElementById('txtHue').textContent = themeState.h + '°';
+        document.getElementById('txtSat').textContent = themeState.s + '%';
+        document.getElementById('txtLight').textContent = themeState.l + '%';
+        document.getElementById('txtBlur').textContent = themeState.blur + 'px';
+
+        if (interactiveChart) renderChart();
+    }
+
+    function saveTheme() {
+        try {
+            localStorage.setItem('hydro_forest_theme', JSON.stringify(themeState));
+        } catch (e) {}
+    }
+
+    function loadSavedTheme() {
+        try {
+            const saved = localStorage.getItem('hydro_forest_theme');
+            if (saved) {
+                themeState = { ...themeState, ...JSON.parse(saved) };
+            }
+        } catch (e) {}
+        applyThemeStyles();
+    }
+    </script>
+</body>
+</html>

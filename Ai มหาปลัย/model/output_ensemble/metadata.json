@@ -1,0 +1,326 @@
+{
+  "model_version": "v2.0-hierarchical-multimodal-ensemble",
+  "trained_at": "2026-10-22T13:26:33.063130",
+  "classes": [
+    "healthy",
+    "nitrogen",
+    "phosphorus",
+    "potassium"
+  ],
+  "total_base_images": 286,
+  "real_base_images": 92,
+  "external_base_images": 194,
+  "vision_ensemble_weights": {
+    "ModelA1_MobileNetV2": 0.25,
+    "ModelA2_MultiScale_SE_CNN": 0.05,
+    "ModelA3_Foliar_ColorTexture": 0.7
+  },
+  "late_fusion_weights": {
+    "w_img": 0.35,
+    "w_sen": 0.65
+  },
+  "ablation_summary": [
+    {
+      "model_name": "Naive Majority Baseline",
+      "key": "naive",
+      "combined_acc": 0.25,
+      "combined_f1": 0.1,
+      "combined_precision": 0.0625,
+      "combined_recall": 0.25,
+      "ci95_low": 0.1364,
+      "ci95_high": 0.3864,
+      "real_holdout_acc": 0.2381,
+      "real_holdout_f1": 0.0962
+    },
+    {
+      "model_name": "Sensor B0: Logistic Regression (Baseline)",
+      "key": "P_B0",
+      "combined_acc": 0.8182,
+      "combined_f1": 0.8207,
+      "combined_precision": 0.827,
+      "combined_recall": 0.8197,
+      "ci95_low": 0.7045,
+      "ci95_high": 0.9318,
+      "real_holdout_acc": 0.9048,
+      "real_holdout_f1": 0.9025
+    },
+    {
+      "model_name": "Sensor B1: Gradient Boosting",
+      "key": "P_B1",
+      "combined_acc": 1.0,
+      "combined_f1": 1.0,
+      "combined_precision": 1.0,
+      "combined_recall": 1.0,
+      "ci95_low": 1.0,
+      "ci95_high": 1.0,
+      "real_holdout_acc": 1.0,
+      "real_holdout_f1": 1.0
+    },
+    {
+      "model_name": "Sensor B2: Random Forest",
+      "key": "P_B2",
+      "combined_acc": 1.0,
+      "combined_f1": 1.0,
+      "combined_precision": 1.0,
+      "combined_recall": 1.0,
+      "ci95_low": 1.0,
+      "ci95_high": 1.0,
+      "real_holdout_acc": 1.0,
+      "real_holdout_f1": 1.0
+    },
+    {
+      "model_name": "Sensor B3: Extra Trees",
+      "key": "P_B3",
+      "combined_acc": 0.9773,
+      "combined_f1": 0.9781,
+      "combined_precision": 0.9808,
+      "combined_recall": 0.9773,
+      "ci95_low": 0.9313,
+      "ci95_high": 1.0,
+      "real_holdout_acc": 1.0,
+      "real_holdout_f1": 1.0
+    },
+    {
+      "model_name": "Stream B: Sensor Ensemble (Soft Vote)",
+      "key": "P_sen_ens",
+      "combined_acc": 1.0,
+      "combined_f1": 1.0,
+      "combined_precision": 1.0,
+      "combined_recall": 1.0,
+      "ci95_low": 1.0,
+      "ci95_high": 1.0,
+      "real_holdout_acc": 1.0,
+      "real_holdout_f1": 1.0
+    },
+    {
+      "model_name": "Vision A1: MobileNetV2 (Two-Stage FT)",
+      "key": "P_A1",
+      "combined_acc": 0.6591,
+      "combined_f1": 0.6054,
+      "combined_precision": 0.8229,
+      "combined_recall": 0.6424,
+      "ci95_low": 0.5227,
+      "ci95_high": 0.7955,
+      "real_holdout_acc": 0.6667,
+      "real_holdout_f1": 0.6499
+    },
+    {
+      "model_name": "Vision A2: Multi-Scale SE-Attention CNN",
+      "key": "P_A2",
+      "combined_acc": 0.5,
+      "combined_f1": 0.4182,
+      "combined_precision": 0.397,
+      "combined_recall": 0.4792,
+      "ci95_low": 0.3636,
+      "ci95_high": 0.6591,
+      "real_holdout_acc": 0.4286,
+      "real_holdout_f1": 0.3438
+    },
+    {
+      "model_name": "Vision A3: Foliar Color-Texture Expert",
+      "key": "P_A3",
+      "combined_acc": 0.6136,
+      "combined_f1": 0.5976,
+      "combined_precision": 0.6339,
+      "combined_recall": 0.6034,
+      "ci95_low": 0.4773,
+      "ci95_high": 0.75,
+      "real_holdout_acc": 0.4762,
+      "real_holdout_f1": 0.4626
+    },
+    {
+      "model_name": "Stream A: Vision Ensemble (A1+A2+A3)",
+      "key": "P_img_ens",
+      "combined_acc": 0.7273,
+      "combined_f1": 0.6912,
+      "combined_precision": 0.7749,
+      "combined_recall": 0.7129,
+      "ci95_low": 0.5909,
+      "ci95_high": 0.8415,
+      "real_holdout_acc": 0.7143,
+      "real_holdout_f1": 0.6876
+    },
+    {
+      "model_name": "Hierarchical Multimodal Late-Fusion (w=0.35/0.65)",
+      "key": "P_fusion",
+      "combined_acc": 1.0,
+      "combined_f1": 1.0,
+      "combined_precision": 1.0,
+      "combined_recall": 1.0,
+      "ci95_low": 1.0,
+      "ci95_high": 1.0,
+      "real_holdout_acc": 1.0,
+      "real_holdout_f1": 1.0
+    }
+  ],
+  "unit_predictions": {
+    "Control": {
+      "unit": "Control",
+      "true_class": "healthy",
+      "predicted_class": "healthy",
+      "probabilities_pct": {
+        "healthy": 83.89,
+        "nitrogen": 9.61,
+        "phosphorus": 2.67,
+        "potassium": 3.83
+      },
+      "vision_stream_conf_pct": 67.23,
+      "sensor_stream_conf_pct": 96.77,
+      "sample_count": 19
+    },
+    "Cup1": {
+      "unit": "Cup1",
+      "true_class": "healthy",
+      "predicted_class": "healthy",
+      "probabilities_pct": {
+        "healthy": 70.62,
+        "nitrogen": 8.76,
+        "phosphorus": 7.2,
+        "potassium": 13.41
+      },
+      "vision_stream_conf_pct": 59.91,
+      "sensor_stream_conf_pct": 89.22,
+      "sample_count": 2
+    },
+    "Cup2": {
+      "unit": "Cup2",
+      "true_class": "healthy",
+      "predicted_class": "healthy",
+      "probabilities_pct": {
+        "healthy": 86.42,
+        "nitrogen": 3.67,
+        "phosphorus": 3.26,
+        "potassium": 6.65
+      },
+      "vision_stream_conf_pct": 86.52,
+      "sensor_stream_conf_pct": 82.84,
+      "sample_count": 2
+    },
+    "Cup3": {
+      "unit": "Cup3",
+      "true_class": "nitrogen",
+      "predicted_class": "nitrogen",
+      "probabilities_pct": {
+        "healthy": 7.22,
+        "nitrogen": 84.25,
+        "phosphorus": 4.47,
+        "potassium": 4.06
+      },
+      "vision_stream_conf_pct": 85.52,
+      "sensor_stream_conf_pct": 86.76,
+      "sample_count": 2
+    },
+    "Cup4": {
+      "unit": "Cup4",
+      "true_class": "nitrogen",
+      "predicted_class": "nitrogen",
+      "probabilities_pct": {
+        "healthy": 9.26,
+        "nitrogen": 78.29,
+        "phosphorus": 8.89,
+        "potassium": 3.57
+      },
+      "vision_stream_conf_pct": 60.69,
+      "sensor_stream_conf_pct": 87.55,
+      "sample_count": 2
+    },
+    "Cup5": {
+      "unit": "Cup5",
+      "true_class": "phosphorus",
+      "predicted_class": "phosphorus",
+      "probabilities_pct": {
+        "healthy": 9.93,
+        "nitrogen": 7.07,
+        "phosphorus": 77.38,
+        "potassium": 5.62
+      },
+      "vision_stream_conf_pct": 70.83,
+      "sensor_stream_conf_pct": 82.23,
+      "sample_count": 2
+    },
+    "Cup6": {
+      "unit": "Cup6",
+      "true_class": "phosphorus",
+      "predicted_class": "phosphorus",
+      "probabilities_pct": {
+        "healthy": 6.59,
+        "nitrogen": 4.36,
+        "phosphorus": 85.84,
+        "potassium": 3.22
+      },
+      "vision_stream_conf_pct": 83.56,
+      "sensor_stream_conf_pct": 83.51,
+      "sample_count": 2
+    },
+    "Cup7": {
+      "unit": "Cup7",
+      "true_class": "potassium",
+      "predicted_class": "potassium",
+      "probabilities_pct": {
+        "healthy": 4.09,
+        "nitrogen": 2.33,
+        "phosphorus": 1.64,
+        "potassium": 91.94
+      },
+      "vision_stream_conf_pct": 91.32,
+      "sensor_stream_conf_pct": 91.36,
+      "sample_count": 2
+    },
+    "Cup8": {
+      "unit": "Cup8",
+      "true_class": "potassium",
+      "predicted_class": "potassium",
+      "probabilities_pct": {
+        "healthy": 6.02,
+        "nitrogen": 3.52,
+        "phosphorus": 2.82,
+        "potassium": 87.64
+      },
+      "vision_stream_conf_pct": 85.81,
+      "sensor_stream_conf_pct": 88.1,
+      "sample_count": 2
+    },
+    "K": {
+      "unit": "K",
+      "true_class": "potassium",
+      "predicted_class": "potassium",
+      "probabilities_pct": {
+        "healthy": 3.14,
+        "nitrogen": 4.25,
+        "phosphorus": 2.2,
+        "potassium": 90.4
+      },
+      "vision_stream_conf_pct": 65.89,
+      "sensor_stream_conf_pct": 97.98,
+      "sample_count": 19
+    },
+    "N": {
+      "unit": "N",
+      "true_class": "nitrogen",
+      "predicted_class": "nitrogen",
+      "probabilities_pct": {
+        "healthy": 3.28,
+        "nitrogen": 90.37,
+        "phosphorus": 2.45,
+        "potassium": 3.9
+      },
+      "vision_stream_conf_pct": 70.68,
+      "sensor_stream_conf_pct": 95.99,
+      "sample_count": 19
+    },
+    "P": {
+      "unit": "P",
+      "true_class": "phosphorus",
+      "predicted_class": "phosphorus",
+      "probabilities_pct": {
+        "healthy": 10.94,
+        "nitrogen": 5.58,
+        "phosphorus": 80.49,
+        "potassium": 2.99
+      },
+      "vision_stream_conf_pct": 43.23,
+      "sensor_stream_conf_pct": 97.01,
+      "sample_count": 19
+    }
+  }
+}
