@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>ภาคผนวกฉบับกะทัดรัด สำหรับ Microsoft Word (TH Sarabun PSK 14pt - ไม่เบียด)</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 2.54cm 2.54cm 2.54cm 3.81cm;
+  }
+  body {
+    font-family: 'TH Sarabun New', 'TH Sarabun PSK', sans-serif;
+    font-size: 16pt;
+    line-height: 1.25;
+    color: #000;
+    background-color: #f8fafc;
+    padding: 20px;
+  }
+  .container {
+    max-width: 850px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 30px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    border-radius: 8px;
+  }
+  .instruction-box {
+    background-color: #eff6ff;
+    border-left: 4px solid #2563eb;
+    padding: 12px 16px;
+    margin-bottom: 25px;
+    font-size: 14pt;
+    border-radius: 4px;
+  }
+  .github-ref-box {
+    background-color: #f1f5f9;
+    border: 1px dashed #64748b;
+    padding: 10px 14px;
+    margin: 15px 0 25px 0;
+    font-size: 13pt;
+    border-radius: 6px;
+    color: #1e293b;
+  }
+  h1.appendix-title {
+    font-size: 18pt;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 30px;
+    margin-bottom: 5px;
+  }
+  h2.appendix-subtitle {
+    font-size: 16pt;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  p {
+    margin-bottom: 10px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    font-size: 14pt;
+  }
+  th, td {
+    border: 1px solid #333;
+    padding: 5px 7px;
+    vertical-align: middle;
+  }
+  th {
+    background-color: #f2f2f2;
+    text-align: center;
+    font-weight: bold;
+  }
+  .text-center { text-align: center; }
+  .text-left { text-align: left; }
+  .text-right { text-align: right; }
+  .note {
+    font-size: 12pt;
+    color: #4b5563;
+    margin-top: 4px;
+    margin-bottom: 12px;
+  }
+  .diagram-container {
+    text-align: center;
+    margin: 15px 0 20px 0;
+  }
+  .diagram-container img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #e2e8f0;
+  }
+  hr.section-divider {
+    border: 0;
+    border-top: 2px dashed #cbd5e1;
+    margin: 40px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="instruction-box">
+    <strong>คำแนะนำสำหรับการจัดทำเล่มวิทยานิพนธ์:</strong> เนื้อหาในหน้านี้เป็นภาคผนวกฉบับปรับปรุงใหม่ที่จัดคอลัมน์ไม่ให้เบียดกันในกระดาษแนวตั้ง และตัดตารางซ้ำซ้อนออก พร้อมทั้งเพิ่มกล่องอ้างอิงเชิงวิชาการไปยัง GitHub เพื่อให้กรรมการสามารถสแกนเข้าดูข้อมูลดิบและไฟล์พิมพ์เขียว 4K ได้ทันที สามารถคัดลอกส่วนที่ต้องการไปวางใน Word ได้เลยครับ
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- ภาคผนวก ก -->
+  <!-- ========================================================================= -->
+  <h1 class="appendix-title">ภาคผนวก ก</h1>
+  <h2 class="appendix-subtitle">ข้อมูลสรุปโทรมาตรและการเจริญเติบโตทางชีววิทยา</h2>
+
+  <p><strong>1. สรุปโปรไฟล์สารละลายธาตุอาหารเปรียบเทียบค่าเริ่มต้นและค่าสุดท้าย (Baseline vs. Final Hydroponic Profile)</strong></p>
+  
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 18%;">หน่วยการทดลอง</th>
+        <th style="width: 18%;">สภาวะสารละลาย</th>
+        <th style="width: 12%;">ปริมาตร</th>
+        <th style="width: 22%;">Baseline EC (R1 / R2)<br>(mS/cm)</th>
+        <th style="width: 15%;">EC สิ้นสุด<br>(mS/cm)</th>
+        <th style="width: 15%;">pH สิ้นสุด</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="text-left">ถัง Control</td>
+        <td class="text-center">ปกติ (Healthy)</td>
+        <td class="text-center">23.3 L</td>
+        <td class="text-center">2.641 / 3.000</td>
+        <td class="text-center">2.744</td>
+        <td class="text-center">6.19</td>
+      </tr>
+      <tr>
+        <td class="text-left">ถัง -N</td>
+        <td class="text-center">ขาดไนโตรเจน</td>
+        <td class="text-center">23.3 L</td>
+        <td class="text-center">2.572 / 1.530</td>
+        <td class="text-center">1.866</td>
+        <td class="text-center">6.27</td>
+      </tr>
+      <tr>
+        <td class="text-left">ถัง -P</td>
+        <td class="text-center">ขาดฟอสฟอรัส</td>
+        <td class="text-center">23.3 L</td>
+        <td class="text-center">3.512 / 1.912</td>
+        <td class="text-center">2.496</td>
+        <td class="text-center">5.54</td>
+      </tr>
+      <tr>
+        <td class="text-left">ถัง -K</td>
+        <td class="text-center">ขาดโพแทสเซียม</td>
+        <td class="text-center">23.3 L</td>
+        <td class="text-center">2.196 / 1.660</td>
+        <td class="text-center">1.282</td>
+        <td class="text-center">6.03</td>
+      </tr>
+      <tr>
+        <td class="text-left">Cup 1</td>
+        <td class="text-center">ปกติ (ซ้ำ 1)</td>
+        <td class="text-center">750 mL</td>
+        <td class="text-center">1.808</td>
+        <td class="text-center">2.018</td>
+        <td class="text-center">6.43</td>
+      </tr>
+      <tr>
+        <td class="text-left">Cup 2</td>
+        <td class="text-center">ปกติ (ซ้ำ 2)</td>
+        <td class="text-center">750 mL</td>
+        <td class="text-center">1.996</td>
+        <td class="text-center">1.956</td>
+        <td class="text-center">6.30</td>
+      </tr>
+      <tr>
+        <td class="text-left">Cup 3</td>
+        <td class="text-center">ขาด N (ซ้ำ 1)</td>
+        <td class="text-center">750 mL</td>
+        <td class="text-center">1.130</td>
+        <td class="text-center">1.456</td>
+        <td class="text-center">5.82</td>
+      </tr>
+      <tr>
+        <td class="text-left">Cup 4</td>
+        <td class="text-center">ขาด N (ซ้ำ 2)</td>
+        <td class="text-center">750 mL</td>
+        <td class="text-center">1.144</td>
+        <td class="text-center">0.916</td>
+        <td class="text-center">6.56</td>
+      </tr>
+      <tr>
+        <td class="text-left">Cup 5</td>
+        <td class="text-center">ขาด P (ซ้ำ 1)</td>
+        <td class="text-center">750 mL</td>
+        <td class="text-center">1.086</td>
+        <td class="text-center">1.108</td>
+        <td class="text-center">6.14</td>
+      </tr>
+      <tr>
+        <td class="text-left">Cup 6</td>
+        <td class="text-center">ขาด P (ซ้ำ 2)</td>
+        <td class="text-center">750 mL</td>
+        <td class="text-center">1.150</td>
+        <td class="text-center">1.132</td>
+        <td class="text-center">6.41</td>
+      </tr>
+      <tr>
+        <td class="text-left">Cup 7</td>
+        <td class="text-center">ขาด K (ซ้ำ 1)</td>
+        <td class="text-center">750 mL</td>
+        <td class="text-center">0.938</td>
+        <td class="text-center">1.226</td>
+        <td class="text-center">6.28</td>
+      </tr>
+      <tr>
+        <td class="text-left">Cup 8</td>
+        <td class="text-center">ขาด K (ซ้ำ 2)</td>
+        <td class="text-center">750 mL</td>
+        <td class="text-center">1.020</td>
+        <td class="text-center">1.196</td>
+        <td class="text-center">6.36</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="github-ref-box">
+    <strong>การเข้าถึงข้อมูลดิบฉบับเต็ม (Full Telemetry Log Access):</strong> คณะผู้วิจัยได้นำเข้าและเผยแพร่ตารางบันทึกข้อมูลโทรมาตรแบบอนุกรมเวลา (Time-series Readings) ฉบับสมบูรณ์ครบทั้ง 143 รายการ พร้อมไฟล์ <code>sensor_log.json</code> และตารางชีตแยกรายหน่วยทดลองไว้บน GitHub Repository: <a href="https://github.com/nottyzez/A.E.G.I.S-Ai" target="_blank">https://github.com/nottyzez/A.E.G.I.S-Ai</a> (ไดเรกทอรี <code>data/</code>) เพื่อสนับสนุนความโปร่งใสทางวิชาการ (Open Science & Reproducibility)
+  </div>
+
+  <p><strong>2. สรุปผลการตรวจวัดและอาการสรีรวิทยาชุดแก้วทดลอง 8 หน่วย (Cup 1 – Cup 8)</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 14%;">รหัสแก้ว</th>
+        <th style="width: 18%;">กลุ่มทดลอง</th>
+        <th style="width: 14%;">Baseline EC</th>
+        <th style="width: 14%;">EC ล่าสุด</th>
+        <th style="width: 12%;">pH ล่าสุด</th>
+        <th style="width: 28%;">อาการทางสรีรวิทยาและบันทึกเหตุการณ์</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="text-center">Cup 1</td>
+        <td class="text-center">Control (ซ้ำ 1)</td>
+        <td class="text-center">1.81</td>
+        <td class="text-center">2.02</td>
+        <td class="text-center">6.43</td>
+        <td class="text-left">พุ่มใบเขียวสด แข็งแรง รากขาวสมบูรณ์</td>
+      </tr>
+      <tr>
+        <td class="text-center">Cup 2</td>
+        <td class="text-center">Control (ซ้ำ 2)</td>
+        <td class="text-center">2.00</td>
+        <td class="text-center">1.96</td>
+        <td class="text-center">6.30</td>
+        <td class="text-left">พุ่มใบเขียวสด แข็งแรง รากขาวสมบูรณ์</td>
+      </tr>
+      <tr>
+        <td class="text-center">Cup 3</td>
+        <td class="text-center">ขาด N (ซ้ำ 1)</td>
+        <td class="text-center">1.13</td>
+        <td class="text-center">1.46</td>
+        <td class="text-center">5.82</td>
+        <td class="text-left">ใบล่างเริ่มเหลือง; เหตุ Acid Shock pH 1.58</td>
+      </tr>
+      <tr>
+        <td class="text-center">Cup 4</td>
+        <td class="text-center">ขาด N (ซ้ำ 2)</td>
+        <td class="text-center">1.14</td>
+        <td class="text-center">0.92</td>
+        <td class="text-center">6.56</td>
+        <td class="text-left">ลำต้นแคระแกร็น ใบล่างเหลืองซีดชัดเจน</td>
+      </tr>
+      <tr>
+        <td class="text-center">Cup 5</td>
+        <td class="text-center">ขาด P (ซ้ำ 1)</td>
+        <td class="text-center">1.09</td>
+        <td class="text-center">1.11</td>
+        <td class="text-center">6.14</td>
+        <td class="text-left">ใบเขียวเข้มหม่น ยอดชะงักการเจริญเติบโต</td>
+      </tr>
+      <tr>
+        <td class="text-center">Cup 6</td>
+        <td class="text-center">ขาด P (ซ้ำ 2)</td>
+        <td class="text-center">1.15</td>
+        <td class="text-center">1.13</td>
+        <td class="text-center">6.41</td>
+        <td class="text-left">ใบเขียวเข้มคล้ำ เส้นใบหลังใบมีสีอมม่วง</td>
+      </tr>
+      <tr>
+        <td class="text-center">Cup 7</td>
+        <td class="text-center">ขาด K (ซ้ำ 1)</td>
+        <td class="text-center">0.94</td>
+        <td class="text-center">1.23</td>
+        <td class="text-center">6.28</td>
+        <td class="text-left">ปลายใบเริ่มไหม้; เหตุ Acid Shock pH 1.58</td>
+      </tr>
+      <tr>
+        <td class="text-center">Cup 8</td>
+        <td class="text-center">ขาด K (ซ้ำ 2)</td>
+        <td class="text-center">1.02</td>
+        <td class="text-center">1.20</td>
+        <td class="text-center">6.36</td>
+        <td class="text-left">ขอบใบและปลายใบม้วนไหม้สีน้ำตาล</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p><strong>3. สรุปผลการเจริญเติบโตและชีวมวลสด ณ วันสิ้นสุดการทดลอง (Day 22)</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">หน่วยการทดลอง</th>
+        <th style="width: 22%;">ความสูงเฉลี่ย (ซม.)</th>
+        <th style="width: 20%;">จำนวนใบจริง (ใบ)</th>
+        <th style="width: 20%;">ชีวมวลสด (กรัม/ต้น)</th>
+        <th style="width: 13%;">เทียบกับ Control</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="text-left">ถัง Control (ปกติ)</td>
+        <td class="text-center">39.6 ± 2.1</td>
+        <td class="text-center">20.4 ± 1.4</td>
+        <td class="text-center">54.3 ± 4.2</td>
+        <td class="text-center">100.0% (อ้างอิง)</td>
+      </tr>
+      <tr>
+        <td class="text-left">ถัง -N (ขาดไนโตรเจน)</td>
+        <td class="text-center">22.4 ± 1.5</td>
+        <td class="text-center">10.5 ± 0.9</td>
+        <td class="text-center">19.8 ± 2.4</td>
+        <td class="text-center">36.5% (-63.5%)</td>
+      </tr>
+      <tr>
+        <td class="text-left">ถัง -P (ขาดฟอสฟอรัส)</td>
+        <td class="text-center">28.3 ± 1.7</td>
+        <td class="text-center">14.8 ± 1.1</td>
+        <td class="text-center">32.2 ± 3.0</td>
+        <td class="text-center">59.3% (-40.7%)</td>
+      </tr>
+      <tr>
+        <td class="text-left">ถัง -K (ขาดโพแทสเซียม)</td>
+        <td class="text-center">32.8 ± 1.9</td>
+        <td class="text-center">16.5 ± 1.2</td>
+        <td class="text-center">37.9 ± 3.4</td>
+        <td class="text-center">69.8% (-30.2%)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr class="section-divider">
+
+  <!-- ========================================================================= -->
+  <!-- ภาคผนวก ข -->
+  <!-- ========================================================================= -->
+  <h1 class="appendix-title">ภาคผนวก ข</h1>
+  <h2 class="appendix-subtitle">วงจรอิเล็กทรอนิกส์และแผนผังกลศาสตร์ของไหล</h2>
+
+  <p><strong>1. ตารางกำหนดขาใช้งานไมโครคอนโทรลเลอร์ ESP32-S3 N16R8</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 20%;">หมวดหมู่</th>
+        <th style="width: 22%;">อุปกรณ์ที่เชื่อมต่อ</th>
+        <th style="width: 20%;">ตำแหน่งขา GPIO</th>
+        <th style="width: 38%;">หน้าที่การทำงาน</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td rowspan="3" class="text-center"><strong>เซนเซอร์วัดค่า<br>(Sensors)</strong></td>
+        <td class="text-left">Analog pH Kit</td>
+        <td class="text-center">GPIO 1 (ADC1_CH0)</td>
+        <td class="text-left">วัดกรด-ด่างสารละลาย (0–3.3V, pH = -8.487V + 29.59)</td>
+      </tr>
+      <tr>
+        <td class="text-left">Analog EC/TDS Probe</td>
+        <td class="text-center">GPIO 2 (ADC1_CH1)</td>
+        <td class="text-left">วัดการนำไฟฟ้าไอออน ชดเชยอุณหภูมิมาตรฐาน 25°C</td>
+      </tr>
+      <tr>
+        <td class="text-left">DS18B20 Temp Probe</td>
+        <td class="text-center">GPIO 4 (OneWire)</td>
+        <td class="text-left">วัดอุณหภูมิสารละลายสแตนเลสกันน้ำ (Pull-up 4.7kΩ)</td>
+      </tr>
+      <tr>
+        <td rowspan="4" class="text-center"><strong>ปั๊มไดอะแฟรม & วาล์ว<br>(Fluidic Control)</strong></td>
+        <td class="text-left">Diaphragm Pump 1 (Inflow)</td>
+        <td class="text-center">GPIO 5</td>
+        <td class="text-left">สูบน้ำตัวอย่างจากถังปลูกเข้ากระบอกวัด (6s)</td>
+      </tr>
+      <tr>
+        <td class="text-left">Diaphragm Pump 2 (Return)</td>
+        <td class="text-center">GPIO 6</td>
+        <td class="text-left">สูบน้ำตัวอย่างวนคืนถังปลูก 100% (7s)</td>
+      </tr>
+      <tr>
+        <td class="text-left">Diaphragm Pump 3 (Rinse)</td>
+        <td class="text-center">GPIO 7</td>
+        <td class="text-left">สูบน้ำสะอาดชะล้างโพรบวัดอัตโนมัติ (5s)</td>
+      </tr>
+      <tr>
+        <td class="text-left">Solenoid Valve (Drain)</td>
+        <td class="text-center">GPIO 8</td>
+        <td class="text-left">วาล์วเปิดระบายน้ำล้างทิ้งสู่ถังขยะของเสีย (6s)</td>
+      </tr>
+      <tr>
+        <td rowspan="3" class="text-center"><strong>ปั๊มรีดสายจ่ายปุ๋ย<br>(Dosing Pumps)</strong></td>
+        <td class="text-left">Peristaltic 1 (Stock A)</td>
+        <td class="text-center">GPIO 9</td>
+        <td class="text-left">จ่ายแม่ปุ๋ยสูตรเน้นไนโตรเจน (High-N / Calcium Nitrate)</td>
+      </tr>
+      <tr>
+        <td class="text-left">Peristaltic 2 (Stock B)</td>
+        <td class="text-center">GPIO 10</td>
+        <td class="text-left">จ่ายแม่ปุ๋ยสูตรเน้นฟอสฟอรัส (High-P / Phosphoric Acid)</td>
+      </tr>
+      <tr>
+        <td class="text-left">Peristaltic 3 (Stock C)</td>
+        <td class="text-center">GPIO 11</td>
+        <td class="text-left">จ่ายแม่ปุ๋ยสูตรเน้นโพแทสเซียม (High-K / Potassium Sulfate)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="github-ref-box">
+    <strong>การเข้าถึงแบบพิมพ์เขียววิศวกรรม 4K และซอร์สโค้ดเฟิร์มแวร์:</strong> ผู้ประเมินสามารถดาวน์โหลดแบบพิมพ์เขียววงจร IEEE-315 และผัง ISA-5.1 P&ID ความละเอียดสูง พร้อมซอร์สโค้ดภาษา C++ (Arduino IDE) สำหรับบอร์ด ESP32-S3 และ ESP32-S3 CAM ได้ที่โฟลเดอร์ <code>firmware/</code> บน GitHub: <a href="https://github.com/nottyzez/A.E.G.I.S-Ai" target="_blank">https://github.com/nottyzez/A.E.G.I.S-Ai</a>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ========================================================================= -->
+  <!-- ภาคผนวก ค -->
+  <!-- ========================================================================= -->
+  <h1 class="appendix-title">ภาคผนวก ค</h1>
+  <h2 class="appendix-subtitle">สถาปัตยกรรมและอัลกอริทึม A.E.G.I.S.</h2>
+
+  <p><strong>1. รหัสเทียมกระบวนการควบคุมของไหลและการตัดสินใจแบบวงปิด (FSM Pseudocode)</strong></p>
+  <table style="background-color: #fdfefe; font-family: 'Consolas', monospace; font-size: 11pt;">
+    <tbody>
+      <tr>
+        <td style="padding: 10px; line-height: 1.4;">
+<strong>ALGORITHM:</strong> Two-Tier Closed-Loop Fluidic FSM Controller<br>
+<strong>INPUT:</strong> Sensor Telemetry (EC, pH, Temp), Top-Down Canopy Crop (224x224 RGB)<br>
+<strong>OUTPUT:</strong> Actuator Commands (Relay GPIO 5..11), Closed-Loop Correction Pulse<br>
+--------------------------------------------------------------------------------<br>
+<strong>BEGIN</strong><br>
+&nbsp;&nbsp;1. <strong>Phase 1 (Sampling):</strong> Activate Diaphragm 1 (GPIO 5) for 6,000 ms to fill cell V-102.<br>
+&nbsp;&nbsp;2. <strong>Phase 2 (Sensing):</strong> Settle 3,000 ms; Sample 15 ADC readings; Compute Median EC25 & pH.<br>
+&nbsp;&nbsp;3. <strong>Phase 3 (Recovery):</strong> Activate Diaphragm 2 (GPIO 6) for 7,000 ms to return 100% water.<br>
+&nbsp;&nbsp;4. <strong>A.E.G.I.S. Late-Fusion:</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P_vision = VisionEnsemble(Crop_224)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P_sensor = SensorEnsemble(EC, pH, Temp, ΔEC, Day)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P_fused = (0.35 * P_vision) + (0.65 * P_sensor)<br>
+&nbsp;&nbsp;5. <strong>Phase 4 (Two-Tier Dosing Decision):</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>IF</strong> EC < 0.8 mS/cm <strong>THEN</strong> Execute Tier 1 Baseline Priming (P1..P3 staggered 10s)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>ELSE IF</strong> EC > 2.5 mS/cm OR pH < 4.0 <strong>THEN</strong> Trigger HARD_SAFETY_LOCKOUT (Abort)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>ELSE IF</strong> P_fused identifies Deficiency (-N, -P, -K) <strong>THEN</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Execute Tier 2 Targeted Pulse (Pump 1, 2, or 3 for 5–10s; Cooldown 6–12h)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>ELSE</strong> Status = Healthy; Bypass dosing.<br>
+&nbsp;&nbsp;6. <strong>Phase 5 (Probe Wash):</strong> Activate Diaphragm 3 (GPIO 7) for 5,000 ms with clean water.<br>
+&nbsp;&nbsp;7. <strong>Phase 6 (Waste Drain):</strong> Open Solenoid Valve (GPIO 8) for 6,000 ms to drain rinse water.<br>
+&nbsp;&nbsp;8. <strong>Standby:</strong> Sleep until next scheduled 12-hour cycle.<br>
+<strong>END</strong>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="github-ref-box">
+    <strong>การเข้าถึงโมเดลปัญญาประดิษฐ์และสคริปต์การฝึกสอน:</strong> ไฟล์น้ำหนักโครงข่ายประสาทเทียม <code>image_model.keras</code> (25 MB), โมเดลสายเซนเซอร์ <code>sensor_ensemble_models.pkl</code>, สคริปต์การทำนายผล <code>predict_ensemble.py</code> และสคริปต์ประเมินผล Ablation Study เผยแพร่แบบโอเพนซอร์สบน GitHub: <a href="https://github.com/nottyzez/A.E.G.I.S-Ai" target="_blank">https://github.com/nottyzez/A.E.G.I.S-Ai</a> (ไดเรกทอรี <code>Ai มหาปลัย/model/</code>)
+  </div>
+
+</div>
+
+</body>
+</html>
