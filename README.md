@@ -8,6 +8,7 @@
 [![Hardware](https://img.shields.io/badge/MCU-ESP32--S3-E7352C.svg)](https://www.espressif.com/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Academic Grade](https://img.shields.io/badge/Status-Competition%20%26%20Thesis%20Ready-success.svg)](#)
+[![Academic References](https://img.shields.io/badge/Academic-References%20(APA%207th)-informational.svg)](REFERENCES.md)
 
 ---
 
@@ -255,6 +256,14 @@ python "Ai มหาปลัย/model/predict_ensemble.py"
   note      = {Supervised by Miss Asanlaya Doungrawa}
 }
 ```
+
+### เอกสารอ้างอิงทางวิชาการและโปสเตอร์งานวิจัย (Academic References & Poster QR)
+
+โครงการนี้มีรายการเอกสารอ้างอิงทางวิชาการที่ผ่านการคัดกรองตามมาตรฐาน **APA 7th Edition** จำนวน 21 รายการ ครอบคลุมด้าน Hydroponics, Multimodal AI, Computer Vision, และ Plant Nutrition พร้อมไฟล์ภาพ QR Code ความละเอียดสูง (PNG 1440×1440 px และ SVG) สำหรับพิมพ์ลงบนโปสเตอร์นำเสนอผลงานวิจัย:
+
+* 📄 **หน้ารายการเอกสารอ้างอิงฉบับสมบูรณ์:** [REFERENCES.md](REFERENCES.md)
+* 📱 **QR Code เชื่อมโยงเอกสารอ้างอิง:** [docs/assets/references_qr.png](docs/assets/references_qr.png) (PNG) | [docs/assets/references_qr.svg](docs/assets/references_qr.svg) (SVG)
+* 📐 **คู่มือการจัดพิมพ์บนโปสเตอร์วิชาการ:** [docs/assets/POSTER_GUIDELINES.md](docs/assets/POSTER_GUIDELINES.md)
 
 ---
 

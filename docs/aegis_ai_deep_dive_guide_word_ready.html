@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A.E.G.I.S. AI Architecture Deep Dive — คู่มือเจาะลึกปัญญาประดิษฐ์</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-main: 'Sarabun', 'TH Sarabun New', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --primary-emerald: #10b981;
+            --primary-dark: #0f172a;
+            --bg-gray: #f8fafc;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            line-height: 1.7;
+            color: #1e293b;
+            background-color: var(--bg-gray);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 48px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: #0f172a;
+            font-size: 26px;
+            font-weight: 800;
+            border-bottom: 3px solid #10b981;
+            padding-bottom: 12px;
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            color: #0f172a;
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 36px;
+            margin-bottom: 14px;
+            border-left: 5px solid #10b981;
+            padding-left: 12px;
+        }
+
+        h3 {
+            color: #1e293b;
+            font-size: 17px;
+            font-weight: 700;
+            margin-top: 24px;
+            margin-bottom: 10px;
+        }
+
+        h4 {
+            color: #047857;
+            font-size: 15px;
+            font-weight: 700;
+            margin-top: 16px;
+            margin-bottom: 6px;
+        }
+
+        p, li {
+            font-size: 15px;
+            color: #334155;
+        }
+
+        .meta-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+
+        .meta-box strong {
+            color: #166534;
+        }
+
+        .model-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .model-card:hover {
+            border-color: #10b981;
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.08);
+        }
+
+        .tag-pill {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 999px;
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+            margin-right: 6px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 13.5px;
+        }
+
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 10px 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            background: #f1f5f9;
+            color: #0f172a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .formula-box {
+            background: #f8fafc;
+            border-left: 4px solid #06b6d4;
+            padding: 12px 16px;
+            margin: 12px 0;
+            font-family: var(--font-mono);
+            font-size: 13.5px;
+            color: #0e7490;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .qa-card {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .qa-card .question {
+            font-weight: 700;
+            color: #92400e;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .qa-card .answer {
+            color: #451a03;
+            font-size: 14.5px;
+        }
+
+        @media print {
+            body {
+                background: #ffffff;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>คู่มือเจาะลึกสถาปัตยกรรมปัญญาประดิษฐ์ (AI Architecture Deep Dive)</h1>
+    <p style="color: #64748b; font-size: 14px; margin-top: -4px;">ระบบ A.E.G.I.S. (Autonomous Ensemble for Growth & Ion Sensing) — เอกสารอ้างอิงวิทยานิพนธ์ฉบับสมบูรณ์</p>
+
+    <div class="meta-box">
+        <strong>หัวข้อวิจัย:</strong> ระบบควบคุมและวินิจฉัยการขาดธาตุอาหาร NPK อัตโนมัติในพืชไฮโดรโปนิกส์ด้วยปัญญาประดิษฐ์<br>
+        <strong>ทีมผู้จัดทำ:</strong> A.E.G.I.S. Team (ชยพล, ปัญญพัฒน์, กิติพล) | <code>aegis.team@spp.ac.th</code><br>
+        <strong>ไฟล์เอกสารต้นฉบับ:</strong> <code>docs/aegis_ai_deep_dive_guide.md</code>
+    </div>
+
+    <h2>1. รายละเอียดเจาะลึกโมเดลและกลไก AI (ครบทุกโมเดล)</h2>
+
+    <!-- Model 1 -->
+    <div class="model-card">
+        <h3>1. กลไกคัดกรองอาการระยะแฝง (Symptom-Gated Filtering)</h3>
+        <span class="tag-pill">Preprocessing</span><span class="tag-pill">Statistical Biology</span><span class="tag-pill">Z-Score</span>
+        
+        <h4>📌 ความหมาย</h4>
+        <p>อัลกอริทึมคัดกรองข้อมูลเชิงสถิติชีวเคมี ทำหน้าที่ประเมินระดับการแสดงออกของอาการทางใบพืช โดยใช้ระยะเบี่ยงเบนมาตรฐาน (Z-score) ในปริภูมิสีสม่ำเสมอ เพื่อคัดแยกภาพพืชในกลุ่มขาดธาตุอาหารที่ยังไม่แสดงรอยโรค (Pre-symptomatic) ออกจากชุดข้อมูลภาพที่จะนำไปฝึกฝนโครงข่ายประสาทเทียม</p>
+
+        <h4>🏛️ ที่มา</h4>
+        <p>ในสรีรวิทยาพืช N, P, K เป็นธาตุที่เคลื่อนย้ายได้ดีมากในท่อโฟลเอ็ม (Mobile Nutrients) ช่วง 5–7 วันแรกที่เริ่มขาดปุ๋ย พืชจะสลายสารอาหารในเมล็ดและใบเลี้ยงมาใช้ ทำให้ใบยังคงเขียวสดเหมือนกลุ่มปกติ หากนำภาพใบเขียวในระยะนี้ไปติดป้ายกำกับว่าขาดสารอาหาร จะเกิด <strong>Label Noise</strong> ขั้นรุนแรง ทำให้ CNN สับสนและมีความแม่นยำตกเหลือเพียง 50–65% ผู้วิจัยจึงพัฒนาเกณฑ์ตัดสินเชิงปริมาณเพื่อจำแนกภาพที่มีรอยโรคแท้จริง</p>
+
+        <h4>🎯 หน้าที่ในระบบ A.E.G.I.S.</h4>
+        <p>รับภาพพุ่มใบ 304 ภาพ ส่งภาพที่แสดงรอยโรคชัดเจนจริง (182 ภาพ) ไปให้ Stream A (Vision CNN) เรียนรู้ และกักภาพใบเขียวระยะแฝง (122 ภาพ) ไว้ให้ Stream B (เซนเซอร์น้ำ) ทำหน้าที่เรียนรู้การเตือนภัยล่วงหน้า</p>
+
+        <h4>⚙️ การทำงานและสูตรคำนวณ</h4>
+        <div class="formula-box">
+            Z = (x - μ_ctrl) / σ_ctrl<br>
+            Score_N = max(0, 0.35·Z_L + 0.35·Z_a + 0.30·Z_b) + 3.0·Yellow_Ratio<br>
+            Score_P = max(0, -0.40·Z_L + 0.35·Z_a - 0.25·Z_b) + 3.0·Purple_Ratio<br>
+            Score_K = max(0, 0.45·|Z_Δa| + 0.35·|Z_Δb| + 0.20·|Z_a|)<br>
+            Threshold: Score >= 1.35 ผ่านเข้า Vision Training | Score &lt; 1.35 กักไว้เป็นระยะแฝง
+        </div>
+    </div>
+
+    <!-- Model 2 -->
+    <div class="model-card">
+        <h3>2. Vision Member A1: MobileNetV2 (Two-Stage Fine-Tuning)</h3>
+        <span class="tag-pill">Deep Learning</span><span class="tag-pill">CNN</span><span class="tag-pill">Transfer Learning</span>
+        
+        <h4>📌 ความหมาย</h4>
+        <p>โครงข่ายประสาทเทียมสำหรับการมองเห็นเชิงลึกขนาดเบา (Lightweight Deep CNN) ที่ใช้โครงสร้าง Depthwise Separable Convolution ร่วมกับ Inverted Residuals</p>
+
+        <h4>🏛️ ที่มา</h4>
+        <p>Sandler et al. (Google Research, 2018) บทความ <em>"MobileNetV2: Inverted Residuals and Linear Bottlenecks"</em> ในงาน CVPR 2018 ออกแบบมาเพื่อลดพารามิเตอร์และการคำนวณลงมากกว่า 85% เมื่อเทียบกับ ResNet-50</p>
+
+        <h4>🎯 หน้าที่ในระบบ A.E.G.I.S.</h4>
+        <p>สกัดคุณลักษณะเชิงลึกและรูปทรงสัณฐานของใบพืช ส่งออกความน่าจะเป็น 4 คลาส (P_A1)</p>
+
+        <h4>⚙️ การทำงานและขั้นตอนการเทรน</h4>
+        <p>ใช้เทคนิค Two-Stage Fine-Tuning: Stage 1 ตรึงก้านเบส เทรนเฉพาะ Head ด้วย Adam (lr=1e-3, 8 epochs) $\rightarrow$ Stage 2 ปลดล็อก 12 เลเยอร์บนสุด เทรนด้วย Adam (lr=3e-5, 6 epochs) พร้อม EarlyStopping (ความแม่นยำ 85.37%)</p>
+    </div>
+
+    <!-- Model 3 -->
+    <div class="model-card">
+        <h3>3. Vision Member A2: Multi-Scale SE-Attention CNN</h3>
+        <span class="tag-pill">Attention Mechanism</span><span class="tag-pill">Custom CNN</span><span class="tag-pill">Multi-Scale</span>
+        
+        <h4>📌 ความหมาย</h4>
+        <p>โครงข่ายประสาทเทียมที่พัฒนาขึ้นโดยเฉพาะ ผสานการรับรู้ภาพหลายระยะ (กิ่ง 3x3 และ 5x5) เข้ากับกลไก Squeeze-and-Excitation เพื่อเพิ่มความสนใจเชิงช่องสัญญาณ</p>
+
+        <h4>🏛️ ที่มา</h4>
+        <p>Hu et al. (2018) บทความ <em>"Squeeze-and-Excitation Networks"</em> (ผู้ชนะเลิศ ImageNet 2017) ออกแบบมาเพื่อแก้ปัญหารอยโรคขนาดเล็ก เช่น จุดม่วงของแอนโทไซยานิน (-P) หรือขอบใบไหม้บางๆ (-K) ที่ฟิลเตอร์ขนาดเดียวมองข้าม</p>
+
+        <h4>🎯 หน้าที่ในระบบ A.E.G.I.S.</h4>
+        <p>ตรวจจับรอยโรคระดับจุลภาค (Micro-Pathological Features) ส่งออกความน่าจะเป็น 4 คลาส (P_A2)</p>
+
+        <h4>⚙️ การทำงานและขั้นตอนการเทรน</h4>
+        <div class="formula-box">
+            Squeeze: z_c = GAP(u_c)<br>
+            Excitation: s = σ( W_2 · ReLU(W_1 · z) )<br>
+            Scale: X̃_c = s_c · u_c
+        </div>
+        <p>เทรนขึ้นมาใหม่ตั้งแต่ต้น (Scratch Training) ด้วย Adam (lr=5e-4, 8 epochs) ความแม่นยำพุ่งขึ้นจาก 50.00% เป็น 90.24% (+40.24%)</p>
+    </div>
+
+    <!-- Model 4 -->
+    <div class="model-card">
+        <h3>4. Vision Member A3: Foliar Expert 44 มิติ (Physiological ML Sub-Ensemble)</h3>
+        <span class="tag-pill">Machine Learning</span><span class="tag-pill">Handcrafted Features</span><span class="tag-pill">Plant Physiology</span>
+        
+        <h4>📌 ความหมาย</h4>
+        <p>โมเดล Machine Learning แบบ Sub-Ensemble ที่คำนวณตัวเลขสรีรวิทยาพืช 44 ค่า สกัดจากพิกเซลใบพืชโดยตรง</p>
+
+        <h4>🏛️ ที่มา</h4>
+        <p>พัฒนาขึ้นตามหลักดัชนีพืชพรรณทางการเกษตรแม่นยำ (Meyer & Neto, 2008) และการสะสมเม็ดสีของ Marschner (2012) เพื่อทำหน้าที่เป็น "Anchor Model" ที่มั่นคง ไม่หลุดกรอบตามแสงเงา</p>
+
+        <h4>🎯 หน้าที่ในระบบ A.E.G.I.S.</h4>
+        <p>วิเคราะห์ความผิดปกติของเม็ดสีพืชและเนื้อสัมผัสตามหลักสรีรวิทยา ส่งออกความน่าจะเป็น 4 คลาส (P_A3)</p>
+
+        <h4>⚙️ การทำงานและสถาปัตยกรรมภายใน</h4>
+        <p>สกัด 44 มิติ: ดัชนีพืชพรรณ (ExG, ExR, NDI, VARI), ปริภูมิสี CIELAB/HSV, ผลต่างขอบใบกับกลางใบ (Δa*, Δb*), ความแปรปรวน Laplacian Variance และสัดส่วนสีเหลือง/ม่วง ส่งเข้า Sub-Ensemble: ExtraTrees (45%) + RandomForest (35%) + MLP (20%) ให้ความแม่นยำ 87.80%</p>
+    </div>
+
+    <!-- Model 5 -->
+    <div class="model-card">
+        <h3>5. Stream B: Sensor Ensemble (GBDT + Random Forest + Extra Trees)</h3>
+        <span class="tag-pill">Sensor Analytics</span><span class="tag-pill">Ensemble</span><span class="tag-pill">GBDT</span>
+        
+        <h4>📌 ความหมาย</h4>
+        <p>ระบบปัญญาประดิษฐ์วิเคราะห์คุณสมบัติสารละลายธาตุอาหารในน้ำ (EC, pH, อุณหภูมิ, อัตราส่วนเทียบเบสไลน์, การดริฟต์) ผสานพลังของอัลกอริทึมต้นไม้ตัดสินใจ 3 รูปแบบ</p>
+
+        <h4>🏛️ ที่มา</h4>
+        <p>ผสาน Gradient Boosting (Friedman, 2001), Random Forest (Breiman, 2001) และ Extra Trees (Geurts et al., 2006) เพื่อให้ตรวจจับการพร่องของสารอาหารในน้ำได้ตั้งแต่วันแรกของการปลูก</p>
+
+        <h4>🎯 หน้าที่ในระบบ A.E.G.I.S.</h4>
+        <p>ทำนายสภาวะธาตุอาหารจากข้อมูลในน้ำ ส่งออกความน่าจะเป็น 4 คลาส (P_sen)</p>
+
+        <h4>⚙️ สูตรการรวมผลลัพธ์</h4>
+        <div class="formula-box">
+            P_sen = 0.45·P_GBDT + 0.30·P_RandomForest + 0.25·P_ExtraTrees
+        </div>
+        <p>ให้ความแม่นยำรวม 97.56% บน Holdout Set และ 100.00% บนชุดข้อมูลถังจริงในแปลงปลูก</p>
+    </div>
+
+    <!-- Model 6 -->
+    <div class="model-card">
+        <h3>6. กลไกตัดสินใจผสานสองสายขั้นสูง (Hierarchical Late-Fusion Engine)</h3>
+        <span class="tag-pill">Multimodal Fusion</span><span class="tag-pill">Decision-Level</span><span class="tag-pill">Meta-Decision</span>
+        
+        <h4>📌 ความหมาย</h4>
+        <p>สถาปัตยกรรมการผสานข้อมูลหลากรูปแบบระดับการตัดสินใจ (Decision-Level Multimodal Fusion) ทำหน้าที่เป็นศาลชี้ขาดสูงสุดในการรวมเวกเตอร์ความน่าจะเป็นจากสายภาพ (P_vis) และสายเซนเซอร์ (P_sen)</p>
+
+        <h4>🏛️ ที่มา</h4>
+        <p>ทฤษฎี Multimodal Fusion พิสูจน์ว่า Late Fusion มีความทนทานต่อความล้มเหลว (Fault-Tolerant) สูงกว่า Early Fusion หากกล้องมีฝ้าเกาะ เซนเซอร์น้ำก็ยังทำงานต่อได้อย่างแม่นยำ</p>
+
+        <h4>⚙️ สมการการตัดสินใจชี้ขาด</h4>
+        <div class="formula-box">
+            P_fused = 0.35 · P_vis + 0.65 · P_sen
+        </div>
+        <p>ให้ความแม่นยำ 100.00% (Macro F1 = 1.0000) จำแนกถูกต้องครบทั้ง 12 จาก 12 หน่วยการทดลองจริงในแปลงปลูก</p>
+    </div>
+
+    <!-- Model 7 -->
+    <div class="model-card">
+        <h3>7. ปัญญาประดิษฐ์อธิบายเหตุผลได้ (Explainable AI: Grad-CAM)</h3>
+        <span class="tag-pill">Explainable AI</span><span class="tag-pill">Heatmap</span><span class="tag-pill">XAI</span>
+        
+        <h4>📌 ความหมาย</h4>
+        <p>Gradient-weighted Class Activation Mapping ทำหน้าที่สร้างแผนภาพความร้อน (Heatmap) ซ้อนทับลงบนภาพถ่ายจริง เพื่อแสดงจุดที่โมเดลใช้ในการตัดสินใจ</p>
+
+        <h4>🏛️ ที่มา</h4>
+        <p>Selvaraju et al. (ICCV 2017) บทความ <em>"Grad-CAM: Visual Explanations from Deep Networks"</em> เพื่อเปิดเผยกล่องดำ (Black Box) ของ Deep Learning</p>
+
+        <h4>⚙️ การทำงาน</h4>
+        <p>คำนวณอนุพันธ์ย่อยของคะแนนคลาสเทียบกับ Feature Map ชั้น Conv สุดท้าย นำมาถ่วงน้ำหนักรวมผ่านฟังก์ชัน ReLU ได้แผนภาพความร้อนสีแดงส้มชี้ชัดไปยังรอยโรคบนใบจริง 100%</p>
+    </div>
+
+    <h2>2. ตารางสรุปผลการทดลอง Ablation Study (ตาราง 4.3 ในวิทยานิพนธ์)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>สถาปัตยกรรมโมเดล</th>
+                <th>ก่อนคัดกรอง (Ungated %)</th>
+                <th>หลังคัดกรอง (Gated %)</th>
+                <th>Precision (%)</th>
+                <th>Recall (%)</th>
+                <th>Macro F1</th>
+                <th>95% CI</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Naive Majority Baseline</td>
+                <td>-</td>
+                <td>46.34%</td>
+                <td>11.59%</td>
+                <td>25.00%</td>
+                <td>0.1583</td>
+                <td>[31.7%, 61.0%]</td>
+            </tr>
+            <tr>
+                <td>Sensor B0: Logistic Regression</td>
+                <td>-</td>
+                <td>82.93%</td>
+                <td>82.02%</td>
+                <td>80.98%</td>
+                <td>0.8141</td>
+                <td>[70.7%, 92.7%]</td>
+            </tr>
+            <tr>
+                <td>Sensor B1: Gradient Boosting (GBDT)</td>
+                <td>-</td>
+                <td>100.00%</td>
+                <td>100.00%</td>
+                <td>100.00%</td>
+                <td>1.0000</td>
+                <td>[100.0%, 100.0%]</td>
+            </tr>
+            <tr>
+                <td>Sensor B2: Random Forest</td>
+                <td>-</td>
+                <td>97.56%</td>
+                <td>97.50%</td>
+                <td>96.88%</td>
+                <td>0.9702</td>
+                <td>[92.6%, 100.0%]</td>
+            </tr>
+            <tr>
+                <td>Sensor B3: Extra Trees</td>
+                <td>-</td>
+                <td>92.68%</td>
+                <td>92.68%</td>
+                <td>88.75%</td>
+                <td>0.9027</td>
+                <td>[82.9%, 100.0%]</td>
+            </tr>
+            <tr style="background-color: #ecfdf5; font-weight: 700;">
+                <td>► Stream B: Sensor Ensemble</td>
+                <td>-</td>
+                <td>97.56%</td>
+                <td>97.50%</td>
+                <td>96.88%</td>
+                <td>0.9702</td>
+                <td>[92.6%, 100.0%]</td>
+            </tr>
+            <tr>
+                <td>Vision A1: MobileNetV2</td>
+                <td>65.91%</td>
+                <td>85.37% (+19.46%)</td>
+                <td>88.50%</td>
+                <td>82.50%</td>
+                <td>0.8410</td>
+                <td>[73.2%, 95.1%]</td>
+            </tr>
+            <tr>
+                <td>Vision A2: MultiScale SE-CNN</td>
+                <td>50.00%</td>
+                <td>90.24% (+40.24%)</td>
+                <td>92.50%</td>
+                <td>87.50%</td>
+                <td>0.8920</td>
+                <td>[80.5%, 97.6%]</td>
+            </tr>
+            <tr>
+                <td>Vision A3: 44-D Foliar Expert</td>
+                <td>61.36%</td>
+                <td>87.80% (+26.44%)</td>
+                <td>90.00%</td>
+                <td>85.00%</td>
+                <td>0.8650</td>
+                <td>[75.6%, 97.6%]</td>
+            </tr>
+            <tr style="background-color: #ecfdf5; font-weight: 700;">
+                <td>► Stream A: Vision Ensemble</td>
+                <td>72.73%</td>
+                <td>95.12% (+22.39%)</td>
+                <td>97.62%</td>
+                <td>90.00%</td>
+                <td>0.9250</td>
+                <td>[87.8%, 100.0%]</td>
+            </tr>
+            <tr style="background-color: #fef3c7; font-weight: 800; border-top: 2px solid #f59e0b;">
+                <td>★ A.E.G.I.S. Late-Fusion (Full)</td>
+                <td>-</td>
+                <td>100.00%</td>
+                <td>100.00%</td>
+                <td>100.00%</td>
+                <td>1.0000</td>
+                <td>[100.0%, 100.0%]</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3. แนวทางตอบคำถามกรรมการสอบวิทยานิพนธ์ (Defense Q&A)</h2>
+
+    <div class="qa-card">
+        <div class="question">Q1: ทำไมต้องทำ Symptom-Gated Filtering ไม่ให้ CNN เรียนรู้ภาพทั้งหมดไปเลย?</div>
+        <div class="answer"><strong>คำตอบ:</strong> เพราะในสรีรวิทยาพืช วันที่ 1–7 ของการขาดธาตุ ใบพืชยังเขียวสดสมบูรณ์ (Pre-symptomatic phase) หากเราบังคับให้ CNN เรียนรู้ว่าใบเขียวนี้คือขาดธาตุ จะเกิด Label Noise ขั้นรุนแรง ทำให้ CNN สับสนว่าตกลงใบเขียวคือปกติหรือขาดสารอาหาร ความแม่นยำจึงตกเหลือเพียง 50–65% การทำ Symptom-Gating คัดแยกภาพใบเขียวในถังขาดธาตุออกไปให้เซนเซอร์ตรวจแทน ทำให้ความแม่นยำของโมเดลภาพพุ่งขึ้นถึง +22.39%</div>
+    </div>
+
+    <div class="qa-card">
+        <div class="question">Q2: ทำไม Stream A ถึงมีทั้ง Deep Learning และ Handcrafted Features (Member A3)?</div>
+        <div class="answer"><strong>คำตอบ:</strong> Deep Learning มักจะมีพฤติกรรมเป็น "Black Box" ที่อาจไวต่อแสงเงาหรือสิ่งแปลกปลอมในฉากหลัง การใส่ Member A3 ที่คำนวณเวกเตอร์ฟิสิกส์ 44 ค่า (CIELAB, Margin-to-Core Gradient) เข้ามาด้วย จะทำหน้าที่เป็น "Anchor Model" คอยค้ำประกันความถูกต้องทางสรีรวิทยา ทำให้ผลลัพธ์ของ Stream A มีเสถียรภาพและไม่หลุดกรอบวิชาการ</div>
+    </div>
+
+    <div class="qa-card">
+        <div class="question">Q3: ทำไมน้ำหนัก Late-Fusion ถึงให้เซนเซอร์น้ำมากกว่าภาพถ่าย (เซนเซอร์ 0.65 vs ภาพ 0.35)?</div>
+        <div class="answer"><strong>คำตอบ:</strong> เพราะค่าทางเคมีในสารละลาย (EC, pH, อุณหภูมิ) มีความไวในการตอบสนอง (Sensitivity) สูงกว่าสายตา เมื่อพืชดูดซึมปุ๋ยไป ค่า EC จะลดลงทันทีตั้งแต่วันแรก ในขณะที่ใบพืชต้องใช้เวลาหลายวันกว่าจะเกิดรอยเหลืองหรือรอยไหม้ การให้น้ำหนักเซนเซอร์ 0.65 ช่วยให้ระบบสามารถแจ้งเตือนล่วงหน้าได้ในระดับ Pre-symptomatic ก่อนที่พืชจะชะงักการเจริญเติบโต</div>
+    </div>
+</div>
+
+</body>
+</html>

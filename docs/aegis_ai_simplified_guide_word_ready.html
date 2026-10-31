@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A.E.G.I.S. AI Simplified Master Guide — คู่มือสรุปหมวด AI ฉบับอ่านง่าย เข้าใจทันที</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-main: 'Sarabun', 'TH Sarabun New', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --primary: #0284c7;
+            --emerald: #10b981;
+            --purple: #8b5cf6;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --slate-dark: #0f172a;
+            --slate-light: #f8fafc;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            line-height: 1.75;
+            color: #1e293b;
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 30px 16px;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px 48px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            border: 1px solid var(--border-color);
+        }
+
+        .header-box {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            padding: 28px 32px;
+            border-radius: 14px;
+            margin-bottom: 32px;
+            box-shadow: 0 4px 15px rgba(15, 23, 42, 0.15);
+        }
+
+        .header-box h1 {
+            margin: 0 0 8px 0;
+            font-size: 26px;
+            font-weight: 800;
+            color: #38bdf8;
+            letter-spacing: -0.5px;
+        }
+
+        .header-box p {
+            margin: 4px 0;
+            font-size: 15px;
+            color: #cbd5e1;
+        }
+
+        .tag-pill {
+            display: inline-block;
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            margin-top: 10px;
+        }
+
+        h2.section-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #0f172a;
+            margin-top: 36px;
+            margin-bottom: 18px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dept-banner {
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 17px;
+            margin-top: 28px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dept-triage { background: #fef3c7; color: #92400e; border-left: 6px solid #f59e0b; }
+        .dept-vision { background: #e0f2fe; color: #075985; border-left: 6px solid #0284c7; }
+        .dept-sensor { background: #dcfce7; color: #166534; border-left: 6px solid #10b981; }
+        .dept-fusion { background: #f3e8ff; color: #6b21a8; border-left: 6px solid #8b5cf6; }
+
+        .model-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 22px 24px;
+            margin-bottom: 22px;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .model-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+        }
+
+        .model-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .model-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .badge-acc {
+            background: #ecfdf5;
+            color: #065f46;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 3px 9px;
+            border-radius: 6px;
+            border: 1px solid #a7f3d0;
+            font-family: var(--font-mono);
+        }
+
+        .prop-item {
+            margin-bottom: 12px;
+        }
+
+        .prop-label {
+            font-weight: 700;
+            color: #334155;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 3px;
+        }
+
+        .prop-desc {
+            font-size: 14.5px;
+            color: #475569;
+            margin: 0 0 6px 0;
+            padding-left: 14px;
+            border-left: 2px solid #e2e8f0;
+        }
+
+        .steps-list {
+            margin: 4px 0 6px 0;
+            padding-left: 30px;
+            font-size: 14px;
+            color: #334155;
+        }
+
+        .steps-list li {
+            margin-bottom: 5px;
+        }
+
+        .quote-box {
+            background: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 14px 18px;
+            border-radius: 0 8px 8px 0;
+            margin: 14px 0;
+            font-size: 14px;
+            color: #78350f;
+        }
+
+        table.summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 13.5px;
+        }
+
+        table.summary-table th {
+            background-color: #0f172a;
+            color: #ffffff;
+            font-weight: 700;
+            text-align: left;
+            padding: 10px 12px;
+            border: 1px solid #334155;
+        }
+
+        table.summary-table td {
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        table.summary-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        table.summary-table tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        .punchline-card {
+            background: #faf5ff;
+            border: 1px solid #e9d5ff;
+            border-left: 5px solid #8b5cf6;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 14px;
+        }
+
+        .punchline-q {
+            font-weight: 700;
+            color: #581c87;
+            font-size: 14.5px;
+            margin-bottom: 6px;
+        }
+
+        .punchline-a {
+            font-size: 14px;
+            color: #3b0764;
+            line-height: 1.6;
+        }
+
+        @media print {
+            body { background: #ffffff; padding: 0; }
+            .container { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+            .model-card { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-box">
+        <h1>คู่มือสรุปหมวด AI ระบบ A.E.G.I.S. (ฉบับอ่านง่าย เข้าใจทันที)</h1>
+        <p><strong>โครงการ:</strong> ระบบควบคุมและวินิจฉัยการขาดธาตุอาหาร NPK อัตโนมัติในพืชไฮโดรโปนิกส์ด้วยปัญญาประดิษฐ์</p>
+        <p><strong>ระบบ:</strong> A.E.G.I.S. <em>(Autonomous Ensemble for Growth & Ion Sensing)</em></p>
+        <span class="tag-pill">สำหรับเตรียมตัวสอบวิทยานิพนธ์ (Thesis Defense)</span>
+    </div>
+
+    <div class="quote-box">
+        💡 <strong>แนวคิดหลักในการจำ:</strong> ให้มองระบบ A.E.G.I.S. เหมือน <strong>"โรงพยาบาลพืชอัจฉริยะ"</strong> ที่แบ่งหน้าที่กัน 4 แผนก: 
+        (1) ด่านคัดกรอง ➔ (2) แผนกหมอสายตา ➔ (3) แผนกตรวจเลือดในน้ำ ➔ (4) ผู้อำนวยการสั่งการรักษา
+    </div>
+
+    <!-- แผนกที่ 1 -->
+    <div class="dept-banner dept-triage">
+        <span>🚪 แผนกที่ 1: ด่านคัดกรองคนไข้ (Data Preprocessing)</span>
+        <span style="font-size: 13px; font-weight: normal;">กรองสัญญาณรบกวนก่อนพบแพทย์</span>
+    </div>
+
+    <div class="model-card">
+        <div class="model-header">
+            <h3 class="model-title">1. กลไกคัดกรองอาการระยะแฝง (Symptom-Gated Filtering)</h3>
+            <span class="badge-acc" style="background:#fef3c7; color:#92400e; border-color:#fde68a;">Statistical Triage</span>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">💡 เข้าใจง่ายๆ คืออะไร (ความหมาย):</div>
+            <div class="prop-desc">
+                เหมือน <strong>"ด่านคัดกรองคนไข้ติดเชื้อระยะฟักตัว"</strong> คนที่เพิ่งติดเชื้อวันแรกๆ ยังไม่มีไข้ ตัวยังไม่ร้อน ถ้าเราเอาคนกลุ่มนี้ไปบอกนักเรียนแพทย์ว่า <em>"นี่คือหน้าตาคนป่วยไข้หวัดใหญ่นะ"</em> นักเรียนแพทย์จะงงทันทีว่าทำไมคนหน้าตาปกติถึงป่วย ในพืชก็เช่นกัน!
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">📜 ทำไมถึงต้องมี (ที่มา):</div>
+            <div class="prop-desc">
+                ในช่วง <strong>วันที่ 1–7 ของการขาดปุ๋ย (ระยะแฝง / Pre-symptomatic)</strong> พืชจะดึงสารอาหารสำรองจากเมล็ดและใบเลี้ยงมาใช้ก่อน ทำให้ใบพืชยังคง <strong>"เขียวสดใสเหมือนต้นปกติทุกประการ"</strong> ถ้าเราเอาภาพใบเขียวนี้ไปสอน AI ว่าขาดไนโตรเจน AI จะเกิดอาการ <em>เมาป้ายกำกับ (Label Noise)</em> จนทายมั่ว ความแม่นยำจะร่วงเหลือเพียง 50–65% เท่านั้น
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">🎯 หน้าที่ทำอะไรในระบบ:</div>
+            <div class="prop-desc">
+                ตรวจสแกนภาพใบพืชทั้งหมด 304 ภาพ: แยกภาพที่ <strong>เริ่มป่วยจริง (182 ภาพ)</strong> ส่งให้หมอสายตาเรียนรู้ ส่วนภาพที่ <strong>ยังเขียวสดแต่อยู่ในถังขาดปุ๋ย (122 ภาพ)</strong> ให้สกัดออก ไม่ให้ไปหลอกสายตา AI แต่ส่งไปให้ห้องแล็บตรวจน้ำดูแลแทน
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">⚙️ ขั้นตอนการทำงาน:</div>
+            <ol class="steps-list">
+                <li>เก็บค่าเฉลี่ยสีของ "ใบปกติที่สมบูรณ์แข็งแรง" ไว้เป็นเกณฑ์อ้างอิง (Baseline) ในระบบสีสากล CIELAB</li>
+                <li>เมื่อมีภาพใบใหม่เข้ามา นำมาคำนวณระยะเบี่ยงเบน Z-Score ว่าสีเพี้ยนไปจากใบปกติแค่ไหน</li>
+                <li>คิดคะแนนเฉพาะโรค: ขาด N (ดูความซีดเหลือง), ขาด P (ดูเม็ดสีม่วงคล้ำ), ขาด K (ดูความต่างสีขอบใบกับกลางใบ)</li>
+                <li>ถ้าได้คะแนน ≥ 1.35 แปลว่าป่วยจริง ส่งไปเทรนสายตา AI (ส่งผลให้ความแม่นยำของสายตาพุ่งขึ้นทันที +22.39%)</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- แผนกที่ 2 -->
+    <div class="dept-banner dept-vision">
+        <span>👁️ แผนกที่ 2: ทีมคุณหมอสายตาตรวจใบพืช (Stream A: Vision Ensemble)</span>
+        <span style="font-size: 13px; font-weight: normal;">แม่นยำรวม 95.12%</span>
+    </div>
+
+    <div class="model-card">
+        <div class="model-header">
+            <h3 class="model-title">2. หมอ A1: โครงข่าย MobileNetV2 (Two-Stage Fine-Tuning)</h3>
+            <span class="badge-acc">ความแม่นยำ: 85.37%</span>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">💡 เข้าใจง่ายๆ คืออะไร (ความหมาย):</div>
+            <div class="prop-desc">
+                เหมือน <strong>"หมออายุรกรรมทั่วไป ที่ทำงานรวดเร็ว คล่องตัว และประหยัดพลังงาน"</strong> กวาดตามองคนไข้ปราดเดียวก็ประเมินโครงสร้างภาพรวมทั้งต้นได้อย่างแม่นยำ
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">📜 ทำไมถึงต้องมี (ที่มา):</div>
+            <div class="prop-desc">
+                โมเดล AI ดูภาพยุคเดิมมีขนาดใหญ่โต กินไฟ และช้าเกินกว่าจะติดตั้งในแปลงเกษตรจริง Google จึงคิดค้น MobileNetV2 ที่ตัดทอนการคำนวณที่ไม่จำเป็นออก เหมาะอย่างยิ่งกับการทำงานร่วมกับบอร์ดขนาดเล็กอย่าง ESP32-S3
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">🎯 หน้าที่ทำอะไรในระบบ:</div>
+            <div class="prop-desc">
+                รับภาพพุ่มใบพืชขนาด 224×224 พิกเซล สกัดคุณลักษณะทางโครงสร้างเชิงลึก (ทรงพุ่ม ทรงใบ ความสมมาตร) แล้วประเมินความน่าจะเป็น 4 คลาส (ปกติ, ขาด N, ขาด P, ขาด K)
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">⚙️ ขั้นตอนการทำงาน:</div>
+            <ol class="steps-list">
+                <li><strong>หั่นการคำนวณเป็น 2 สเต็ป (Depthwise Separable Conv):</strong> สแกนพื้นที่ทีละสีก่อน แล้วค่อยรวมสีข้ามชั้นทีหลัง ลดแรงคำนวณลง 85%</li>
+                <li><strong>สอนหนังสือแบบ 2 ระดับ (Two-Stage Fine-Tuning):</strong> รอบแรก ล็อกตัวถังเดิมไว้แล้วสอนเฉพาะสมองส่วนตัดเกรด (Head) 8 รอบ ➔ รอบสอง ปลดล็อกสมอง 12 เลเยอร์บนสุด แล้วค่อยๆ ปรับจูนอย่างประณีตอีก 6 รอบ</li>
+                <li><strong>ผลลัพธ์:</strong> ความแม่นยำพุ่งขึ้นจาก 65.91% กลายเป็น <strong>85.37%</strong></li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="model-card">
+        <div class="model-header">
+            <h3 class="model-title">3. หมอ A2: โครงข่าย Multi-Scale SE-Attention CNN</h3>
+            <span class="badge-acc">ความแม่นยำ: 90.24% (+40.24%)</span>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">💡 เข้าใจง่ายๆ คืออะไร (ความหมาย):</div>
+            <div class="prop-desc">
+                เหมือน <strong>"หมอเฉพาะทางที่สวมแว่นขยาย 2 ระยะ พร้อมมีไฟสปอตไลต์ส่องเน้นเฉพาะจุดรอยโรค"</strong> ไม่ว่ารอยโรคจะเล็กจิ๋วแค่ไหนก็หนีไม่พ้นสายตา
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">📜 ทำไมถึงต้องมี (ที่มา):</div>
+            <div class="prop-desc">
+                รอยโรคของผักบุ้งมีขนาดต่างกันมาก! ขาด N ใบจะเหลืองกว้าง แต่ขาด P จะเป็น <strong>จุดสีม่วงเล็กจิ๋ว</strong> และขาด K จะเป็น <strong>แถบขอบใบไหม้เส้นแคบๆ</strong> ถ้าใช้แว่นขยายขนาดเดียวส่องดู จะมองข้ามจุดเล็กๆ พวกนี้ไป ผู้วิจัยจึงออกแบบโครงข่ายพิเศษนี้ขึ้นมาเอง
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">🎯 หน้าที่ทำอะไรในระบบ:</div>
+            <div class="prop-desc">
+                ตรวจจับ "รอยโรคขนาดเล็ก (Micro-symptoms)" ที่ซ่อนอยู่ตามเนื้อเยื่อใบ เพื่อไม่ให้จุดสีม่วงหรือขอบใบไหม้เล็ดลอดสายตาไปได้
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">⚙️ ขั้นตอนการทำงาน:</div>
+            <ol class="steps-list">
+                <li><strong>มอง 2 ระยะพร้อมกัน:</strong> ใช้เลนส์เล็ก 3×3 ส่องขอบใบและลายเส้นละเอียด ควบคู่กับเลนส์ใหญ่ 5×5 ส่องบริเวณสีใบกว้างๆ</li>
+                <li><strong>ฉายไฟสปอตไลต์ (SE-Attention Block):</strong> AI คำนวณว่าสีไหนคือรอยโรคสำคัญ จากนั้น <em>เร่งความสว่างของสีรอยโรคนั้นขึ้นมา</em> และ <em>หรี่แสงพื้นหลังกล่องโฟมทิ้งไป</em></li>
+                <li><strong>ผลลัพธ์:</strong> ความแม่นยำพุ่งก้าวกระโดดจาก 50.00% กลายเป็น <strong>90.24%</strong> (เพิ่มขึ้นถึง +40.24% สูงที่สุดในระบบ!)</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="model-card">
+        <div class="model-header">
+            <h3 class="model-title">4. หมอ A3: ผู้เชี่ยวชาญสรีรวิทยาใบ 44 มิติ (44-D Foliar Expert)</h3>
+            <span class="badge-acc">ความแม่นยำ: 87.80%</span>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">💡 เข้าใจง่ายๆ คืออะไร (ความหมาย):</div>
+            <div class="prop-desc">
+                เหมือน <strong>"หมอนิติเวชพืชสายวิทยาศาสตร์บริสุทธิ์ ที่ไม่เชื่อสายตาเปล่า แต่ใช้ไม้บรรทัดวัดตัวเลขฟิสิกส์ 44 ค่า"</strong> เป็นคนที่ใช้เหตุผลทางฟิสิกส์ ไม่มีวันถูกแสงเงาหรือภาพลวงตาหลอก
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">📜 ทำไมถึงต้องมี (ที่มา):</div>
+            <div class="prop-desc">
+                Deep Learning มักมีจุดอ่อนคือเป็น "กล่องดำ" ถ้าวันไหนแดดสะท้อนผิวน้ำ หรือมีเงาตกกระทบ หมอ A1 และ A2 อาจจะมองเพี้ยนได้ เราจึงต้องการ <strong>"สมองเสาหลักที่มั่นคง (Anchor Model)"</strong> ที่วัดค่าฟิสิกส์ตรงๆ มาคอยค้ำประกันความถูกต้อง
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">🎯 หน้าที่ทำอะไรในระบบ:</div>
+            <div class="prop-desc">
+                คำนวณตัวเลขฟิสิกส์ 44 ค่าจากเนื้อใบ แล้วส่งให้ 3 ขุนพล Machine Learning ช่วยกันตัดสิน
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">⚙️ ขั้นตอนการทำงาน:</div>
+            <ol class="steps-list">
+                <li><strong>สกัดตัวเลขฟิสิกส์ 44 ค่า:</strong> ดัชนีพืชพรรณทางการเกษตร (ExG, ExR, NDI), ค่าสี CIELAB, ความคมชัดของเนื้อใบ และไฮไลต์สำคัญคือ <strong>ผลต่างสีขอบใบกับกลางใบ (Δa*, Δb*)</strong> เพื่อจับ <em>ขอบใบไหม้ของโพแทสเซียม (-K)</em> โดยเฉพาะ</li>
+                <li><strong>ระดม 3 ขุนพล ML ช่วยกันวิเคราะห์:</strong> ExtraTrees (น้ำหนัก 45%) + RandomForest (น้ำหนัก 35%) + โครงข่ายประสาทเทียม MLP (น้ำหนัก 20%)</li>
+                <li><strong>ผลลัพธ์:</strong> แม่นยำสูงถึง <strong>87.80%</strong> และเป็นโมเดลที่นิ่งที่สุด ไม่แกว่งตามสภาพแสงแดด</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="model-card" style="background:#f0fdf4; border-color:#bbf7d0;">
+        <div class="model-header">
+            <h3 class="model-title" style="color:#166534;">5. การรวมพลังสายตา (Stream A: Vision Soft-Voting Ensemble)</h3>
+            <span class="badge-acc" style="background:#dcfce7; color:#15803d; border-color:#86efac;">ความแม่นยำรวม: 95.12%</span>
+        </div>
+        <div class="prop-desc" style="border-left-color:#22c55e;">
+            นำคะแนนความน่าจะเป็นของหมอทั้ง 3 ท่านมาถ่วงน้ำหนักรวมกัน:
+            <br><strong>สูตรการโหวต:</strong> <code>P_vis = 0.35·A1 + 0.15·A2 + 0.50·A3</code>
+            <br><em>(หมอ A3 วัดตัวเลขฟิสิกส์ได้รับน้ำหนักสูงสุด 50% เพื่อเป็นเสาหลักค้ำความมั่นคง)</em>
+        </div>
+    </div>
+
+    <!-- แผนกที่ 3 -->
+    <div class="dept-banner dept-sensor">
+        <span>🧪 แผนกที่ 3: ทีมห้องแล็บตรวจเลือดในน้ำ (Stream B: Sensor Ensemble)</span>
+        <span style="font-size: 13px; font-weight: normal;">แม่นยำรวม 97.56% (แปลงจริง 100%)</span>
+    </div>
+
+    <div class="model-card">
+        <div class="model-header">
+            <h3 class="model-title">6. แล็บ B0: การถดถอยโลจิสติก (Logistic Regression Baseline)</h3>
+            <span class="badge-acc">ความแม่นยำ: 82.93%</span>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">💡 เข้าใจง่ายๆ คืออะไร:</div>
+            <div class="prop-desc">เหมือน <strong>"สูตรคำนวณตัดเกรดเส้นตรงแบบธรรมดา (ไม้บรรทัดวัดมาตรฐาน)"</strong></div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">📜 ทำไมถึงต้องมี:</div>
+            <div class="prop-desc">ในงานวิจัยต้องมีโมเดลพื้นฐาน (Baseline) เพื่อพิสูจน์ให้กรรมการเห็นว่า ปัญหาพืชขาดธาตุอาหารมันซับซ้อนเกินกว่าจะใช้สมการเส้นตรงธรรมดามาแก้ได้</div>
+        </div>
+    </div>
+
+    <div class="model-card">
+        <div class="model-header">
+            <h3 class="model-title">7. แล็บ B1: ต้นไม้เกรเดียนต์บูสต์ (Gradient Boosting: GBDT)</h3>
+            <span class="badge-acc" style="background:#fef2f2; color:#b91c1c; border-color:#fecaca;">ความแม่นยำ: 100.00% เต็ม!</span>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">💡 เข้าใจง่ายๆ คืออะไร:</div>
+            <div class="prop-desc">เหมือน <strong>"ยอดนักสืบเอกแห่งห้องแล็บ ที่ส่งทีมสืบต่อกันเป็นทอดๆ โดยคนที่มาทีหลังจะมุ่งแก้จุดผิดพลาดของคนก่อนหน้า"</strong></div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">📜 ทำไมถึงต้องมี:</div>
+            <div class="prop-desc">คิดค้นโดย Jerome Friedman (2001) เป็นอัลกอริทึมที่เก่งที่สุดในโลกสำหรับข้อมูลแบบตารางตัวเลข สามารถจับความสัมพันธ์ที่ละเอียดอ่อน เช่น ค่าปุ๋ย EC ค่อยๆ ลดลงพร้อมกับ pH ดริฟต์หนีสมดุล</div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">⚙️ ขั้นตอนการทำงาน:</div>
+            <div class="prop-desc">ปลูกต้นไม้ 220 ต้นต่อแถวกัน ต้นที่สองจะเรียนรู้เฉพาะ <em>จุดที่ต้นแรกทายผิด</em> ต่อเนื่องไปเรื่อยๆ จนได้ความแม่นยำ <strong>100.00% เต็ม</strong> บนชุดทดสอบ</div>
+        </div>
+    </div>
+
+    <div class="model-card">
+        <div class="model-header">
+            <h3 class="model-title">8. แล็บ B2: ป่าสุ่มตัดสินใจ (Random Forest Classifier)</h3>
+            <span class="badge-acc">ความแม่นยำ: 97.56%</span>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">💡 เข้าใจง่ายๆ คืออะไร:</div>
+            <div class="prop-desc">เหมือน <strong>"สภาผู้เชี่ยวชาญ 320 คน ที่โหวตพร้อมกันอย่างเป็นอิสระ เพื่อป้องกันไม่ให้ระบบตื่นตูมกับคลื่นรบกวน"</strong></div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">📜 ทำไมถึงต้องมี:</div>
+            <div class="prop-desc">หัววัดในน้ำอาจเจอฟองอากาศจากปั๊มออกซิเจน หรือสัญญาณไฟกระชาก Random Forest ถูกใส่เข้ามาเพื่อทำหน้าที่เป็น <strong>"กันชนดูดซับสัญญาณรบกวน (Noise Absorber)"</strong></div>
+        </div>
+    </div>
+
+    <div class="model-card">
+        <div class="model-header">
+            <h3 class="model-title">9. แล็บ B3: ต้นไม้สุ่มยิ่งยวด (Extra Trees Classifier)</h3>
+            <span class="badge-acc">ความแม่นยำ: 92.68%</span>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">💡 เข้าใจง่ายๆ คืออะไร:</div>
+            <div class="prop-desc">เหมือน <strong>"ผู้เชี่ยวชาญสายสุ่มแบบสุดขั้ว ที่ช่วยเกลี่ยผลลัพธ์ให้เนียนตา ไม่ยึดติดกับตัวเลขใดตัวเลขหนึ่ง"</strong> ช่วยลดความเอนเอียง (Variance) ของระบบ</div>
+        </div>
+    </div>
+
+    <div class="model-card" style="background:#f0fdf4; border-color:#bbf7d0;">
+        <div class="model-header">
+            <h3 class="model-title" style="color:#166534;">10. การรวมพลังห้องแล็บ (Stream B: Sensor Soft-Voting Ensemble)</h3>
+            <span class="badge-acc" style="background:#dcfce7; color:#15803d; border-color:#86efac;">ความแม่นยำรวม: 97.56%</span>
+        </div>
+        <div class="prop-desc" style="border-left-color:#22c55e;">
+            รวมคะแนนแล็บน้ำ 3 ขุนพล: <code>P_sen = 0.45·GBDT + 0.30·RandomForest + 0.25·ExtraTrees</code>
+            <br>ให้ GBDT เป็นผู้นำ และมีอีก 2 สภาช่วยยืนยัน ป้องกันหัววัดเพี้ยนได้อย่างรัดกุม
+        </div>
+    </div>
+
+    <!-- แผนกที่ 4 -->
+    <div class="dept-banner dept-fusion">
+        <span>🏛️ แผนกที่ 4: ผู้อำนวยการวินิจฉัยและสั่งการ (Late-Fusion & 3-Stage Triage)</span>
+        <span style="font-size: 13px; font-weight: normal;">ความแม่นยำชี้ขาด 100.00%</span>
+    </div>
+
+    <div class="model-card">
+        <div class="model-header">
+            <h3 class="model-title">11. ผู้อำนวยการตัดสินใจชี้ขาด (Hierarchical Late-Fusion Engine)</h3>
+            <span class="badge-acc" style="background:#faf5ff; color:#6b21a8; border-color:#e9d5ff;">ความแม่นยำชี้ขาด: 100.00%</span>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">💡 เข้าใจง่ายๆ คืออะไร (ความหมาย):</div>
+            <div class="prop-desc">
+                เหมือน <strong>"ผู้อำนวยการโรงพยาบาล ที่นำผลตรวจตาของหมอ และผลตรวจเลือดของแล็บ มาเคาะคำตอบสุดท้ายว่าจะสั่งยาจ่ายปุ๋ยอย่างไร"</strong>
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">📜 ทำไมถึงต้องมี (ที่มา):</div>
+            <div class="prop-desc">
+                <em>ทำไมไม่เอารูปภาพกับค่าน้ำมารวมกันตั้งแต่แรก (Early Fusion)?</em><br>
+                เพราะข้อมูลค่าน้ำ 7 ค่า จะถูกรูปภาพที่มีพิกเซลเป็นแสนๆ กลืนหายไปหมด! และถ้าวันไหนกล้องเป็นฝ้า ระบบจะพังทั้งระบบ การใช้ <strong>Late Fusion</strong> (ให้แต่ละแผนกคิดจนได้เปอร์เซ็นต์ความมั่นใจออกมาก่อน แล้วค่อยเอาเปอร์เซ็นต์มารวมกัน) จะทำให้ระบบทนทานสูงมาก แม้กล้องเสีย เซนเซอร์น้ำก็ยังทำงานต่อได้
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">⚙️ การทำงานและกลไกสั่งการ 3 ระดับ (3-Stage Triage):</div>
+            <div class="prop-desc">
+                <strong>สมการรวมคะแนน:</strong> <code>P_fused = 0.35·P_vis + 0.65·P_sen</code><br>
+                <em>(เซนเซอร์น้ำได้น้ำหนักสูงถึง 65% เพราะน้ำเปลี่ยนเร็วกว่าใบ สามารถเตือนภัยล่วงหน้าได้ตั้งแต่วันแรก)</em>
+            </div>
+            <ol class="steps-list">
+                <li><strong>ระดับ 1 (พืชปกติ - Healthy):</strong> ทั้งตาและน้ำบอกว่าปกติ ➔ ไม่ต้องทำอะไร ประหยัดปุ๋ย</li>
+                <li><strong>ระดับ 2 (ระยะแฝงเตือนภัยล่วงหน้า - Pre-Symptomatic Early Warning):</strong><br>
+                    <strong>⭐ ไฮไลต์ชิ้นเอกของงานวิจัย:</strong> สายตาเห็นใบยังเขียวสด (P_vis = ปกติ) แต่แล็บตรวจพบปุ๋ยในน้ำฮวบลง (P_sen = ขาด N, P หรือ K) ➔ <strong>ระบบจะสั่งเปิดปั๊มเติมปุ๋ยทันทีตั้งแต่วันที่ 1–3 ของการปลูก ก่อนที่ใบพืชจะทันได้เหี่ยวหรือแสดงรอยโรค!</strong></li>
+                <li><strong>ระดับ 3 (ยืนยันอาการป่วยชัดเจน - Symptomatic Confirmed):</strong> ทั้งใบแสดงรอยโรคและค่าน้ำยืนยันตรงกัน ➔ สั่งจ่ายปุ๋ยเต็มระบบและแจ้งเตือนวิกฤตบนแดชบอร์ด</li>
+            </ol>
+        </div>
+    </div>
+
+    <div class="model-card">
+        <div class="model-header">
+            <h3 class="model-title">12. เครื่องเอกซเรย์พิสูจน์ความโปร่งใส (Explainable AI: Grad-CAM)</h3>
+            <span class="badge-acc" style="background:#eff6ff; color:#1d4ed8; border-color:#bfdbfe;">Explainable AI</span>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">💡 เข้าใจง่ายๆ คืออะไร (ความหมาย):</div>
+            <div class="prop-desc">
+                เหมือน <strong>"เครื่องเอกซเรย์ตรวจสมอง AI เพื่อดูว่าตอนที่ AI ตัดสินใจ มันมองที่รอยโรคบนใบจริง หรือมันแอบมองสิ่งอื่น"</strong>
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">📜 ทำไมถึงต้องมี (ที่มา):</div>
+            <div class="prop-desc">
+                เพื่อตอบข้อครหาที่ว่า AI เป็น "กล่องดำ (Black Box)" เราจึงใช้ Grad-CAM ฉายภาพความร้อน (Heatmap) พิสูจน์ต่อคณะกรรมการว่า AI มองที่รอยโรคจริง ไม่ได้แอบไปจำแสงสะท้อนบนผิวน้ำ
+            </div>
+        </div>
+        <div class="prop-item">
+            <div class="prop-label">⚙️ สิ่งที่ค้นพบในแปลงจริง:</div>
+            <ol class="steps-list">
+                <li><strong>ขาด N:</strong> แสงสีแดงส้มจะส่องสว่างทั่ว <em>"เนื้อใบสีเหลืองซีด"</em></li>
+                <li><strong>ขาด P:</strong> แสงสีแดงจะส่องเจาะจงเฉพาะ <em>"จุดเนื้อเยื่อสีม่วงคล้ำ"</em></li>
+                <li><strong>ขาด K:</strong> แสงสีแดงจะส่องล้อมรอบ <em>"ขอบใบที่ไหม้เกรียม"</em></li>
+                <li>ส่วนบริเวณผิวน้ำและกล่องโฟมเป็นสีน้ำเงินมืดสนิท ยืนยันว่า AI ฉลาดจริงตามหลักวิทยาศาสตร์ 100%!</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- ตารางสรุป -->
+    <h2 class="section-title">📊 ตารางสรุป 12 ขุนพล AI ในแผ่นเดียว (Master Comparison Table)</h2>
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th style="width: 5%;">ที่</th>
+                <th style="width: 25%;">ชื่อโมเดล / กลไก AI</th>
+                <th style="width: 28%;">เปรียบเหมือนใครในโรงพยาบาลพืช</th>
+                <th style="width: 14%;">ความแม่นยำ</th>
+                <th style="width: 28%;">จุดเด่นสำคัญ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><strong>Symptom-Gated Filtering</strong></td>
+                <td>ด่านคัดกรองคนไข้ระยะฟักตัว</td>
+                <td>-</td>
+                <td>กรองใบเขียวระยะแฝงออก ไม่ให้ AI ตาเบลอ</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><strong>Vision A1: MobileNetV2</strong></td>
+                <td>หมออายุรกรรมทั่วไป วิ่งเร็ว</td>
+                <td>85.37%</td>
+                <td>ประหยัดพลังงาน เทรน 2 สเต็ปอย่างประณีต</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><strong>Vision A2: MultiScale SE</strong></td>
+                <td>หมอสวมแว่นขยาย+สปอตไลต์</td>
+                <td>90.24%</td>
+                <td>ขยายจุดม่วงเล็กจิ๋วและแถบขอบใบไหม้</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><strong>Vision A3: Foliar Expert</strong></td>
+                <td>หมอนิติเวชพืช วัดตัวเลขฟิสิกส์</td>
+                <td>87.80%</td>
+                <td>วัดตัวเลข 44 ค่า ไม่ถูกแสงแดดหลอก</td>
+            </tr>
+            <tr style="background:#e0f2fe; font-weight:600;">
+                <td>5</td>
+                <td>► Stream A: Vision Ensemble</td>
+                <td>สภาแพทย์สายตาลงมติร่วม</td>
+                <td>95.12%</td>
+                <td>โหวต 0.35 A1 + 0.15 A2 + 0.50 A3</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td><strong>Sensor B0: Logistic Reg.</strong></td>
+                <td>ไม้บรรทัดวัดเกณฑ์มาตรฐาน</td>
+                <td>82.93%</td>
+                <td>โมเดลเชิงเส้นพื้นฐานเปรียบเทียบในงานวิจัย</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td><strong>Sensor B1: Gradient Boost</strong></td>
+                <td>ยอดนักสืบ ต่อจิ๊กซอว์แก้จุดผิด</td>
+                <td>100.00%</td>
+                <td>ต้นไม้ 220 ต้นแก้โจทย์ต่อกัน แม่นยำที่สุด</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td><strong>Sensor B2: Random Forest</strong></td>
+                <td>สภาที่ปรึกษา 320 คนโหวต</td>
+                <td>97.56%</td>
+                <td>ทนทานต่อฟองอากาศและสัญญาณกวน</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td><strong>Sensor B3: Extra Trees</strong></td>
+                <td>ผู้เชี่ยวชาญสายสุ่มสุดขั้ว</td>
+                <td>92.68%</td>
+                <td>สุ่มจุดตัดเงื่อนไข ลดความลำเอียง</td>
+            </tr>
+            <tr style="background:#dcfce7; font-weight:600;">
+                <td>10</td>
+                <td>► Stream B: Sensor Ensemble</td>
+                <td>3 สถาบันแล็บลงมติร่วม</td>
+                <td>97.56%</td>
+                <td>โหวต 0.45 B1 + 0.30 B2 + 0.25 B3</td>
+            </tr>
+            <tr style="background:#f3e8ff; font-weight:700;">
+                <td>11</td>
+                <td>★ Hierarchical Late-Fusion</td>
+                <td>ผู้อำนวยการเคาะคำตอบสั่งยา</td>
+                <td>100.00%</td>
+                <td>รวมสายตา 35% + น้ำ 65% เติมปุ๋ยก่อนใบเหี่ยว</td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td><strong>Grad-CAM (XAI)</strong></td>
+                <td>เครื่องเอกซเรย์ตรวจสมอง AI</td>
+                <td>โปร่งใส 100%</td>
+                <td>ฉายแสงสีแดงยืนยันว่าดูที่รอยโรคจริง</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- 4 ประโยคทองคำ -->
+    <h2 class="section-title">🎤 4 ประโยคทองคำสำหรับตอบกรรมการสอบ (Defense Punchlines)</h2>
+    
+    <div class="punchline-card">
+        <div class="punchline-q">1. ทำไมระบบเราถึงฉลาดกว่ากล้องตรวจโรคพืชทั่วไปตามท้องตลาด?</div>
+        <div class="punchline-a">
+            <strong>คำตอบ:</strong> "กล้องทั่วไปจะตรวจเจอโรคก็ต่อเมื่อ <em>'ใบพืชเสียหายแล้ว'</em> ครับ แต่ระบบ A.E.G.I.S. ผสานเซนเซอร์น้ำเข้ากับภาพถ่าย ทำให้เราตรวจพบการขาดธาตุอาหารได้ตั้งแต่ <strong>'ระยะแฝง (Pre-symptomatic)'</strong> ในช่วงวันที่ 1–3 ของการปลูก ซึ่งใบยังเขียวสดอยู่ ทำให้เราสั่งจ่ายปุ๋ยรักษาพืชได้ทันเวลาก่อนที่ใบจะเหี่ยวเฉาครับ"
+        </div>
+    </div>
+
+    <div class="punchline-card">
+        <div class="punchline-q">2. ทำไมต้องทำ Symptom-Gating คัดแยกภาพออก ไม่เทรนภาพทั้งหมดไปเลย?</div>
+        <div class="punchline-a">
+            <strong>คำตอบ:</strong> "เพราะในสรีรวิทยาพืช ช่วง 7 วันแรกของการขาดปุ๋ย ใบจะยังคงเขียวสดเหมือนต้นปกติครับ ถ้าเราบังคับให้ AI จำว่าใบเขียวนี้คือขาดไนโตรเจน AI จะเกิด Label Noise และสับสน การคัดแยกใบเขียวระยะแฝงออกไปให้เซนเซอร์น้ำดูแลแทน ทำให้ความแม่นยำของโมเดลภาพพุ่งขึ้นถึง +22.39% ครับ"
+        </div>
+    </div>
+
+    <div class="punchline-card">
+        <div class="punchline-q">3. ทำไมให้น้ำหนักเซนเซอร์น้ำมากกว่าภาพถ่าย (น้ำ 65% vs ภาพ 35%)?</div>
+        <div class="punchline-a">
+            <strong>คำตอบ:</strong> "เพราะค่าเคมีในน้ำมีความไวในการตอบสนอง (Sensitivity) เร็วกว่าสายตาหลายวันครับ พืชดูดปุ๋ยไป ค่าน้ำจะลดลงทันทีตั้งแต่วันแรก ในขณะที่ใบไม้ต้องใช้เวลาอีกหลายวันกว่าจะเปลี่ยนสี การให้น้ำหนักเซนเซอร์ 65% ทำให้ระบบมีคุณสมบัติเตือนภัยล่วงหน้าได้อย่างแม่นยำครับ"
+        </div>
+    </div>
+
+    <div class="punchline-card">
+        <div class="punchline-q">4. รู้ได้อย่างไรว่า AI ไม่ได้ฟลุ๊ก หรือแอบจำฉากหลังกล่องโฟม?</div>
+        <div class="punchline-a">
+            <strong>คำตอบ:</strong> "เราพิสูจน์ด้วย Explainable AI ผ่านแผนภาพความร้อน Grad-CAM ครับ ซึ่งผลการทดลองยืนยัน 100% ว่าแสงความร้อนสีแดงส่องสว่างเจาะจงเฉพาะรอยโรคทางพฤกษศาสตร์ เช่น รอยซีดของ N, จุดม่วงของ P และขอบใบไหม้ของ K โดยบริเวณผิวน้ำและกล่องโฟมเป็นสีน้ำเงินมืดสนิท ยืนยันว่า AI ตัดสินใจจากอาการของโรคจริงครับ"
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

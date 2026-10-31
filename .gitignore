@@ -56,9 +56,12 @@ sandbox/
 # ------------------------------------------------------------------------------
 Ai มหาปลัย/dataset_real/images/
 Ai มหาปลัย/dataset_real/images_cropped/
-server/static/images_real/
+server/static/images_real/*
+!server/static/images_real/*.png
+!server/static/images_real/*.jpg
 test_captures/
 *.log
+*.docx
 
 # ------------------------------------------------------------------------------
 # 6. Operating System & IDE Specific Files
