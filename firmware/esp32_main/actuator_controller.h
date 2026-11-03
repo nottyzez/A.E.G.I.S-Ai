@@ -9,14 +9,16 @@
 // ------------------------------------------------------------------------------
 enum CyclePhase {
     PHASE_IDLE = 0,
-    PHASE_1_SAMPLING_IN = 1,      // Diaphragm 1 draws sample into cup
-    PHASE_2_MEASURING = 2,        // Wait settling delay + read pH/EC/Temp
-    PHASE_3_SAMPLING_RETURN = 3,  // Diaphragm 2 pumps sample back into tank
-    PHASE_4_DOSING = 4,           // Peristaltic pumps 1, 2, 3 dose formulas
-    PHASE_5_PROBE_RINSE = 5,      // Diaphragm 3 rinses probes with clean water
-    PHASE_6_DRAIN_WASTE = 6,      // Solenoid valve drains rinse water out
-    PHASE_7_POST_CIRCULATION = 7, // Circulation delay before post-dosing verification
-    PHASE_8_POST_VERIFY = 8       // Post-dosing verification measurement
+    PHASE_0_PRE_RETURN = 1,          // Diaphragm 2 returns resting storage water back to tank (Zero Waste)
+    PHASE_1_SAMPLING_IN = 2,         // Diaphragm 1 draws fresh sample into chamber
+    PHASE_2_MEASURING = 3,           // Wait settling delay + read pH/EC/Temp & send AI telemetry
+    PHASE_3_SAMPLING_RETURN = 4,     // Diaphragm 2 pumps tested sample back into tank
+    PHASE_4_DOSING = 5,              // Peristaltic pumps 1, 2, 3 dose formulas
+    PHASE_5_PROBE_RINSE = 6,         // Diaphragm 3 rinses probes with clean RO water
+    PHASE_6_DRAIN_WASTE = 7,         // Solenoid valve drains rinse wastewater out
+    PHASE_7_PROBE_PRESERVATION = 8,  // Diaphragm 1 draws small soak water to preserve pH probe (No reading)
+    PHASE_8_POST_CIRCULATION = 9,    // Optional circulation delay
+    PHASE_9_POST_VERIFY = 10         // Optional post-dosing verification
 };
 
 class ActuatorController {
@@ -30,6 +32,17 @@ public:
     unsigned long dosePump2Ms;
     unsigned long dosePump3Ms;
 
+    // Per-relay manual override windows (relay index 1..7 -> slot 0..6).
+    // A manual command stores its runtime here and returns immediately, so the
+    // main loop keeps polling WiFi, reading sensors and serving serial input.
+    struct RelayOverride {
+        bool active;
+        int pin;
+        unsigned long startMs;
+        unsigned long durationMs;
+    };
+    RelayOverride overrides[7];
+
     ActuatorController() {
         currentPhase = PHASE_IDLE;
         phaseStartTime = 0;
@@ -37,6 +50,9 @@ public:
         dosePump1Ms = 0;
         dosePump2Ms = 0;
         dosePump3Ms = 0;
+        for (int i = 0; i < 7; i++) {
+            overrides[i] = {false, -1, 0, 0};
+        }
     }
 
     void initPins() {
@@ -64,10 +80,10 @@ public:
     }
 
     void startFullPresentationCycle() {
-        Serial.println("\n>>> [CYCLE START] Beginning 6-Phase Automated Presentation Cycle <<<");
-        setPhase(PHASE_1_SAMPLING_IN, TIME_SAMPLE_IN_MS);
-        digitalWrite(PIN_RELAY_SAMPLE_IN, RELAY_ON);
-        Serial.printf("[Phase 1] Diaphragm 1 (Sample IN) active for %lu ms\n", TIME_SAMPLE_IN_MS);
+        Serial.println("\n>>> [CYCLE START] Beginning 7-Phase Automated Presentation & Preservation Cycle <<<");
+        setPhase(PHASE_0_PRE_RETURN, TIME_PRE_RETURN_MS);
+        digitalWrite(PIN_RELAY_SAMPLE_RETURN, RELAY_ON);
+        Serial.printf("[Phase 0] Diaphragm 2 (Pre-Return Storage Water) active for %lu ms\n", TIME_PRE_RETURN_MS);
     }
 
     void setPhase(CyclePhase newPhase, unsigned long durationMs) {
@@ -82,20 +98,53 @@ public:
         Serial.println("[CYCLE ABORTED] All relays forced OFF.");
     }
 
-    // Manual test function for live judge demonstrations
+    // Manual test function for live judge demonstrations.
+    // Non-blocking: records the runtime window and returns; updateManualOverrides()
+    // turns the relay off once the window elapses.
     void manualTriggerRelay(int relayIndex, unsigned long durationMs) {
         if (durationMs > MAX_SAFETY_DOSING_MS) {
             durationMs = MAX_SAFETY_DOSING_MS;
         }
 
         int pin = getPinFromIndex(relayIndex);
-        if (pin == -1) return;
+        if (pin == -1 || relayIndex < 1 || relayIndex > 7) return;
 
-        Serial.printf("[MANUAL] Triggering Relay #%d (GPIO %d) for %lu ms\n", relayIndex, pin, durationMs);
+        int slot = relayIndex - 1;
+        overrides[slot].active = true;
+        overrides[slot].pin = pin;
+        overrides[slot].startMs = millis();
+        overrides[slot].durationMs = durationMs;
+
+        Serial.printf("[MANUAL] Relay #%d (GPIO %d) ON for %lu ms (non-blocking)\n",
+                      relayIndex, pin, durationMs);
         digitalWrite(pin, RELAY_ON);
-        delay(durationMs);
-        digitalWrite(pin, RELAY_OFF);
-        Serial.printf("[MANUAL] Relay #%d turned OFF\n", relayIndex);
+    }
+
+    // Call every loop(): releases each relay whose manual window has elapsed.
+    void updateManualOverrides(unsigned long now) {
+        for (int i = 0; i < 7; i++) {
+            if (!overrides[i].active) continue;
+            if (now - overrides[i].startMs >= overrides[i].durationMs) {
+                digitalWrite(overrides[i].pin, RELAY_OFF);
+                overrides[i].active = false;
+                Serial.printf("[MANUAL] Relay #%d turned OFF after %lu ms\n",
+                              i + 1, overrides[i].durationMs);
+            }
+        }
+    }
+
+    bool isManualOverrideActive(int relayIndex) {
+        if (relayIndex < 1 || relayIndex > 7) return false;
+        return overrides[relayIndex - 1].active;
+    }
+
+    void clearManualOverrides() {
+        for (int i = 0; i < 7; i++) {
+            if (overrides[i].active) {
+                digitalWrite(overrides[i].pin, RELAY_OFF);
+                overrides[i].active = false;
+            }
+        }
     }
 
     int getPinFromIndex(int index) {
@@ -113,15 +162,17 @@ public:
 
     const char* getPhaseName() {
         switch (currentPhase) {
-            case PHASE_IDLE: return "STANDBY";
+            case PHASE_IDLE: return "STANDBY_PRESERVED";
+            case PHASE_0_PRE_RETURN: return "0_PRE_RETURN";
             case PHASE_1_SAMPLING_IN: return "1_SAMPLING_IN";
             case PHASE_2_MEASURING: return "2_MEASURING_AI";
             case PHASE_3_SAMPLING_RETURN: return "3_SAMPLE_RETURN";
             case PHASE_4_DOSING: return "4_TWO_TIER_DOSING";
             case PHASE_5_PROBE_RINSE: return "5_PROBE_RINSE";
             case PHASE_6_DRAIN_WASTE: return "6_DRAIN_WASTE";
-            case PHASE_7_POST_CIRCULATION: return "7_POST_CIRCULATION";
-            case PHASE_8_POST_VERIFY: return "8_POST_VERIFY";
+            case PHASE_7_PROBE_PRESERVATION: return "7_PROBE_PRESERVATION";
+            case PHASE_8_POST_CIRCULATION: return "8_POST_CIRCULATION";
+            case PHASE_9_POST_VERIFY: return "9_POST_VERIFY";
             default: return "UNKNOWN";
         }
     }

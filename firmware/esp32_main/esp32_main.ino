@@ -277,6 +277,9 @@ void setup() {
 void loop() {
     unsigned long now = millis();
 
+    // Release any manual relay whose runtime window has elapsed
+    actuators.updateManualOverrides(now);
+
     // Check Serial Inputs & Remote Dashboard Polling
     handleSerialCommands();
 
@@ -302,7 +305,20 @@ void loop() {
     // --------------------------------------------------------------------------
     switch (actuators.currentPhase) {
         case PHASE_IDLE:
-            // Standby waiting for dashboard or physical trigger
+            // Standby waiting for dashboard or physical trigger (pH probe safely hydrated in sample water)
+            break;
+
+        case PHASE_0_PRE_RETURN:
+            if (now - actuators.phaseStartTime >= actuators.phaseDuration) {
+                digitalWrite(PIN_RELAY_SAMPLE_RETURN, RELAY_OFF);
+                Serial.println("[Phase 0 DONE] Resting storage water returned to culture tank (Zero Waste).");
+
+                // Transition to Phase 1: Draw Fresh Sample Water
+                actuators.setPhase(PHASE_1_SAMPLING_IN, TIME_SAMPLE_IN_MS);
+                digitalWrite(PIN_RELAY_SAMPLE_IN, RELAY_ON);
+                Serial.printf("[Phase 1] Diaphragm 1 (Fresh Sample IN) active for %lu ms\n", TIME_SAMPLE_IN_MS);
+                reportStatusToServer();
+            }
             break;
 
         case PHASE_1_SAMPLING_IN:
@@ -396,9 +412,22 @@ void loop() {
                 digitalWrite(PIN_RELAY_VALVE_DRAIN, RELAY_OFF);
                 Serial.println("[Phase 6 DONE] Rinse wastewater completely drained.");
 
-                // Cycle Complete -> Back to Standby
+                // Transition to Phase 7: Probe Preservation Soak (Draw small sample water to soak pH bulb)
+                actuators.setPhase(PHASE_7_PROBE_PRESERVATION, TIME_PRESERVATION_SOAK_MS);
+                digitalWrite(PIN_RELAY_SAMPLE_IN, RELAY_ON);
+                Serial.printf("[Phase 7] Diaphragm 1 (Probe Preservation Soak) active for %lu ms\n", TIME_PRESERVATION_SOAK_MS);
+                reportStatusToServer();
+            }
+            break;
+
+        case PHASE_7_PROBE_PRESERVATION:
+            if (now - actuators.phaseStartTime >= actuators.phaseDuration) {
+                digitalWrite(PIN_RELAY_SAMPLE_IN, RELAY_OFF);
+                Serial.println("[Phase 7 DONE] Chamber filled with small sample volume for probe preservation.");
+
+                // Cycle Complete -> Back to Standby (Strictly NO measurement during preservation soak)
                 actuators.setPhase(PHASE_IDLE, 0);
-                Serial.println("\n🎉 >>> [CYCLE COMPLETE] Presentation cycle finished successfully! <<<\n");
+                Serial.println("\n🎉 >>> [CYCLE COMPLETE] System in Standby. pH probe hydrated in sample water (No Reading during soak). <<<\n");
                 reportStatusToServer();
             }
             break;
