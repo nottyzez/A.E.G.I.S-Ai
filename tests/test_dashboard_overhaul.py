@@ -60,5 +60,17 @@ class TestFirmwareCommandContract(unittest.TestCase):
                          "Manual overrides must be accepted while a cycle runs")
 
 
+class TestServerRuntimeCeiling(unittest.TestCase):
+    def test_command_calc_ms_caps_at_thirty_seconds(self):
+        src = (PROJECT_ROOT / "main.py").read_text(encoding="utf-8")
+        self.assertIn("min(30000, int(round(prime_ms", src)
+        self.assertNotIn("min(25000, int(round(prime_ms", src)
+
+    def test_ai_dosing_engine_caps_at_thirty_seconds(self):
+        """The AI dosing path clamps through its own constant, not main.py's."""
+        from dosing_engine import MAX_PUMP_DURATION_MS
+        self.assertEqual(MAX_PUMP_DURATION_MS, 30000)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -487,7 +487,7 @@ def post_dashboard_command(payload: dict):
         def calc_ms(v_ml: float) -> int:
             if v_ml <= 0.0:
                 return 0
-            return min(25000, int(round(prime_ms + (v_ml / flow_rate) * 1000.0)))
+            return min(30000, int(round(prime_ms + (v_ml / flow_rate) * 1000.0)))
 
         dosing_ms = {
             "pump1_ms": calc_ms(vol_a),

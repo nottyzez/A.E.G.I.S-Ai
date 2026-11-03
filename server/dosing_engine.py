@@ -21,7 +21,7 @@ DEFAULT_PRIMING_DELAY = 2.0   # seconds (Delay to draw liquid to nozzle tip)
 K_EC_SLOPE = 0.38             # mS/cm per (ml of concentrated stock / L of water)
 HARD_MAX_EC = 3.2             # Above this, total nutrient lockout
 HARD_MIN_PH = 4.2             # Below this, extreme acidity lockout
-MAX_PUMP_DURATION_MS = 25000  # 25 seconds hardware cutoff safety limit
+MAX_PUMP_DURATION_MS = 30000  # 30 seconds hardware cutoff safety limit
 
 
 class TwoTierDosingEngine:
