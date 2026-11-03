@@ -178,7 +178,10 @@ void reportStatusToServer() {
 // HTTP API: Poll for Remote Dashboard Commands (e.g. "START_CYCLE")
 // ------------------------------------------------------------------------------
 void pollRemoteDashboardCommand() {
-    if (WiFi.status() != WL_CONNECTED || actuators.currentPhase != PHASE_IDLE) return;
+    // Polled even while a cycle runs: manual overrides are non-blocking windows
+    // (see ActuatorController::manualTriggerRelay), so a presenter's button press
+    // must never be silently dropped mid-cycle.
+    if (WiFi.status() != WL_CONNECTED) return;
 
     HTTPClient http;
     http.begin(URL_POLL_COMMAND);
@@ -186,7 +189,7 @@ void pollRemoteDashboardCommand() {
 
     if (code == 200) {
         String payload = http.getString();
-        StaticJsonDocument<256> doc;
+        StaticJsonDocument<512> doc;
         if (!deserializeJson(doc, payload)) {
             const char* cmd = doc["command"] | "";
             if (strcmp(cmd, "START_CYCLE") == 0 || strcmp(cmd, "START_REFILL_CYCLE") == 0) {
@@ -204,7 +207,34 @@ void pollRemoteDashboardCommand() {
                 int relay = doc["relay"] | 1;
                 unsigned long dur = doc["duration_ms"] | 2000;
                 actuators.manualTriggerRelay(relay, dur);
+            } else if (strcmp(cmd, "JUMP_PHASE") == 0) {
+                // Dashboard phase 1..6 -> the physical relays that phase drives.
+                int phase = doc["phase_id"] | 1;
+                unsigned long dur = doc["duration_ms"] | 6000;
+                Serial.printf("[REMOTE DASHBOARD] Jump to demo phase %d (%lu ms)\n", phase, dur);
+                switch (phase) {
+                    case 1: actuators.manualTriggerRelay(1, dur); break;               // Sample inflow
+                    case 2: break;                                                     // Vision capture: no relay
+                    case 3: break;                                                     // AI fusion: no relay
+                    case 4: actuators.manualTriggerRelay(2, dur); break;               // Sample return
+                    case 5: actuators.manualTriggerRelay(5, dur);                      // Stock A
+                            actuators.manualTriggerRelay(6, dur);                      // Stock B
+                            actuators.manualTriggerRelay(7, dur); break;               // Stock C
+                    case 6: actuators.manualTriggerRelay(3, dur);                      // Probe rinse
+                            actuators.manualTriggerRelay(4, dur); break;               // Drain valve
+                    default: break;
+                }
+            } else if (strcmp(cmd, "MANUAL_DOSE") == 0) {
+                // Server sends per-pump runtimes; each runs as its own window.
+                unsigned long p1 = doc["dosing_ms"]["pump1_ms"] | 0;
+                unsigned long p2 = doc["dosing_ms"]["pump2_ms"] | 0;
+                unsigned long p3 = doc["dosing_ms"]["pump3_ms"] | 0;
+                Serial.printf("[REMOTE DASHBOARD] Manual dose: A=%lu ms, B=%lu ms, C=%lu ms\n", p1, p2, p3);
+                if (p1 > 0) actuators.manualTriggerRelay(5, p1);
+                if (p2 > 0) actuators.manualTriggerRelay(6, p2);
+                if (p3 > 0) actuators.manualTriggerRelay(7, p3);
             } else if (strcmp(cmd, "STOP") == 0) {
+                actuators.clearManualOverrides();
                 actuators.stopCycle();
             }
         }

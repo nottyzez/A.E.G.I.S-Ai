@@ -56,7 +56,7 @@
 #define TIME_POST_CIRCULATION_MS 300000  // 5 minutes post-dosing circulation delay before re-verify
 
 // Hardware Safety Guardrails
-#define MAX_SAFETY_DOSING_MS     25000   // Hard cutoff: No dosing pump may run > 25 seconds
+#define MAX_SAFETY_DOSING_MS     30000   // Hard cutoff: No dosing pump may run > 30 seconds
 #define MAX_SAFETY_PUMP_MS       15000   // Hard cutoff for sampling pumps
 #define HARD_MAX_EC_MS_CM        3.5     // If EC exceeds 3.5 mS/cm, abort all nutrient dosing
 #define HARD_MIN_PH              4.0     // Extreme acidity safety lockout

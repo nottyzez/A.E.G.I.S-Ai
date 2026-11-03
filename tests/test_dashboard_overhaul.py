@@ -36,5 +36,29 @@ class TestFirmwareNonBlockingRelay(unittest.TestCase):
         self.assertIn("clearManualOverrides", self.src)
 
 
+class TestFirmwareCommandContract(unittest.TestCase):
+    def setUp(self):
+        self.ino = (FIRMWARE_DIR / "esp32_main.ino").read_text(encoding="utf-8")
+        # config.h is gitignored (it holds the WiFi password); config.example.h is
+        # the tracked template a fresh clone compiles from, so the ceiling is
+        # asserted there — a test that only read config.h would pass on this
+        # machine and fail on any clean checkout.
+        self.cfg = (FIRMWARE_DIR / "config.example.h").read_text(encoding="utf-8")
+
+    def test_firmware_handles_every_dashboard_command(self):
+        for cmd in ("JUMP_PHASE", "MANUAL_DOSE", "MANUAL_RELAY", "START_CYCLE", "STOP"):
+            self.assertIn(f'strcmp(cmd, "{cmd}")', self.ino)
+
+    def test_safety_ceiling_is_thirty_seconds(self):
+        self.assertIn("#define MAX_SAFETY_DOSING_MS     30000", self.cfg)
+
+    def test_manual_relay_not_gated_on_idle_phase(self):
+        start = self.ino.index("void pollRemoteDashboardCommand")
+        end = self.ino.index("void handleSerialCommands", start)
+        body = self.ino[start:end]
+        self.assertNotIn("actuators.currentPhase != PHASE_IDLE", body,
+                         "Manual overrides must be accepted while a cycle runs")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
