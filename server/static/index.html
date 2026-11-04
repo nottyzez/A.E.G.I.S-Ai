@@ -3218,7 +3218,6 @@
         { id: 'R7', num: 7, name: 'Peristaltic Pump 3 (Stock C: High-K)', pin: 'GPIO 11', defaultSec: 10, active: false, isScheduledBase: false, remainingSec: 0, role: 'จ่ายแม่ปุ๋ยสูตรเน้นโพแทสเซียม (Potassium Sulfate)' },
       ]);
 
-      const [pulseDurationMs, setPulseDurationMs] = useState('spec'); // 'spec' | 2000 | 5000 | 10000 | 30000
       const [stockAmounts, setStockAmounts] = useState({ A: 8.0, B: 8.0, C: 4.0 });
       // Manual pump runtime, hard-capped at 30 000 ms in UI, server and firmware alike.
       const [pumpRuntimeMs, setPumpRuntimeMs] = useState(5000);
@@ -3311,7 +3310,9 @@
         if (v <= 0) return 0;
         const primeMs = (calibration.priming_delay_s || 2.0) * 1000;
         const q = Math.max(0.1, calibration.pump_flow_rate_ml_s || 1.5);
-        return Math.min(25000, Math.round(primeMs + (v / q) * 1000));
+        // 30 000 ms matches the three hard ceilings: firmware MAX_SAFETY_DOSING_MS,
+        // server MAX_PUMP_DURATION_MS and main.py's min(30000, ...).
+        return Math.min(30000, Math.round(primeMs + (v / q) * 1000));
       };
 
       // Volume actually delivered in `ms`, after subtracting the priming delay.
@@ -3482,7 +3483,8 @@
 
       // Action 2: Jump to Any Closed-Loop Phase (1-6) on Stage Without Disabling Schedule
       const handleJumpPhase = async (phaseStep, phaseTitle) => {
-        const durSec = pulseDurationMs === 'spec' ? 6 : Math.max(5, Math.round(pulseDurationMs / 1000));
+        const durMs = Math.min(30000, Math.max(100, pumpRuntimeMs));
+        const durSec = Math.max(1, Math.round(durMs / 1000));
         setActivePhase(phaseStep);
         setIsFullCycleDemoRunning(false);
 
