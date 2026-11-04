@@ -62,15 +62,15 @@ check("Figma cards responsive max-width: 100%", html.count("max-width: 100%") >=
 # 5. Cosmic & Atmospheric Effects
 check("Drifting clouds keyframes", "cloudDriftSlow" in html and "cloudDriftFast" in html and "dashboard-clouds-layer" in html)
 check("Drifting clouds pointer-events: none", "pointer-events: none" in html and "dashboard-clouds-layer" in html)
-check("Mouse parallax space nebula", "home-space-nebula" in html and "nebulaRef" in html)
+check("Mouse parallax horizon bloom", "home-backdrop__bloom" in html and "nebulaRef" in html)
 check("Reduced star particle count (280 far, 150 mid, 60 near = 490)", "createStarLayer(280" in html and "createStarLayer(150" in html and "createStarLayer(60" in html)
 check("Meteor frequency adjustment (Dashboard rare, Home disabled)", "Math.random() < 0.002" in html and "meteorGroup.visible = false" in html)
 
 # 6. Background Image Asset Files Exist
 bg_dash = Path("server/static/images_real/dashboard_mountain_bg.png")
-bg_space = Path("server/static/images_real/space_bg.jpg")
+bg_space = Path("server/static/back.jpg")
 check("Dashboard background image exists (>50KB)", bg_dash.exists() and bg_dash.stat().st_size > 50000)
-check("Space background image exists (>50KB)", bg_space.exists() and bg_space.stat().st_size > 50000)
+check("Home backdrop image exists (>30KB)", bg_space.exists() and bg_space.stat().st_size > 30000)
 
 # Summary
 total = len(checks)
