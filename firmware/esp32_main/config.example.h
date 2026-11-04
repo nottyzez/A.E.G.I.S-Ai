@@ -47,11 +47,13 @@
 // ==============================================================================
 // 4. Default Phase Timings & Safety Watchdogs (in Milliseconds)
 // ==============================================================================
+#define TIME_PRE_RETURN_MS        4000    // 4 seconds to return resting storage water back to tank at cycle start
 #define TIME_SAMPLE_IN_MS        6000    // 6 seconds to fill measuring cup to probe level
 #define TIME_SETTLING_DELAY_MS   3000    // 3 seconds wait for water to stabilize before ADC read
 #define TIME_SAMPLE_RETURN_MS    7000    // 7 seconds to pump water back into main box
 #define TIME_RINSE_PROBE_MS      5000    // 5 seconds rinse with clean water
 #define TIME_DRAIN_VALVE_MS      6000    // 6 seconds open solenoid valve to drain wash water
+#define TIME_PRESERVATION_SOAK_MS 3000   // 3 seconds small pulse to soak pH bulb for standby preservation (No measurement)
 #define TIME_PRE_CIRCULATION_MS  120000  // 2 minutes pre-circulation delay for water mixing
 #define TIME_POST_CIRCULATION_MS 300000  // 5 minutes post-dosing circulation delay before re-verify
 
