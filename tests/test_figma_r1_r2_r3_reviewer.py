@@ -190,14 +190,14 @@ class FigmaR2AssetsAndDualPathTest(unittest.TestCase):
             self.assertGreaterEqual(img.height, 600)
 
     def test_r2_space_image_validity(self):
-        """Verify server/static/images_real/space_bg.jpg exists, valid JPEG > 50KB."""
-        path = IMAGES_REAL_DIR / "space_bg.jpg"
+        """Verify server/static/back.jpg exists, valid JPEG > 30KB, wide enough for the hero."""
+        path = STATIC_DIR / "back.jpg"
         self.assertTrue(path.exists(), f"{path} must exist")
-        self.assertGreater(path.stat().st_size, 50000, "Image must be > 50KB")
+        self.assertGreater(path.stat().st_size, 30000, "Image must be > 30KB")
         with Image.open(path) as img:
             self.assertEqual(img.format, "JPEG")
-            self.assertGreaterEqual(img.width, 500)
-            self.assertGreaterEqual(img.height, 800)
+            self.assertGreaterEqual(img.width, 800)
+            self.assertGreaterEqual(img.height, 500)
 
     def test_r2_dual_path_resolver_contract(self):
         """Verify window.__AEGIS_ASSET_RESOLVER__ properly produces relative paths on file: and /static/ on http:."""
@@ -205,7 +205,7 @@ class FigmaR2AssetsAndDualPathTest(unittest.TestCase):
         self.assertIn("window.__AEGIS_IS_FILE__ = window.location.protocol === 'file:'", html)
         self.assertIn("window.__AEGIS_ASSET_BASE__ = window.__AEGIS_IS_FILE__ ? '.' : '/static'", html)
         self.assertIn("dashboard_mountain_bg.png", html)
-        self.assertIn("space_bg.jpg", html)
+        self.assertIn("window.__AEGIS_ASSET_RESOLVER__('back.jpg')", html)
 
 
 class FigmaR3CosmicAndAtmosphericEffectsTest(unittest.TestCase):
@@ -217,8 +217,8 @@ class FigmaR3CosmicAndAtmosphericEffectsTest(unittest.TestCase):
 
     def test_r3_reduced_star_particles_density(self):
         """Verify 3 star layers have reduced count: 280 far, 150 mid, 60 near (490 total, < 500)."""
-        far_match = re.search(r"createStarLayer\((\d+)[^)]*#93c5fd", self.html)
-        mid_match = re.search(r"createStarLayer\((\d+)[^)]*#e0e7ff", self.html)
+        far_match = re.search(r"createStarLayer\((\d+)[^)]*#9dbdf0", self.html)
+        mid_match = re.search(r"createStarLayer\((\d+)[^)]*#dbe4ff", self.html)
         near_match = re.search(r"createStarLayer\((\d+)[^)]*#ffffff", self.html)
 
         self.assertIsNotNone(far_match)
@@ -254,19 +254,26 @@ class FigmaR3CosmicAndAtmosphericEffectsTest(unittest.TestCase):
         self.assertIn("@keyframes cloudDriftSlow", self.html)
         self.assertIn("@keyframes cloudDriftFast", self.html)
 
-        # Check JSX rendering under dashboard view
-        cloud_jsx = re.search(r'currentView\s*===\s*[\'"]dashboard[\'"]\s*&&\s*\(\s*<div\s+className=["\']dashboard-clouds-layer["\']', self.html)
-        self.assertIsNotNone(cloud_jsx, "Dashboard drifting clouds must be rendered when currentView === 'dashboard'")
+        # Check JSX rendering under dashboard view. The dashboard branch is
+        # `{!isHome && ( ... )}` (isHome = currentView === 'home'), so assert the
+        # cloud layer sits inside that branch and nowhere else.
+        dash_block = re.search(r"\{!isHome\s*&&\s*\(([\s\S]*?)\{isHome\s*&&\s*\(", self.html)
+        self.assertIsNotNone(dash_block, "Dashboard backdrop branch ({!isHome && ...}) must exist")
+        cloud_jsx = re.search(r'<div\s+className=["\']dashboard-clouds-layer["\']', dash_block.group(1))
+        self.assertIsNotNone(cloud_jsx, "Dashboard drifting clouds must be rendered inside the non-home backdrop branch")
 
     def test_r3_home_space_nebula_mouse_parallax(self):
-        """Verify stationary space nebula on Home view with pointer-events: none and smooth mouse parallax."""
-        nebula_css = re.search(r"\.home-space-nebula\s*\{([^}]+)\}", self.html)
+        """Verify stationary home horizon bloom with pointer-events: none and smooth mouse parallax."""
+        nebula_css = re.search(r"\.home-backdrop__bloom\s*\{([^}]+)\}", self.html)
         self.assertIsNotNone(nebula_css)
         self.assertIn("pointer-events: none", nebula_css.group(1))
 
         # Check JSX rendering under home view
-        nebula_jsx = re.search(r'currentView\s*===\s*[\'"]home[\'"]\s*&&\s*\(\s*<div\s+ref=\{nebulaRef\}\s+className=["\']home-space-nebula["\']', self.html)
-        self.assertIsNotNone(nebula_jsx, "Home space nebula must be rendered when currentView === 'home'")
+        self.assertIn("const isHome = currentView === 'home';", self.html)
+        home_block = re.search(r"\{isHome\s*&&\s*\(([\s\S]*?)<div ref=\{nebulaRef\}", self.html)
+        self.assertIsNotNone(home_block, "Home backdrop must only render under isHome (currentView === 'home')")
+        self.assertIn('className="home-backdrop"', home_block.group(1))
+        self.assertIn('ref={nebulaRef} className="home-backdrop__bloom"', self.html)
 
         # Check parallax transform update
         self.assertIn("nebulaRef.current.style.transform = `translate3d(${targetX * 28}px, ${targetY * 20}px, 0)`", self.html)

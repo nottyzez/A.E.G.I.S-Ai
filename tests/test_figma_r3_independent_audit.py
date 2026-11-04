@@ -221,18 +221,15 @@ class TestFigmaR3LayoutAndDimensions(unittest.TestCase):
             self.assertIn(f"key: '{k}'", self.html)
 
     def test_r1_tab_isolation_and_no_leak(self):
-        """Verify .figma-card-aegis-analyze is strictly isolated to Tab 1 (Analyze) and not present in Tab 2 or Tab 3."""
+        """Verify .figma-card-aegis-analyze is isolated to Tab 1 (Analyze) and absent from Tab 2 (Electronic Control)."""
+        # Task 6 removed Tab 3 (All Sample); the remaining tabs are Analyze and
+        # Electronic Control. Tab 2 runs from its heading to the end of the file.
         idx_tab2 = self.html.find("Electronic Control — Dual ESP32-S3 Hardware")
-        idx_tab3 = self.html.find("All Sample — 12 ชุดทดลองผักบุ้งไฮโดรโปนิกส์")
         self.assertGreater(idx_tab2, 0)
-        self.assertGreater(idx_tab3, idx_tab2)
 
-        tab2_content = self.html[idx_tab2:idx_tab3]
+        tab2_content = self.html[idx_tab2:]
         self.assertNotIn("figma-card-aegis-analyze", tab2_content)
         self.assertIn("figma-card-dark", tab2_content)
-
-        tab3_content = self.html[idx_tab3:]
-        self.assertNotIn("figma-card-aegis-analyze", tab3_content)
 
 
 class TestFigmaR3BackgroundImagesAndDualPath(unittest.TestCase):
@@ -249,22 +246,22 @@ class TestFigmaR3BackgroundImagesAndDualPath(unittest.TestCase):
             self.assertGreaterEqual(im.height, 600)
 
     def test_r2_space_background_image(self):
-        """space_bg.jpg exists, valid JPEG, >50KB, proper resolution."""
-        img_path = IMAGES_REAL_DIR / "space_bg.jpg"
+        """back.jpg exists, valid JPEG, >30KB, proper resolution."""
+        img_path = STATIC_DIR / "back.jpg"
         self.assertTrue(img_path.exists(), f"{img_path} must exist on disk")
-        self.assertGreater(img_path.stat().st_size, 50000, "Image size must exceed 50KB")
+        self.assertGreater(img_path.stat().st_size, 30000, "Image size must exceed 30KB")
         with Image.open(img_path) as im:
             self.assertEqual(im.format, "JPEG")
-            self.assertGreaterEqual(im.width, 500)
-            self.assertGreaterEqual(im.height, 800)
+            self.assertGreaterEqual(im.width, 800)
+            self.assertGreaterEqual(im.height, 500)
 
     def test_r2_background_application_in_html(self):
-        """Verify dashboard uses dashboard_mountain_bg.png and home uses space_bg.jpg."""
+        """Verify dashboard uses dashboard_mountain_bg.png and home uses back.jpg."""
         html = INDEX_PATH.read_text(encoding="utf-8")
         self.assertIn("images_real/dashboard_mountain_bg.png", html)
-        self.assertIn("images_real/space_bg.jpg", html)
+        self.assertIn("window.__AEGIS_ASSET_RESOLVER__('back.jpg')", html)
         self.assertIn('url("${mountainBg}")', html)
-        self.assertIn('url("${spaceBg}")', html)
+        self.assertIn('url("${homeBack}")', html)
 
     def test_r2_dual_path_contract_comprehensive(self):
         """Test asset resolver contract with clean, prefixed, and edge-case relative paths."""
@@ -282,7 +279,7 @@ class TestFigmaR3BackgroundImagesAndDualPath(unittest.TestCase):
         for is_file, prefix in [(True, "."), (False, "/static")]:
             cases = [
                 ("images_real/dashboard_mountain_bg.png", f"{prefix}/images_real/dashboard_mountain_bg.png"),
-                ("./images_real/space_bg.jpg", f"{prefix}/images_real/space_bg.jpg"),
+                ("./back.jpg", f"{prefix}/back.jpg"),
                 ("/static/data/sensor_data.js", f"{prefix}/data/sensor_data.js"),
                 ("static/presentation_engine.js", f"{prefix}/presentation_engine.js"),
                 ("data/images_manifest.js", f"{prefix}/data/images_manifest.js"),
@@ -316,9 +313,9 @@ class TestFigmaR3CosmicAndAtmosphericEffects(unittest.TestCase):
 
     def test_r3_star_particle_density_and_twinkling(self):
         """Reduced star density (280 far, 150 mid, 60 near = 490 total < 500) and sinusoidal twinkling."""
-        self.assertIn("createStarLayer(280, 560, -280, -80, 1.2, '#93c5fd', 0.55)", self.html)
-        self.assertIn("createStarLayer(150, 420, -120, 20, 1.8, '#e0e7ff', 0.70)", self.html)
-        self.assertIn("createStarLayer(60, 310, -30, 85, 2.4, '#ffffff', 0.85)", self.html)
+        self.assertIn("createStarLayer(280, 560, -280, -80, 1.35, '#9dbdf0', 0.55)", self.html)
+        self.assertIn("createStarLayer(150, 420, -120, 20, 1.9, '#dbe4ff', 0.70)", self.html)
+        self.assertIn("createStarLayer(60, 310, -30, 85, 2.5, '#ffffff', 0.85)", self.html)
 
         # Twinkling math in animate loop
         self.assertIn("farLayer.points.material.opacity = 0.45 + Math.sin(clock * 1.8) * 0.12", self.html)
@@ -352,19 +349,22 @@ class TestFigmaR3CosmicAndAtmosphericEffects(unittest.TestCase):
         self.assertIn("className=\"dashboard-clouds-layer\"", self.html)
 
     def test_r3_home_space_nebula_mouse_parallax(self):
-        """Stationary space nebula on Home view with pointer-events: none and smooth mouse parallax."""
-        nebula_css = re.search(r"\.home-space-nebula\s*\{([^}]+)\}", self.html)
+        """Stationary home horizon bloom with pointer-events: none and smooth mouse parallax."""
+        nebula_css = re.search(r"\.home-backdrop__bloom\s*\{([^}]+)\}", self.html)
         self.assertIsNotNone(nebula_css)
         rules = nebula_css.group(1)
         self.assertIn("pointer-events: none", rules)
-        self.assertIn("transition: transform 0.25s", rules)
+        self.assertIn("transition: transform 0.3s", rules)
 
         # Smooth mouse parallax transform
         self.assertIn("nebulaRef.current.style.transform = `translate3d(${targetX * 28}px, ${targetY * 20}px, 0)`", self.html)
 
-        # Rendered strictly on home view
-        self.assertIn("currentView === 'home' && (", self.html)
-        self.assertIn("ref={nebulaRef} className=\"home-space-nebula\"", self.html)
+        # Rendered strictly on home view ({isHome && ( ... <div ref={nebulaRef} ...)
+        self.assertIn("const isHome = currentView === 'home';", self.html)
+        home_block = re.search(r"\{isHome\s*&&\s*\(([\s\S]*?)<div ref=\{nebulaRef\}", self.html)
+        self.assertIsNotNone(home_block, "Home backdrop must only render under isHome (currentView === 'home')")
+        self.assertIn('className="home-backdrop"', home_block.group(1))
+        self.assertIn('ref={nebulaRef} className="home-backdrop__bloom"', self.html)
 
 
 class TestFigmaR3NodeRuntimeAdversarialAndUnitProbabilities(unittest.TestCase):
