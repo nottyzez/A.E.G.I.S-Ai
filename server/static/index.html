@@ -3170,7 +3170,9 @@
       const v1 = +(totalMl * r1).toFixed(2);
       const v2 = +(totalMl * r2).toFixed(2);
       const v3 = +(totalMl * r3).toFixed(2);
-      const calcMs = (v) => (v <= 0 ? 0 : Math.min(25000, Math.round(primeDelayS * 1000 + (v / flowRate) * 1000)));
+      // 30 000 ms matches the three hard ceilings: firmware MAX_SAFETY_DOSING_MS,
+      // server MAX_PUMP_DURATION_MS and main.py's min(30000, ...).
+      const calcMs = (v) => (v <= 0 ? 0 : Math.min(30000, Math.round(primeDelayS * 1000 + (v / flowRate) * 1000)));
 
       return {
         deficiency_class: aiClass,
