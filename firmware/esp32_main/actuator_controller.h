@@ -80,6 +80,12 @@ public:
     }
 
     void startFullPresentationCycle() {
+        // A cycle may be requested while another is mid-flight (the dashboard's
+        // START_CYCLE button is always live). Quiesce first: the FSM only turns a
+        // relay off on the way OUT of its owning phase, so jumping straight to
+        // PHASE_0 would leave peristaltic pumps energized and re-dose the tank.
+        allRelaysOff();
+        clearManualOverrides();
         Serial.println("\n>>> [CYCLE START] Beginning 7-Phase Automated Presentation & Preservation Cycle <<<");
         setPhase(PHASE_0_PRE_RETURN, TIME_PRE_RETURN_MS);
         digitalWrite(PIN_RELAY_SAMPLE_RETURN, RELAY_ON);

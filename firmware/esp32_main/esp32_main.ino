@@ -386,6 +386,11 @@ void loop() {
                 Serial.println("[Phase 3 DONE] Sample water returned to culture tank.");
 
                 // Transition to Phase 4: Two-Tier Dosing
+                // The firmware enforces the pump runtime ceiling itself; never
+                // trust the server plan to have clamped a peristaltic runtime.
+                actuators.dosePump1Ms = min(actuators.dosePump1Ms, (unsigned long)MAX_SAFETY_DOSING_MS);
+                actuators.dosePump2Ms = min(actuators.dosePump2Ms, (unsigned long)MAX_SAFETY_DOSING_MS);
+                actuators.dosePump3Ms = min(actuators.dosePump3Ms, (unsigned long)MAX_SAFETY_DOSING_MS);
                 unsigned long maxDosingDuration = max(actuators.dosePump1Ms, max(actuators.dosePump2Ms, actuators.dosePump3Ms));
                 actuators.setPhase(PHASE_4_DOSING, maxDosingDuration);
 
