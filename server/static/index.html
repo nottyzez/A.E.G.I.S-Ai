@@ -145,6 +145,9 @@
       font-family: 'Space Grotesk', 'Inter', sans-serif;
       font-weight: 700;
       letter-spacing: 0.22em;
+      /* Tracking pushes the last glyph past the box on a phone; the optical
+         right pad keeps the wordmark centred instead of clipped. */
+      padding-right: 0.22em;
       text-transform: uppercase;
       color: #ffffff;
       text-shadow:
@@ -455,18 +458,80 @@
       pointer-events: none;
     }
 
-    /* Home Page Parallax Space Nebula */
-    .home-space-nebula {
+    /* ======================================================================
+       HOME BACKDROP — dawn over the cloud sea (server/static/back.jpg)
+       The photograph is the page's light source: a warm horizon band over a
+       dark ridge and a cloud sea. At cover scale that glow lands between the
+       hero copy and the telemetry deck, so nothing has to be repositioned.
+       Source is 800x533, so it carries only the lower half of the frame and
+       is masked into a clean gradient sky where the hero copy sits.
+       ====================================================================== */
+    .home-backdrop {
       position: absolute;
-      inset: -10%;
+      inset: 0;
+      overflow: hidden;
+      background: linear-gradient(180deg, #080e1c 0%, #101828 22%, #171f2e 40%, #1d2433 52%, #12182a 70%, #070b14 100%);
+    }
+    /* The photo is only 800px wide, so it is asked to carry what survives
+       enlargement: the horizon glow, the ridge silhouette, the cloud sea.
+       Its upper sky is masked out toward a clean gradient — upscaled JPEG
+       star field reads as haze behind the hero, while the canvas stars are
+       clean at every scale. */
+    .home-backdrop__photo {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: 50% 100%;
+      background-repeat: no-repeat;
+      filter: saturate(1.1) contrast(1.04) brightness(0.94);
+      transform: scale(1.015);
+      -webkit-mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.1) 16%, rgba(0, 0, 0, 0.62) 30%, rgba(0, 0, 0, 0.95) 40%, #000 48%);
+      mask-image: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.1) 16%, rgba(0, 0, 0, 0.62) 30%, rgba(0, 0, 0, 0.95) 40%, #000 48%);
+    }
+    .home-backdrop__grade {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 54% 22% at 33% 61%, rgba(255, 188, 132, 0.22) 0%, rgba(255, 160, 96, 0.08) 46%, transparent 74%),
+        radial-gradient(ellipse 64% 44% at 80% 6%, rgba(112, 148, 244, 0.13) 0%, transparent 70%),
+        linear-gradient(180deg, rgba(5, 9, 22, 0.74) 0%, rgba(6, 10, 24, 0.62) 18%, rgba(7, 12, 28, 0.60) 28%, rgba(8, 13, 30, 0.58) 37%, rgba(9, 16, 36, 0.30) 47%, rgba(7, 12, 28, 0.10) 57%, rgba(7, 12, 28, 0.18) 70%, rgba(5, 9, 20, 0.48) 86%, rgba(3, 6, 15, 0.78) 100%);
+    }
+    /* Grounds the telemetry deck. The photo's brightest band (the glow) lands
+       exactly where this row begins, so the floor has to arrive fast enough
+       that card text never sits on the haze. */
+    .home-backdrop__floor {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 43%, rgba(3, 6, 15, 0.20) 53%, rgba(3, 6, 15, 0.58) 61%, rgba(3, 6, 15, 0.83) 68%, rgba(3, 6, 15, 0.93) 76%, rgba(3, 6, 15, 0.97) 100%);
+    }
+    /* Focus scrim: pulls the glow down behind the primary action so the CTA
+       copy clears 4.5:1 without flattening the light the page is built on. */
+    .home-backdrop__focus {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 34% 13% at 50% 60%, rgba(3, 6, 15, 0.46) 0%, rgba(3, 6, 15, 0.22) 52%, transparent 78%);
+      filter: blur(18px);
+    }
+    /* Film grain: gives the smooth gradients a photographic surface */
+    .home-backdrop__grain {
+      position: absolute;
+      inset: 0;
+      opacity: 0.3;
+      mix-blend-mode: soft-light;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)'/%3E%3C/svg%3E");
+      background-size: 160px 160px;
+    }
+    /* Horizon bloom — cursor-parallax life-light over the photo's own glow band */
+    .home-backdrop__bloom {
+      position: absolute;
+      inset: -12%;
       pointer-events: none;
       z-index: 1;
-      opacity: 0.72;
-      background: radial-gradient(circle at 45% 38%, rgba(112, 148, 244, 0.22) 0%, rgba(65, 90, 180, 0.12) 40%, transparent 68%),
-                  radial-gradient(circle at 68% 54%, rgba(198, 199, 248, 0.18) 0%, rgba(135, 140, 210, 0.08) 45%, transparent 72%),
-                  radial-gradient(circle at 28% 62%, rgba(56, 189, 248, 0.16) 0%, rgba(25, 85, 155, 0.06) 50%, transparent 75%);
-      filter: blur(36px);
-      transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      opacity: 0.6;
+      mix-blend-mode: screen;
+      background: radial-gradient(ellipse 38% 14% at 33% 62%, rgba(255, 202, 152, 0.34) 0%, rgba(255, 168, 106, 0.12) 50%, transparent 78%);
+      filter: blur(40px);
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
     /* Tooltip Tag (rgba(28, 28, 28, 0.8), blur(20px), border-radius: 8px) */
@@ -1739,14 +1804,17 @@
             color: new THREE.Color(colorHex),
             depthWrite: false,
             blending: THREE.AdditiveBlending,
+            // Pixels, not world units: near-layer stars must stay pinpricks on
+            // top of a photographic sky instead of blooming into soft blobs.
+            sizeAttenuation: false,
           });
           const points = new THREE.Points(geo, mat);
           return { points, geo, initialZ, count, minZ, maxZ };
         };
 
-        const farLayer = createStarLayer(280, 560, -280, -80, 1.2, '#93c5fd', 0.55);
-        const midLayer = createStarLayer(150, 420, -120, 20, 1.8, '#e0e7ff', 0.70);
-        const nearLayer = createStarLayer(60, 310, -30, 85, 2.4, '#ffffff', 0.85);
+        const farLayer = createStarLayer(280, 560, -280, -80, 1.35, '#9dbdf0', 0.55);
+        const midLayer = createStarLayer(150, 420, -120, 20, 1.9, '#dbe4ff', 0.70);
+        const nearLayer = createStarLayer(60, 310, -30, 85, 2.5, '#ffffff', 0.85);
 
         scene.add(farLayer.points);
         scene.add(midLayer.points);
@@ -1911,7 +1979,8 @@
       }, []);
 
       const mountainBg = window.__AEGIS_ASSET_RESOLVER__('images_real/dashboard_mountain_bg.png');
-      const spaceBg = window.__AEGIS_ASSET_RESOLVER__('images_real/space_bg.jpg');
+      const homeBack = window.__AEGIS_ASSET_RESOLVER__('back.jpg');
+      const isHome = currentView === 'home';
 
       return (
         <div
@@ -1919,41 +1988,44 @@
             isWarping ? 'warp-zoom-active' : ''
           }`}
         >
-          {/* Background Image Layer: Mountain Starry Sky on Dashboard, Deep Milky Way on Home */}
-          <div
-            className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
-            style={{
-              backgroundImage:
-                currentView === 'dashboard'
-                  ? `url("${mountainBg}")`
-                  : `url("${spaceBg}"), radial-gradient(circle at 58% 44%, rgba(56, 88, 158, 0.34) 0%, rgba(18, 29, 58, 0.55) 42%, rgba(3, 6, 15, 0.98) 100%)`,
-              opacity: currentView === 'dashboard' ? 0.88 : 0.95,
-              transform: 'scale(1.03)',
-            }}
-          />
-
-          {/* Subtle Dark Vignette Overlay matching Figma #1C1C1C / Night Sky tone */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                currentView === 'dashboard'
-                  ? 'linear-gradient(180deg, rgba(16, 19, 28, 0.52) 0%, rgba(18, 22, 34, 0.36) 50%, rgba(14, 17, 25, 0.68) 100%)'
-                  : 'radial-gradient(ellipse at center, transparent 15%, rgba(2, 5, 14, 0.78) 100%)',
-            }}
-          />
-
-          {/* Dashboard Drifting Floating Cloud Layer (pointer-events: none, behind cards) */}
-          {currentView === 'dashboard' && (
-            <div className="dashboard-clouds-layer">
-              <div className="cloud-drift-1" />
-              <div className="cloud-drift-2" />
-            </div>
+          {/* DASHBOARD: moonlit ridge under drifting cloud bands */}
+          {!isHome && (
+            <>
+              <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                  backgroundImage: `url("${mountainBg}")`,
+                  opacity: 0.88,
+                  transform: 'scale(1.03)',
+                }}
+              />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    'linear-gradient(180deg, rgba(16, 19, 28, 0.52) 0%, rgba(18, 22, 34, 0.36) 50%, rgba(14, 17, 25, 0.68) 100%)',
+                }}
+              />
+              <div className="dashboard-clouds-layer">
+                <div className="cloud-drift-1" />
+                <div className="cloud-drift-2" />
+              </div>
+            </>
           )}
 
-          {/* Home Space Nebula Layer with Mouse Parallax (stationary, no continuous drift, pointer-events: none) */}
-          {currentView === 'home' && (
-            <div ref={nebulaRef} className="home-space-nebula" />
+          {/* HOME: dawn over the cloud sea — the photograph is the light source */}
+          {isHome && (
+            <div className="home-backdrop">
+              <div
+                className="home-backdrop__photo"
+                style={{ backgroundImage: `url("${homeBack}")` }}
+              />
+              <div className="home-backdrop__grade" />
+              <div className="home-backdrop__floor" />
+              <div className="home-backdrop__focus" />
+              <div className="home-backdrop__grain" />
+              <div ref={nebulaRef} className="home-backdrop__bloom" />
+            </div>
           )}
 
           {/* Three.js 3D Layered Stars & Meteor Shower Canvas */}
@@ -2074,59 +2146,37 @@
     function HomeView({ onNavigateDashboard }) {
       const [showModal, setShowModal] = useState(false);
 
-      const bottomMetrics = [
-        {
-          id: '01',
-          label: 'MEANING OF A.E.G.I.S.',
-          value: 'THE SHIELD OF LIFE',
-          detail: 'เกราะคุ้มกันชีวิตอัจฉริยะสำหรับแปลงผักบุ้งไฮโดรโปนิกส์ ตรวจจับความผิดปกติของธาตุอาหาร N-P-K ล่วงหน้าก่อนเกิดความเสียหายถาวร',
-        },
-        {
-          id: '02',
-          label: 'DIAGNOSIS ACCURACY',
-          value: '100% LATE-FUSION',
-          detail: 'Symptom-Gated Multimodal Ensemble ผสานข้อมูลเซนเซอร์ pH / EC / Temp เข้ากับ Vision AI วิเคราะห์ใบผักบุ้ง 4 คลาสแม่นยำ 100%',
-        },
-        {
-          id: '03',
-          label: 'EXPERIMENTAL SCALE',
-          value: '12 HYDRO UNITS',
-          detail: 'ชุดทดลองผักบุ้ง 12 ยูนิต (4 ถังหลัก Control, -N, -P, -K ขนาด 23.3L และ 8 ถ้วยซ้ำทดลอง Cup 1–8 ขนาด 750mL)',
-        },
-        {
-          id: '04',
-          label: 'HARDWARE CORE',
-          value: 'DUAL ESP32-S3',
-          detail: 'ระบบสมองกลฝังตัวคู่ Dual ESP32-S3 ควบคุมรีเลย์ R1–R7 และปั๊มโดสสารละลายปุ๋ย Stock A / B / C แบบ Closed-Loop อัตโนมัติ',
-        },
-      ];
-
       return (
         <div className="relative z-10 min-h-screen flex flex-col justify-between px-8 md:px-16 py-8 select-none view-materialize">
           {/* Top-Right Transparent Glass Navigation Bar */}
           <div className="w-full flex justify-end items-center">
-            <nav className="ios-top-right-nav px-6 py-2.5 rounded-full flex items-center gap-7">
+            <nav
+              aria-label="Primary"
+              className="ios-top-right-nav min-w-0 max-w-full px-4 sm:px-6 py-2.5 rounded-full flex items-center gap-4 sm:gap-7 overflow-x-auto"
+              style={{ scrollbarWidth: 'none' }}
+            >
               <button
                 onClick={() => {}}
-                className="text-xs font-display font-semibold tracking-[0.22em] text-white border-b border-white pb-0.5"
+                aria-current="page"
+                className="shrink-0 text-[11px] sm:text-xs font-display font-semibold tracking-[0.18em] sm:tracking-[0.22em] text-white border-b border-white pb-0.5"
               >
                 HOME
               </button>
               <button
                 onClick={() => onNavigateDashboard('Analyze')}
-                className="text-xs font-display font-medium tracking-[0.22em] text-white/75 hover:text-white transition-colors"
+                className="shrink-0 text-[11px] sm:text-xs font-display font-medium tracking-[0.18em] sm:tracking-[0.22em] text-white/75 hover:text-white transition-colors"
               >
                 DASHBOARD
               </button>
               <button
                 onClick={() => onNavigateDashboard('Electronic Control')}
-                className="text-xs font-display font-medium tracking-[0.22em] text-white/75 hover:text-white transition-colors"
+                className="shrink-0 text-[11px] sm:text-xs font-display font-medium tracking-[0.18em] sm:tracking-[0.22em] text-white/75 hover:text-white transition-colors"
               >
                 CONTROL
               </button>
               <button
                 onClick={() => onNavigateDashboard('All Sample')}
-                className="text-xs font-display font-medium tracking-[0.22em] text-white/75 hover:text-white transition-colors"
+                className="shrink-0 text-[11px] sm:text-xs font-display font-medium tracking-[0.18em] sm:tracking-[0.22em] text-white/75 hover:text-white transition-colors"
               >
                 SAMPLES
               </button>
@@ -2138,67 +2188,28 @@
             <div className="text-[11px] font-mono tracking-[0.38em] uppercase text-blue-200/75 mb-4">
               CLOSED-LOOP HYDROPONIC AI • WATER SPINACH (ผักบุ้ง)
             </div>
-            <h1 className="aegis-hero-title text-6xl sm:text-7xl md:text-[92px] leading-none mb-6">
+            <h1 className="aegis-hero-title text-[13.5vw] sm:text-7xl md:text-[92px] leading-none mb-6">
               A.E.G.I.S
             </h1>
             <p className="font-sans text-sm sm:text-base md:text-[17px] text-slate-200/85 max-w-2xl leading-relaxed font-normal mb-8">
               ระบบปัญญาประดิษฐ์แบบ <span className="text-white font-medium">Closed-Loop</span> สำหรับวินิจฉัยภาวะขาดธาตุอาหาร{' '}
-              <span className="text-blue-200 font-medium">N-P-K ในผักบุ้งไฮโดรโปนิกส์</span>{' '}
-              ผสานข้อมูลเซนเซอร์เคมีน้ำและภาพถ่ายใบผักบุ้งเพื่อสั่งโดสสารละลายปุ๋ยอัตโนมัติอย่างแม่นยำ
+              <span className="text-blue-200 font-medium">N-P-K ในผักบุ้งไฮโดรโปนิกส์</span>
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <button
                 onClick={() => onNavigateDashboard('Analyze')}
-                className="group relative px-8 py-3.5 rounded-full bg-white/12 hover:bg-white/20 border border-white/25 backdrop-blur-xl text-xs font-display font-semibold tracking-[0.24em] uppercase text-white transition-all duration-300 hover:scale-105 hover:shadow-[0_0_35px_rgba(198,199,248,0.45)] flex items-center gap-3"
+                className="group relative px-8 py-3.5 rounded-full bg-[#0a1120]/55 hover:bg-[#0a1120]/40 border border-white/30 backdrop-blur-xl text-xs font-display font-semibold tracking-[0.24em] uppercase text-white transition-all duration-300 hover:scale-105 hover:shadow-[0_0_35px_rgba(198,199,248,0.45)] flex items-center gap-3"
               >
                 <span>ENTER A.E.G.I.S ANALYZE</span>
                 <span className="group-hover:translate-x-1 transition-transform">→</span>
               </button>
               <button
                 onClick={() => setShowModal(true)}
-                className="px-6 py-3.5 rounded-full bg-transparent hover:bg-white/8 border border-white/15 text-xs font-display tracking-[0.2em] uppercase text-white/80 hover:text-white transition-all"
+                className="px-6 py-3.5 rounded-full bg-[#0a1120]/45 hover:bg-[#0a1120]/30 border border-white/20 backdrop-blur-xl text-xs font-display tracking-[0.2em] uppercase text-white/85 hover:text-white transition-all"
               >
                 READ SYSTEM SPEC +
               </button>
             </div>
-          </div>
-
-          {/* Bottom Interactive Floating Telemetry Bar */}
-          <div className="w-full max-w-6xl mx-auto">
-            <div className="flex items-center justify-between text-[11px] font-mono tracking-[0.22em] text-slate-300/70 pb-3 mb-4 border-b border-white/15">
-              <span>3D GALAXY PARALLAX • 1 / 4</span>
-              <button
-                onClick={() => onNavigateDashboard('Analyze')}
-                className="flex items-center gap-2 text-white/85 hover:text-white transition-colors"
-              >
-                <span>WARP TO DASHBOARD</span>
-                <span className="w-5 h-5 rounded-full border border-white/35 flex items-center justify-center text-xs">+</span>
-              </button>
-            </div>
-
-            <MagicBento glowColor="198, 199, 248">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {bottomMetrics.map((m) => (
-                  <div
-                    key={m.id}
-                    onClick={() => onNavigateDashboard('Analyze')}
-                    className="bottom-telemetry-card magic-bento-card p-4 cursor-pointer group text-center relative overflow-hidden"
-                  >
-                    <span className="magic-bento__light" aria-hidden="true" />
-                    <span className="magic-bento__border" aria-hidden="true" />
-                    <div className="text-[10px] font-mono tracking-[0.22em] text-slate-300/65 uppercase mb-1.5">
-                      {m.label}
-                    </div>
-                    <div className="font-display font-bold text-lg md:text-xl tracking-[0.08em] text-white mb-1.5">
-                      {m.value}
-                    </div>
-                    <p className="text-xs font-sans text-slate-300/75 leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">
-                      {m.detail}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </MagicBento>
           </div>
 
           {/* Read More Spec Modal */}

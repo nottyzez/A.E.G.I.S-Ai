@@ -93,5 +93,25 @@ class TestPerPumpFlowCalibration(unittest.TestCase):
         self.assertIn("/api/calibration/flow/{pump_key}", paths)
 
 
+class TestHomeSimplification(unittest.TestCase):
+    def setUp(self):
+        self.html = (PROJECT_ROOT / "server" / "static" / "index.html").read_text(encoding="utf-8")
+
+    def test_home_has_no_telemetry_deck(self):
+        start = self.html.index("function HomeView")
+        end = self.html.index("function AnalyzeTabView", start)
+        body = self.html[start:end]
+        self.assertNotIn("bottomMetrics", body)
+        self.assertNotIn("bottom-telemetry-card", body)
+        self.assertNotIn("3D GALAXY PARALLAX", body)
+
+    def test_home_keeps_both_primary_actions(self):
+        start = self.html.index("function HomeView")
+        end = self.html.index("function AnalyzeTabView", start)
+        body = self.html[start:end]
+        self.assertIn("ENTER A.E.G.I.S ANALYZE", body)
+        self.assertIn("READ SYSTEM SPEC", body)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
