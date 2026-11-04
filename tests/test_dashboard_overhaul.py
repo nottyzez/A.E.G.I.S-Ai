@@ -183,5 +183,22 @@ class TestVisionPanel(unittest.TestCase):
         self.assertIn("onError", self.html[start:start + 6000])
 
 
+class TestChartPointerMapping(unittest.TestCase):
+    def setUp(self):
+        self.html = (PROJECT_ROOT / "server" / "static" / "index.html").read_text(encoding="utf-8")
+
+    def test_pointer_helper_accounts_for_viewbox_inset(self):
+        self.assertIn("function pointIndexFromPointer", self.html)
+
+    def test_ec_chart_uses_the_series_it_draws(self):
+        self.assertIn("ptsEcR2", self.html)
+        start = self.html.index("const activeEcPt")
+        body = self.html[start:start + 900]
+        self.assertIn("__masterIdx", body)
+
+    def test_mapping_clamps_at_both_edges(self):
+        self.assertIn("Math.max(0, Math.min(count - 1", self.html)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

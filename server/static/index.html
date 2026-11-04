@@ -1709,6 +1709,15 @@
       return pts;
     }
 
+    // Spline points span [inset, width - inset]; invert THAT, not the raw ratio, or the
+    // first and last points are unreachable and the tooltip leads the cursor near edges.
+    function pointIndexFromPointer(ratio, count, width = 560, inset = 20) {
+      if (!count || count < 1) return 0;
+      const vbX = Math.max(0, Math.min(1, ratio)) * width;
+      const t = (vbX - inset) / (width - 2 * inset);
+      return Math.max(0, Math.min(count - 1, Math.round(t * (count - 1))));
+    }
+
     function buildSvgCubicBezierPath(pts) {
       if (!pts || pts.length === 0) return '';
       if (pts.length === 1) return `M ${pts[0].x} ${pts[0].y} L ${pts[0].x} ${pts[0].y}`;
@@ -2478,15 +2487,25 @@
 
       // EC Spline Points & Curves
       const r1Readings = useMemo(() => unitReadings.filter(r => r.solution_round === 'รอบ 1'), [unitReadings]);
-      const r2Readings = useMemo(() => unitReadings.filter(r => r.solution_round === 'รอบ 2'), [unitReadings]);
+      // Round 2 readings keep their index into the unfiltered `unitReadings`, so a point
+      // the chart draws can be resolved back to the sample the crosshair came from.
+      const r2Series = useMemo(() => {
+        return unitReadings
+          .map((r, i) => ({ ...r, __masterIdx: i }))
+          .filter((r) => r.solution_round === 'รอบ 2');
+      }, [unitReadings]);
+      const r2Readings = r2Series;
 
       const ptsEcR1 = useMemo(() => {
         return computeSvgSplinePoints(r1Readings, 'ec', 560, 165, 0.8, 3.8);
       }, [r1Readings]);
 
+      // The EC chart draws this exact array, so the scrub handler maps against it too.
+      const ecSeries = isTank ? r2Series : unitReadings;
+
       const ptsEcR2 = useMemo(() => {
-        return computeSvgSplinePoints(isTank ? r2Readings : unitReadings, 'ec', 560, 165, 0.8, 3.8);
-      }, [isTank, r2Readings, unitReadings]);
+        return computeSvgSplinePoints(ecSeries, 'ec', 560, 165, 0.8, 3.8);
+      }, [ecSeries]);
 
       const pathEcR1 = useMemo(() => buildSvgCubicBezierPath(ptsEcR1), [ptsEcR1]);
       const pathEcR2 = useMemo(() => buildSvgCubicBezierPath(ptsEcR2), [ptsEcR2]);
@@ -2497,13 +2516,35 @@
       // Active EC point & crosshair coordinates
       const activeEcPt = useMemo(() => {
         if (unitReadings.length === 0) return { x: 82, y: 84, val: parseFloat(unitSummary.ec) || 1.219 };
-        const safeIdx = (activeIdx >= 0 && activeIdx < unitReadings.length) ? activeIdx : (unitReadings.length - 1);
-        const x = (safeIdx / Math.max(unitReadings.length - 1, 1)) * (560 - 40) + 20;
-        const val = unitReadings[safeIdx]?.ec;
-        const clamped = (val != null && typeof val === 'number') ? Math.max(0.8, Math.min(3.8, val)) : (baseline || 1.8);
-        const y = 165 - ((clamped - 0.8) / 3.0) * 135 - 15;
-        return { x: Number(x.toFixed(2)), y: Number(y.toFixed(2)), val };
-      }, [unitReadings, activeIdx, baseline, unitSummary.ec]);
+
+        // The EC chart draws `ecSeries`, which on tank units is `r2Series` — a filtered
+        // array. Resolve the active master index through each point's __masterIdx, falling
+        // back to the nearest plotted point when the active sample is not in Round 2.
+        let point = null;
+        if (isTank) {
+          if (ptsEcR2.length === 0) return { x: 82, y: 84, val: parseFloat(unitSummary.ec) || 1.219 };
+          point = ptsEcR2.find((p) => p.reading && p.reading.__masterIdx === activeIdx) || null;
+          if (!point) {
+            let closest = ptsEcR2[0];
+            let minDiff = Math.abs((closest.reading?.__masterIdx ?? -1) - activeIdx);
+            for (const p of ptsEcR2) {
+              const diff = Math.abs((p.reading?.__masterIdx ?? -1) - activeIdx);
+              if (diff < minDiff) { minDiff = diff; closest = p; }
+            }
+            point = closest;
+          }
+        } else {
+          // Cups plot `unitReadings` directly, so the master index IS the plotted index.
+          const safeIdx = (activeIdx >= 0 && activeIdx < unitReadings.length) ? activeIdx : (unitReadings.length - 1);
+          const x = (safeIdx / Math.max(unitReadings.length - 1, 1)) * (560 - 40) + 20;
+          const val = unitReadings[safeIdx]?.ec;
+          const clamped = (val != null && typeof val === 'number') ? Math.max(0.8, Math.min(3.8, val)) : (baseline || 1.8);
+          const y = 165 - ((clamped - 0.8) / 3.0) * 135 - 15;
+          point = { x, y, val };
+        }
+
+        return { x: Number(point.x.toFixed(2)), y: Number(point.y.toFixed(2)), val: point.val };
+      }, [unitReadings, ptsEcR2, isTank, activeIdx, baseline, unitSummary.ec]);
 
       // Active EC baseline delta
       const activeEcDelta = useMemo(() => {
@@ -2514,15 +2555,21 @@
         return unitSummary.ecDelta;
       }, [activeReading, baseline, unitSummary.ecDelta]);
 
-      // General pointer scrubbing handler for full width
-      const handlePointerScrub = (e) => {
+      // General pointer scrubbing handler for full width. `series` is the array the
+      // receiving chart actually draws: the pH chart draws `unitReadings`, the EC chart
+      // draws `isTank ? r2Series : unitReadings`. Resolve the hit back to a master index
+      // into `unitReadings`, which is what every other readout is keyed on.
+      const handlePointerScrub = (e, series) => {
+        const plotted = series || unitReadings;
         const rect = e.currentTarget.getBoundingClientRect();
         const clientX = e.clientX != null ? e.clientX : (e.touches && e.touches[0] ? e.touches[0].clientX : null);
-        if (clientX == null || unitReadings.length === 0) return;
+        if (clientX == null || unitReadings.length === 0 || plotted.length === 0) return;
         const relX = clientX - rect.left;
         const ratio = Math.max(0, Math.min(1, relX / rect.width));
-        const targetIdx = Math.round(ratio * (unitReadings.length - 1));
-        setScrubIndex(targetIdx);
+        const seriesIdx = pointIndexFromPointer(ratio, plotted.length);
+        const hit = plotted[seriesIdx];
+        const masterIdx = (hit && hit.__masterIdx != null) ? hit.__masterIdx : seriesIdx;
+        setScrubIndex(masterIdx);
       };
 
       const handlePointerLeaveScrub = () => {
@@ -2736,9 +2783,9 @@
                 {/* Dynamic SVG Spline + Interactive Scrubbing + Floating .figma-chart-tooltip & Glowing Node */}
                 <div
                   className="relative w-full h-[125px] flex items-center justify-center cursor-crosshair touch-none select-none"
-                  onPointerMove={handlePointerScrub}
+                  onPointerMove={(e) => handlePointerScrub(e, unitReadings)}
                   onPointerLeave={handlePointerLeaveScrub}
-                  onTouchMove={handlePointerScrub}
+                  onTouchMove={(e) => handlePointerScrub(e, unitReadings)}
                 >
                   {/* Floating Tooltip Tag at Scrubbed Point */}
                   {activePhPt && (
@@ -2912,9 +2959,9 @@
                 {/* Dynamic EC Spline Curves + Vertical Crosshair Line & Large Readout */}
                 <div
                   className="relative w-full h-[148px] cursor-crosshair touch-none select-none"
-                  onPointerMove={handlePointerScrub}
+                  onPointerMove={(e) => handlePointerScrub(e, ecSeries)}
                   onPointerLeave={handlePointerLeaveScrub}
-                  onTouchMove={handlePointerScrub}
+                  onTouchMove={(e) => handlePointerScrub(e, ecSeries)}
                 >
                   <svg
                     viewBox="0 0 560 165"
