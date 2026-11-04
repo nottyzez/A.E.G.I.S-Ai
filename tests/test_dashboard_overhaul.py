@@ -148,5 +148,21 @@ class TestControlPageGrouping(unittest.TestCase):
                         f"Found undersized copy: {[s for s in sizes if s < 12]}")
 
 
+class TestPumpRuntimeAndFlow(unittest.TestCase):
+    def setUp(self):
+        self.html = (PROJECT_ROOT / "server" / "static" / "index.html").read_text(encoding="utf-8")
+
+    def test_runtime_presets_top_out_at_thirty_seconds(self):
+        for label in ("2s", "5s", "10s", "15s", "30s"):
+            self.assertIn(f"label: '{label}'", self.html)
+        self.assertNotIn("label: '60s'", self.html)
+
+    def test_runtime_is_clamped_at_thirty_seconds(self):
+        self.assertIn("Math.min(30000,", self.html)
+
+    def test_flow_calculator_calls_per_pump_route(self):
+        self.assertIn("/api/calibration/flow/", self.html)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

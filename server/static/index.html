@@ -3220,6 +3220,10 @@
 
       const [pulseDurationMs, setPulseDurationMs] = useState('spec'); // 'spec' | 2000 | 5000 | 10000 | 30000
       const [stockAmounts, setStockAmounts] = useState({ A: 8.0, B: 8.0, C: 4.0 });
+      // Manual pump runtime, hard-capped at 30 000 ms in UI, server and firmware alike.
+      const [pumpRuntimeMs, setPumpRuntimeMs] = useState(5000);
+      // Per-pump flow rates (mL/s) keyed A/B/C; the flow calculator updates these.
+      const [pumpFlowRates, setPumpFlowRates] = useState({ A: 1.5, B: 1.5, C: 1.5 });
       const [activePhase, setActivePhase] = useState(2);
       const [isFullCycleDemoRunning, setIsFullCycleDemoRunning] = useState(false);
 
@@ -3308,6 +3312,14 @@
         const primeMs = (calibration.priming_delay_s || 2.0) * 1000;
         const q = Math.max(0.1, calibration.pump_flow_rate_ml_s || 1.5);
         return Math.min(25000, Math.round(primeMs + (v / q) * 1000));
+      };
+
+      // Volume actually delivered in `ms`, after subtracting the priming delay.
+      // Pump 'A' is the reference pump for the runtime selector's mL readout.
+      const estimateVolumeMl = (ms, pumpKey = 'A') => {
+        const q = Math.max(0.1, pumpFlowRates[pumpKey] || calibration.pump_flow_rate_ml_s || 1.5);
+        const primeMs = (calibration.priming_delay_s || 2.0) * 1000;
+        return Math.max(0, ((ms - primeMs) / 1000) * q);
       };
 
       // 1-Second Master Coexistence Ticker (handles Schedule Countdown + Override Auto-Revert + Collision Hold/Queue)
@@ -3407,8 +3419,8 @@
         const target = relays.find((r) => r.id === id);
         if (!target) return;
         const turningOn = !target.active || target.remainingSec === 0;
-        const durSec = pulseDurationMs === 'spec' ? (target.defaultSec || 6) : Math.max(1, Math.round(pulseDurationMs / 1000));
-        const durMs = durSec * 1000;
+        const durMs = Math.min(30000, Math.max(100, pumpRuntimeMs));
+        const durSec = Math.max(1, Math.round(durMs / 1000));
 
         setRelays((prev) =>
           prev.map((r) => {
@@ -3437,6 +3449,35 @@
         } else {
           pushCommandLog('RELAY_REVERT', `คืนค่ารีเลย์ ${target.id} กลับสู่สถานะตารางอัตโนมัติ`);
         }
+      };
+
+      // Per-pump flow calibration: reads the three inputs for one pump and posts them.
+      const handleCalibratePump = async (pump) => {
+        const selector = (field) => document.querySelector(
+          `[data-flow-pump="${pump}"][data-flow-field="${field}"]`
+        );
+        const collected_ml = parseFloat(selector('collected_ml')?.value) || 12.0;
+        const test_duration_s = parseFloat(selector('test_duration_s')?.value) || 10.0;
+        const observed_prime_s = parseFloat(selector('observed_prime_s')?.value) || 2.0;
+
+        const res = await sendApiRequest(`/api/calibration/flow/${pump}`, {
+          collected_ml, test_duration_s, observed_prime_s,
+        });
+
+        if (res.ok && res.data) {
+          const q = res.data.calculated_flow_rate_ml_s;
+          setPumpFlowRates((prev) => ({ ...prev, [pump]: q }));
+          pushCommandLog('CALIBRATION', `ปรับ Flow ปั๊ม ${pump} = ${q} mL/s`);
+          return;
+        }
+        // Offline (file://) or server error: compute the same formula locally.
+        const effective = Math.max(0.5, test_duration_s - observed_prime_s);
+        const q = Math.max(0.1, Math.round((collected_ml / effective) * 1000) / 1000);
+        setPumpFlowRates((prev) => ({ ...prev, [pump]: q }));
+        pushCommandLog(
+          res.offline ? 'CALIBRATION_OFFLINE' : 'CALIBRATION_FAILED',
+          `โหมดออฟไลน์: ใช้ค่า Q = ${q} mL/s สำหรับปั๊ม ${pump}`
+        );
       };
 
       // Action 2: Jump to Any Closed-Loop Phase (1-6) on Stage Without Disabling Schedule
@@ -3837,30 +3878,21 @@
                     </p>
                   </div>
 
-                  {/* Pulse Duration Selector */}
-                  <div className="flex flex-wrap items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/10">
-                    <span className="text-xs text-white/55 px-1.5">เวลาพัลส์:</span>
-                    <button
-                      onClick={() => setPulseDurationMs('spec')}
-                      className={`px-2 py-1 rounded text-xs font-mono transition-all ${
-                        pulseDurationMs === 'spec'
-                          ? 'bg-[#C6C7F8] text-slate-950 font-bold'
-                          : 'text-white/65 hover:text-white'
-                      }`}
-                    >
-                      สเปกบอร์ด (6s/7s/5s/6s)
-                    </button>
+                  {/* Pump Runtime Selector — 100 ms .. 30 000 ms, hard-capped */}
+                  <div className="flex flex-wrap items-center gap-1.5 bg-white/5 p-1.5 rounded-lg border border-white/10">
+                    <span className="text-xs text-white/55 px-1.5">เวลาเดินปั๊ม:</span>
                     {[
                       { label: '2s', ms: 2000 },
                       { label: '5s', ms: 5000 },
                       { label: '10s', ms: 10000 },
+                      { label: '15s', ms: 15000 },
                       { label: '30s', ms: 30000 },
                     ].map((d) => (
                       <button
                         key={d.label}
-                        onClick={() => setPulseDurationMs(d.ms)}
-                        className={`px-2 py-1 rounded text-xs font-mono transition-all ${
-                          pulseDurationMs === d.ms
+                        onClick={() => setPumpRuntimeMs(d.ms)}
+                        className={`px-2.5 py-1 rounded text-xs font-mono transition-all ${
+                          pumpRuntimeMs === d.ms
                             ? 'bg-[#C6C7F8] text-slate-950 font-bold'
                             : 'text-white/65 hover:text-white'
                         }`}
@@ -3868,6 +3900,20 @@
                         {d.label}
                       </button>
                     ))}
+                    <input
+                      type="number"
+                      min="100"
+                      max="30000"
+                      step="100"
+                      value={pumpRuntimeMs}
+                      onChange={(e) => setPumpRuntimeMs(Math.min(30000, Math.max(100, parseInt(e.target.value, 10) || 100)))}
+                      aria-label="ระยะเวลาเดินปั๊ม (มิลลิวินาที)"
+                      className="w-20 px-2 py-1 rounded text-xs font-mono text-white bg-[#0a1120]/60 border border-white/15 focus:border-[#C6C7F8] outline-none"
+                    />
+                    <span className="text-xs font-mono text-white/45">ms</span>
+                    <span className="text-xs font-mono text-[#A8C5DA] px-1">
+                      ≈ {estimateVolumeMl(pumpRuntimeMs, 'A').toFixed(1)} mL
+                    </span>
                   </div>
                 </div>
 
@@ -3983,8 +4029,58 @@
               </div>
             </div>
 
-            {/* Task 8 insertion point: 30 s runtime selector + per-pump flow calculator go here,
-                above the collapsed hardware spec. */}
+            {/* Per-pump flow calibration — posts to /api/calibration/flow/{pump} (Task 4). */}
+            <details className="mb-6 rounded-2xl bg-white/5 border border-white/10">
+              <summary className="cursor-pointer select-none px-5 py-3 text-xs font-inter font-semibold text-white/80 hover:text-white">
+                คำนวณอัตราการไหลของปั๊ม (Flow Calibration A / B / C)
+              </summary>
+              <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                {['A', 'B', 'C'].map((pump) => (
+                  <div key={pump} className="rounded-xl bg-[#0a1120]/40 border border-white/10 p-3">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-mono font-bold text-[#C6C7F8]">PUMP {pump}</span>
+                      <span className="text-xs font-mono text-[#A8C5DA]">
+                        Q = {(pumpFlowRates[pump] || 0).toFixed(2)} mL/s
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="block text-xs text-white/60">
+                        ปริมาณที่เก็บได้ (mL)
+                        <input
+                          type="number" step="0.1" min="0" defaultValue="12"
+                          data-flow-pump={pump} data-flow-field="collected_ml"
+                          className="mt-1 w-full px-2 py-1 rounded text-xs font-mono text-white bg-[#0a1120]/60 border border-white/15 outline-none"
+                        />
+                      </label>
+                      <label className="block text-xs text-white/60">
+                        เวลาทดสอบ (s)
+                        <input
+                          type="number" step="0.5" min="1" defaultValue="10"
+                          data-flow-pump={pump} data-flow-field="test_duration_s"
+                          className="mt-1 w-full px-2 py-1 rounded text-xs font-mono text-white bg-[#0a1120]/60 border border-white/15 outline-none"
+                        />
+                      </label>
+                      <label className="block text-xs text-white/60">
+                        Priming delay (s)
+                        <input
+                          type="number" step="0.5" min="0" defaultValue="2"
+                          data-flow-pump={pump} data-flow-field="observed_prime_s"
+                          className="mt-1 w-full px-2 py-1 rounded text-xs font-mono text-white bg-[#0a1120]/60 border border-white/15 outline-none"
+                        />
+                      </label>
+                      <button
+                        onClick={() => handleCalibratePump(pump)}
+                        data-flow-calibrate={pump}
+                        className="w-full px-3 py-1.5 rounded-lg bg-[#C6C7F8] hover:bg-[#d8d9fc] text-slate-950 text-xs font-inter font-bold transition-all"
+                      >
+                        คำนวณ
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </details>
+
             <details className="mb-6 rounded-2xl bg-white/5 border border-white/10">
               <summary className="cursor-pointer select-none px-5 py-3 text-xs font-inter font-semibold text-white/80 hover:text-white">
                 ข้อกำหนดฮาร์ดแวร์ ESP32-S3 (Pinout &amp; สูตร Calibration) — คลิกเพื่อเปิด
