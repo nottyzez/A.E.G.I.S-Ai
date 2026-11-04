@@ -2079,7 +2079,9 @@
         return () => { cancelled = true; clearInterval(timer); };
       }, []);
 
-      const shown = liveOk && liveUrl ? liveUrl : gallery[activeIdx] || gallery[0];
+      // The right-hand column is always the saved gallery — the live frame has its own
+      // column. Never let `shown` fall through to `liveUrl` or the same photo renders twice.
+      const shown = gallery[activeIdx] || gallery[0];
 
       return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -2122,7 +2124,7 @@
                   key={`${src}-${i}`}
                   onClick={() => setActiveIdx(i)}
                   className={`rounded-lg overflow-hidden border transition-all ${
-                    i === activeIdx && !liveOk ? 'border-[#C6C7F8]' : 'border-white/10 hover:border-white/30'
+                    i === activeIdx ? 'border-[#C6C7F8]' : 'border-white/10 hover:border-white/30'
                   }`}
                 >
                   <img src={src} alt="" className="w-full h-16 object-cover" />
