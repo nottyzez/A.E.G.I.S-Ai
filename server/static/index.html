@@ -2034,6 +2034,109 @@
       );
     }
 
+    // Full saved-capture list for one unit, newest first. A manifest entry may be a
+    // string or an {path|url} object depending on how the gallery was generated.
+    function getSavedGallery(unitId, limit = 8) {
+      const manifest = window.IMAGES_MANIFEST || {};
+      const list = manifest[unitId] || (manifest['Cup_' + String(unitId).replace('Cup', '')]) || [];
+      if (!Array.isArray(list)) return [];
+      return list.slice(-limit).reverse().map((entry) => {
+        const name = typeof entry === 'string' ? entry : (entry && (entry.path || entry.url));
+        return name && (name.includes('/') ? name.split('/').pop() : name);
+      }).filter(Boolean).map((clean) => window.__AEGIS_ASSET_RESOLVER__(`images_real/${unitId}/${clean}`));
+    }
+
+    // Live ESP32-S3 CAM frame on the left, saved captures on the right. If the live
+    // frame 404s (camera offline / server not running) the live column hides itself
+    // and the gallery takes the full width — never a broken-image icon.
+    function VisionPanel({ selectedUnit }) {
+      const [liveOk, setLiveOk] = useState(false);
+      const [activeIdx, setActiveIdx] = useState(0);
+      const [liveUrl, setLiveUrl] = useState(null);
+      const [capturedAt, setCapturedAt] = useState(null);
+      const gallery = useMemo(() => getSavedGallery(selectedUnit), [selectedUnit]);
+
+      useEffect(() => {
+        let cancelled = false;
+        const load = async () => {
+          if (window.location.protocol === 'file:') return;
+          try {
+            const res = await fetch('/api/status');
+            if (!res.ok) return;
+            const data = await res.json();
+            if (cancelled) return;
+            const url = data.latest_image_url;
+            if (url) {
+              setLiveUrl(url.includes('?') ? `${url}&ui=${Date.now()}` : `${url}?ui=${Date.now()}`);
+            }
+            if (data.latest_capture_at) setCapturedAt(data.latest_capture_at);
+          } catch (_err) {
+            /* offline: gallery only */
+          }
+        };
+        load();
+        const timer = setInterval(load, 15000);
+        return () => { cancelled = true; clearInterval(timer); };
+      }, []);
+
+      const shown = liveOk && liveUrl ? liveUrl : gallery[activeIdx] || gallery[0];
+
+      return (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className={liveOk ? '' : 'hidden'}>
+            <div className="relative rounded-xl overflow-hidden border border-[#A8C5DA]/40 bg-black/50">
+              <img
+                src={liveUrl || ''}
+                alt="ภาพสดจากกล้อง ESP32-S3"
+                className="w-full h-64 object-cover"
+                onError={() => setLiveOk(false)}
+                onLoad={() => setLiveOk(true)}
+              />
+              <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-[#A8C5DA] text-slate-950 text-xs font-mono font-bold">
+                LIVE • ESP32-S3 CAM
+              </span>
+            </div>
+            {capturedAt && (
+              <p className="text-xs font-mono text-white/45 mt-1.5">
+                จับภาพล่าสุด: {formatThaiDateTime(capturedAt) || capturedAt}
+              </p>
+            )}
+          </div>
+
+          <div className={liveOk ? '' : 'lg:col-span-2'}>
+            <div className="relative rounded-xl overflow-hidden border border-white/12 bg-black/40 mb-3">
+              <img
+                src={shown || ''}
+                alt={`ภาพผักบุ้งยูนิต ${selectedUnit}`}
+                className="w-full h-64 object-cover"
+                onError={(e) => {
+                  if (e.target.dataset.triedFallback) return;
+                  e.target.dataset.triedFallback = 'true';
+                  e.target.src = window.__AEGIS_ASSET_RESOLVER__('images_real/Control/21_10_2026-time08_00.jpg');
+                }}
+              />
+            </div>
+            <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+              {gallery.map((src, i) => (
+                <button
+                  key={`${src}-${i}`}
+                  onClick={() => setActiveIdx(i)}
+                  className={`rounded-lg overflow-hidden border transition-all ${
+                    i === activeIdx && !liveOk ? 'border-[#C6C7F8]' : 'border-white/10 hover:border-white/30'
+                  }`}
+                >
+                  <img src={src} alt="" className="w-full h-16 object-cover" />
+                </button>
+              ))}
+            </div>
+            {gallery.length === 0 && (
+              <p className="text-xs text-white/45">ยังไม่มีภาพที่บันทึกไว้สำหรับยูนิตนี้</p>
+            )}
+          </div>
+        </div>
+      );
+    }
+
     // =========================================================================
     // 3. SNOWUI / FIGMA SVG ICONS
     // =========================================================================
@@ -2260,7 +2363,8 @@
     }) {
       const [scrubIndex, setScrubIndex] = useState(null);
       const [hoveredBarIdx, setHoveredBarIdx] = useState(null);
-      const leafPhoto = getUnitLeafPhoto(selectedUnit);
+      const galleryPreview = getSavedGallery(selectedUnit)[0];
+      const leafPhoto = galleryPreview || getUnitLeafPhoto(selectedUnit);
 
       // Normalized time-series data for selected unit
       const timeSeries = useMemo(() => getUnitTimeSeries(selectedUnit), [selectedUnit]);
@@ -4273,6 +4377,10 @@
                   );
                 })}
               </div>
+            </div>
+
+            <div className="mt-4">
+              <VisionPanel selectedUnit={selectedUnit} />
             </div>
           </section>
 

@@ -164,5 +164,24 @@ class TestPumpRuntimeAndFlow(unittest.TestCase):
         self.assertIn("/api/calibration/flow/", self.html)
 
 
+class TestVisionPanel(unittest.TestCase):
+    def setUp(self):
+        self.html = (PROJECT_ROOT / "server" / "static" / "index.html").read_text(encoding="utf-8")
+        self.main_py = (PROJECT_ROOT / "main.py").read_text(encoding="utf-8")
+
+    def test_frontend_reads_latest_image_url(self):
+        self.assertIn("latest_image_url", self.html)
+
+    def test_gallery_helper_exists(self):
+        self.assertIn("function getSavedGallery", self.html)
+
+    def test_backend_timestamps_the_capture(self):
+        self.assertIn("latest_capture_at", self.main_py)
+
+    def test_image_error_falls_back_to_gallery(self):
+        start = self.html.index("function getSavedGallery")
+        self.assertIn("onError", self.html[start:start + 6000])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

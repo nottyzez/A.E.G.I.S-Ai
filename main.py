@@ -69,6 +69,7 @@ current_hardware_status = {
     "deficiency_class": "Control",
     "stage": "HEALTHY_NORMAL",
     "latest_image_url": "/static/latest_capture.jpg",
+    "latest_capture_at": None,
     "latest_test_file": "None",
     "calibration": dosing_engine.get_calibration(),
     "refill_status": {
@@ -155,6 +156,7 @@ def save_incoming_test_image(img_bytes: bytes) -> str:
         with open(STATIC_DIR / "latest_capture.jpg", "wb") as f:
             f.write(img_bytes)
         current_hardware_status["latest_image_url"] = f"/static/latest_capture.jpg?t={int(datetime.now().timestamp())}"
+        current_hardware_status["latest_capture_at"] = datetime.now().isoformat()
     except Exception as img_err:
         logger.warning(f"Failed to cache latest_capture.jpg: {img_err}")
 
