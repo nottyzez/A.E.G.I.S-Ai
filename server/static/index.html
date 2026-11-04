@@ -2100,12 +2100,6 @@
       </svg>
     );
 
-    const IconFolderNotch = () => (
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-        <path d="M2.8 5.5C2.8 4.67 3.47 4 4.3 4H8.2L10.2 6H15.7C16.53 6 17.2 6.67 17.2 7.5V14.5C17.2 15.33 16.53 16 15.7 16H4.3C3.47 16 2.8 15.33 2.8 14.5V5.5Z" fill="rgba(255,255,255,0.12)" stroke="white" strokeWidth="1.3" strokeLinejoin="round" />
-      </svg>
-    );
-
     const IconArrowRightSmall = () => (
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <path d="M6 4L10 8L6 12" stroke="rgba(255,255,255,0.4)" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
@@ -2173,12 +2167,6 @@
                 className="shrink-0 text-[11px] sm:text-xs font-display font-medium tracking-[0.18em] sm:tracking-[0.22em] text-white/75 hover:text-white transition-colors"
               >
                 CONTROL
-              </button>
-              <button
-                onClick={() => onNavigateDashboard('All Sample')}
-                className="shrink-0 text-[11px] sm:text-xs font-display font-medium tracking-[0.18em] sm:tracking-[0.22em] text-white/75 hover:text-white transition-colors"
-              >
-                SAMPLES
               </button>
             </nav>
           </div>
@@ -2266,15 +2254,12 @@
     // =========================================================================
     function AnalyzeTabView({
       selectedUnit,
-      setSelectedUnit,
       unitSummary,
       onTriggerDose,
-      dosingStatus,
-      onSwitchTab
+      dosingStatus
     }) {
       const [scrubIndex, setScrubIndex] = useState(null);
       const [hoveredBarIdx, setHoveredBarIdx] = useState(null);
-      const quickUnits = ['Control', 'N', 'P', 'K', 'Cup1', 'Cup2', 'Cup3', 'Cup4'];
       const leafPhoto = getUnitLeafPhoto(selectedUnit);
 
       // Normalized time-series data for selected unit
@@ -2441,10 +2426,10 @@
       return (
         <div className="w-full max-w-[1220px] mx-auto px-5 md:px-7 pt-5 pb-10 view-materialize">
           {/* ===============================================================
-              ROW 1: TOP HERO AREA (Left: Title + Compact Unit Selector leaving Starry Sky & Meteor Shower visible | Right: Temperature Card)
+              ROW 1: TOP HERO AREA (Left: Title + plant tag leaving Starry Sky & Meteor Shower visible | Right: Temperature Card)
              =============================================================== */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mb-6">
-            {/* Upper-Left: Title "A.E.G.I.S Analyze" + Clean Unit Quick Selector & NPK Status Bar */}
+            {/* Upper-Left: Title "A.E.G.I.S Analyze" + Plant Tag & NPK Status Bar */}
             <div className="lg:col-span-8 flex flex-col justify-between min-h-[210px] pt-1">
               <div>
                 <h1
@@ -2465,7 +2450,7 @@
                   </span>
                   <span className="text-white/25">•</span>
                   <span className="text-xs font-inter text-[#C6C7F8]">
-                    {unitSummary.label}: {unitSummary.npkStatus}
+                    สถานะ: {unitSummary.npkStatus}
                   </span>
                   <span className="text-white/25">•</span>
                   <span className="text-[11px] font-mono text-white/55">
@@ -2474,34 +2459,11 @@
                 </div>
               </div>
 
-              {/* Compact Unit Quick Selector: React Bits <JellyRadio /> with Spring Physics */}
-              <div className="flex flex-wrap items-center gap-1.5 pt-2">
-                <span className="text-[11px] font-mono uppercase tracking-wider text-white/45 mr-1.5">
-                  เลือกยูนิตผักบุ้ง:
+              {/* Static Plant Tag (single Control unit — no unit switching) */}
+              <div className="flex flex-wrap items-center gap-2 pt-2">
+                <span className="px-3 py-1 rounded-full text-xs font-inter font-medium text-[#C6C7F8] bg-white/5 border border-white/10">
+                  ผักบุ้ง (Water Spinach)
                 </span>
-                <JellyRadio
-                  items={quickUnits.map((uId) => ({
-                    value: uId,
-                    label: UNIT_META[uId]?.short || uId,
-                    short: UNIT_META[uId]?.short || uId,
-                  }))}
-                  value={selectedUnit}
-                  onChange={(val) => setSelectedUnit(val)}
-                  activeColor="#C6C7F8"
-                  activeTextColor="#0f172a"
-                  swell={0.16}
-                  barge={5}
-                  shrink={0.045}
-                  jelly={1.0}
-                  stiffness={580}
-                  ariaLabel="เลือกยูนิตผักบุ้งไฮโดรโปนิกส์"
-                />
-                <button
-                  onClick={() => onSwitchTab('All Sample')}
-                  className="px-2.5 py-1 rounded-lg text-xs font-inter text-[#A8C5DA] hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors ml-1"
-                >
-                  ครบทั้ง 12 ยูนิต →
-                </button>
               </div>
             </div>
 
@@ -4347,104 +4309,11 @@
     }
 
     // =========================================================================
-    // 7. TAB 3: "ALL SAMPLE" VIEW (ALL 12 WATER SPINACH / ผักบุ้ง UNITS)
-    // =========================================================================
-    function AllSampleTabView({ selectedUnit, onSelectUnitAndAnalyze }) {
-      const allUnitKeys = Object.keys(UNIT_META);
-
-      return (
-        <div className="w-full max-w-[1220px] mx-auto px-5 md:px-7 pt-5 pb-10 view-materialize">
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-            <div>
-              <h1 className="font-inter font-semibold text-3xl md:text-[36px] text-white tracking-tight">
-                All Sample — 12 ชุดทดลองผักบุ้งไฮโดรโปนิกส์
-              </h1>
-              <p className="text-sm text-white/65 mt-1">
-                เปรียบเทียบข้อมูลเซนเซอร์ pH, EC, อุณหภูมิ และภาพถ่ายใบผักบุ้งจริงครบทั้ง 4 ถังหลัก (23.3L) และ 8 ถ้วยทดลองซ้ำ (750mL)
-              </p>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {allUnitKeys.map((uId) => {
-              const summary = getUnitSensorSummary(uId);
-              const photo = getUnitLeafPhoto(uId);
-              const isSelected = selectedUnit === uId;
-
-              return (
-                <div
-                  key={uId}
-                  onClick={() => onSelectUnitAndAnalyze(uId)}
-                  className={`figma-card-dark p-4 cursor-pointer flex flex-col justify-between transition-all hover:-translate-y-1 ${
-                    isSelected ? 'ring-2 ring-[#C6C7F8]' : ''
-                  }`}
-                >
-                  <div>
-                    {/* Real ผักบุ้ง Leaf Image */}
-                    <div className="relative h-40 w-full rounded-xl overflow-hidden mb-3.5 border border-white/12 bg-black/40">
-                      <img
-                        src={photo}
-                        alt={`ผักบุ้ง ${summary.label}`}
-                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
-                        onError={(e) => {
-                          if (e.target.dataset.triedFallback) return;
-                          e.target.dataset.triedFallback = 'true';
-                          e.target.src = window.__AEGIS_ASSET_RESOLVER__('images_real/Control/21_10_2026-time08_00.jpg');
-                        }}
-                      />
-                      <div className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-[10px] font-mono text-white border border-white/15">
-                        {summary.type}
-                      </div>
-                      <div
-                        className="absolute top-2.5 right-2.5 w-3 h-3 rounded-full border border-white"
-                        style={{ backgroundColor: summary.badgeColor }}
-                      />
-                    </div>
-
-                    <h3 className="font-inter font-semibold text-base text-white mb-0.5">
-                      {summary.label}
-                    </h3>
-                    <p className="text-xs text-[#C6C7F8] mb-3">{summary.npkStatus}</p>
-
-                    {/* Sensor Readouts */}
-                    <div className="grid grid-cols-3 gap-2 p-2.5 rounded-xl bg-white/5 border border-white/8 text-center mb-3">
-                      <div>
-                        <div className="text-[10px] text-white/45 font-mono">pH</div>
-                        <div className="font-work font-bold text-sm text-white">{summary.ph}</div>
-                      </div>
-                      <div>
-                        <div className="text-[10px] text-white/45 font-mono">EC</div>
-                        <div className="font-work font-bold text-sm text-[#A8C5DA]">{summary.ec}</div>
-                      </div>
-                      <div>
-                        <div className="text-[10px] text-white/45 font-mono">Temp</div>
-                        <div className="font-work font-bold text-sm text-white">{summary.temp}°C</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs">
-                    <span className="text-white/60 truncate max-w-[170px]">
-                      {summary.symptomNote}
-                    </span>
-                    <span className="text-[#C6C7F8] font-medium shrink-0">
-                      Analyze →
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
-
-    // =========================================================================
-    // 8. MAIN APPLICATION (WARP TRANSITION + FIGMA SNOWUI SHELL)
+    // 7. MAIN APPLICATION (WARP TRANSITION + FIGMA SNOWUI SHELL)
     // =========================================================================
     function App() {
       const [currentView, setCurrentView] = useState('home'); // 'home' | 'dashboard'
-      const [activeTab, setActiveTab] = useState('Analyze'); // 'Analyze' | 'Electronic Control' | 'All Sample'
+      const [activeTab, setActiveTab] = useState('Analyze'); // 'Analyze' | 'Electronic Control'
       const [selectedUnit, setSelectedUnit] = useState('Control');
       const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
       const [searchQuery, setSearchQuery] = useState('');
@@ -4550,13 +4419,6 @@
                             icon: <span className="w-1.5 h-1.5 rounded-full bg-white/35" />,
                             onClick: () => triggerViewWarp('home'),
                           },
-                          {
-                            id: 'projects',
-                            label: 'Projects',
-                            title: 'ชุดทดลองผักบุ้งทั้งหมด 12 ยูนิต',
-                            icon: <span className="w-1.5 h-1.5 rounded-full bg-white/35" />,
-                            onClick: () => setActiveTab('All Sample'),
-                          },
                         ],
                       },
                       {
@@ -4573,12 +4435,6 @@
                             label: 'Electronic Control',
                             title: 'Electronic Control',
                             icon: <IconElectronicControl />,
-                          },
-                          {
-                            id: 'All Sample',
-                            label: 'All Sample',
-                            title: 'All Sample',
-                            icon: <IconFolderNotch />,
                           },
                         ],
                       },
@@ -4682,11 +4538,7 @@
                       <button
                         onClick={() =>
                           setActiveTab(
-                            activeTab === 'Analyze'
-                              ? 'Electronic Control'
-                              : activeTab === 'Electronic Control'
-                              ? 'All Sample'
-                              : 'Analyze'
+                            activeTab === 'Analyze' ? 'Electronic Control' : 'Analyze'
                           )
                         }
                         className="figma-icon-btn"
@@ -4711,11 +4563,9 @@
                     {activeTab === 'Analyze' && (
                       <AnalyzeTabView
                         selectedUnit={selectedUnit}
-                        setSelectedUnit={setSelectedUnit}
                         unitSummary={unitSummary}
                         onTriggerDose={handleTriggerDose}
                         dosingStatus={dosingStatus}
-                        onSwitchTab={setActiveTab}
                       />
                     )}
 
@@ -4726,16 +4576,6 @@
                         onTriggerDose={handleTriggerDose}
                         liveScenarioOverride={liveScenarioOverride}
                         setLiveScenarioOverride={setLiveScenarioOverride}
-                      />
-                    )}
-
-                    {activeTab === 'All Sample' && (
-                      <AllSampleTabView
-                        selectedUnit={selectedUnit}
-                        onSelectUnitAndAnalyze={(uId) => {
-                          setSelectedUnit(uId);
-                          setActiveTab('Analyze');
-                        }}
                       />
                     )}
                   </AnimatedContent>

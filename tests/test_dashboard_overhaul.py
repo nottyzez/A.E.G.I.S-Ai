@@ -113,5 +113,22 @@ class TestHomeSimplification(unittest.TestCase):
         self.assertIn("READ SYSTEM SPEC", body)
 
 
+class TestAllSampleRemoval(unittest.TestCase):
+    def setUp(self):
+        self.html = (PROJECT_ROOT / "server" / "static" / "index.html").read_text(encoding="utf-8")
+
+    def test_all_sample_view_is_gone(self):
+        self.assertNotIn("function AllSampleTabView", self.html)
+        self.assertNotIn('id: "All Sample"', self.html)
+        self.assertNotIn("'All Sample'", self.html)
+
+    def test_control_label_is_not_rendered(self):
+        self.assertNotIn("Control (สมบูรณ์)", self.html)
+        self.assertNotIn("{unitSummary.label}: {unitSummary.npkStatus}", self.html)
+
+    def test_quick_unit_selector_is_removed(self):
+        self.assertNotIn("quickUnits", self.html)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
