@@ -777,6 +777,31 @@ def calculate_calibration(payload: dict):
     return res
 
 
+@app.post("/api/calibration/flow/{pump_key}")
+def calibrate_single_pump(pump_key: str, payload: dict):
+    """
+    วัด Flow Rate ของปั๊ม Peristaltic แต่ละตัวแยกกัน (A/B/C)
+    Q = collected_ml / (test_duration_s - observed_prime_s)
+    """
+    try:
+        res = dosing_engine.calibrate_pump(
+            pump_key,
+            payload.get("collected_ml", 12.0),
+            payload.get("test_duration_s", 10.0),
+            payload.get("observed_prime_s", 2.0),
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    current_hardware_status["pump_flow_rates"] = dosing_engine.get_pump_flow_rates()
+    append_command_log(
+        "CALIBRATION",
+        f"ปรับ Flow ปั๊ม {res['pump']} = {res['calculated_flow_rate_ml_s']} mL/s",
+        True,
+    )
+    logger.info(f"[PER-PUMP CALIBRATION] {res}")
+    return res
+
+
 @app.get("/rules")
 def get_rules():
     return {"pump_rules_sec": PUMP_RULES, "moisture_threshold": MOISTURE_THRESHOLD}

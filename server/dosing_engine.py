@@ -38,6 +38,14 @@ class TwoTierDosingEngine:
         self.pump_flow_rate = float(pump_flow_rate_ml_s)
         self.priming_delay_s = float(priming_delay_s)
         self.k_ec_slope = float(k_ec_slope)
+        # Each peristaltic pump has its own tubing and rollers, so its delivered
+        # volume per second differs. The calibration wizard measures them one at a
+        # time; compute_dosing still uses the global pump_flow_rate for the plan.
+        self.pump_flow_rates = {
+            "A": float(pump_flow_rate_ml_s),
+            "B": float(pump_flow_rate_ml_s),
+            "C": float(pump_flow_rate_ml_s),
+        }
 
     def update_calibration(
         self,
@@ -88,6 +96,38 @@ class TwoTierDosingEngine:
             "status": "success",
             "message": f"Calibrated: Flow Rate = {calculated_q} ml/s (Priming Delay = {self.priming_delay_s}s)",
         }
+
+    def calibrate_pump(
+        self,
+        pump_key: str,
+        collected_ml: float,
+        test_duration_s: float = 10.0,
+        observed_prime_s: float = 2.0,
+    ) -> Dict[str, Any]:
+        """
+        Measures one peristaltic pump: Q = collected_ml / (duration - prime).
+        Only the named pump's rate changes; the others keep their own values.
+        """
+        key = str(pump_key).upper()
+        if key not in self.pump_flow_rates:
+            raise ValueError(f"Unknown pump key: {pump_key}")
+
+        effective_time = max(0.5, float(test_duration_s) - float(observed_prime_s))
+        calculated_q = max(0.1, round(float(collected_ml) / effective_time, 3))
+        self.pump_flow_rates[key] = calculated_q
+
+        return {
+            "pump": key,
+            "calculated_flow_rate_ml_s": calculated_q,
+            "priming_delay_s": max(0.0, round(float(observed_prime_s), 2)),
+            "test_duration_s": float(test_duration_s),
+            "collected_ml": float(collected_ml),
+            "status": "success",
+            "message": f"Calibrated pump {key}: Flow Rate = {calculated_q} ml/s",
+        }
+
+    def get_pump_flow_rates(self) -> Dict[str, float]:
+        return dict(self.pump_flow_rates)
 
     def compute_dosing(
         self,

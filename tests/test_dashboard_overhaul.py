@@ -72,5 +72,26 @@ class TestServerRuntimeCeiling(unittest.TestCase):
         self.assertEqual(MAX_PUMP_DURATION_MS, 30000)
 
 
+class TestPerPumpFlowCalibration(unittest.TestCase):
+    def test_each_pump_holds_its_own_flow_rate(self):
+        from dosing_engine import TwoTierDosingEngine
+        eng = TwoTierDosingEngine()
+        eng.calibrate_pump("A", collected_ml=12.0, test_duration_s=10.0, observed_prime_s=2.0)
+        eng.calibrate_pump("B", collected_ml=6.0, test_duration_s=10.0, observed_prime_s=2.0)
+        rates = eng.get_pump_flow_rates()
+        self.assertAlmostEqual(rates["A"], 1.5, places=2)
+        self.assertAlmostEqual(rates["B"], 0.75, places=2)
+
+    def test_unknown_pump_key_is_rejected(self):
+        from dosing_engine import TwoTierDosingEngine
+        with self.assertRaises(ValueError):
+            TwoTierDosingEngine().calibrate_pump("Z", 10.0, 10.0, 2.0)
+
+    def test_per_pump_route_is_registered(self):
+        import main
+        paths = [r.path for r in main.app.routes if hasattr(r, "path")]
+        self.assertIn("/api/calibration/flow/{pump_key}", paths)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
