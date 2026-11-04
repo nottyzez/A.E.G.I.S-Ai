@@ -130,5 +130,23 @@ class TestAllSampleRemoval(unittest.TestCase):
         self.assertNotIn("quickUnits", self.html)
 
 
+class TestControlPageGrouping(unittest.TestCase):
+    def setUp(self):
+        self.html = (PROJECT_ROOT / "server" / "static" / "index.html").read_text(encoding="utf-8")
+        start = self.html.index("function ElectronicControlTabView")
+        self.body = self.html[start:self.html.index("function AllSampleTabView", start)
+                               if "function AllSampleTabView" in self.html
+                               else self.html.index("function App()", start)]
+
+    def test_four_subsystem_groups_exist(self):
+        for anchor in ("settings-schedule", "settings-pumps", "settings-vision", "settings-simulation"):
+            self.assertIn(f'id="{anchor}"', self.body)
+
+    def test_no_body_copy_below_twelve_pixels(self):
+        sizes = [int(m) for m in re.findall(r"text-\[(\d+)px\]", self.body)]
+        self.assertTrue(all(s >= 12 for s in sizes if s < 12),
+                        f"Found undersized copy: {[s for s in sizes if s < 12]}")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
