@@ -54,7 +54,7 @@ String apiUrl(const char* path) {
     return String("http://") + cfgHost + ":" + cfgPort + path;
 }
 
-void initCamera() {
+bool initCamera() {
     camera_config_t config;
     config.ledc_channel = LEDC_CHANNEL_0;
     config.ledc_timer = LEDC_TIMER_0;
@@ -76,7 +76,10 @@ void initCamera() {
     config.pin_reset = RESET_GPIO_NUM;
     config.xclk_freq_hz = 20000000;
     config.pixel_format = PIXFORMAT_JPEG;
-    config.grab_mode = CAMERA_GRAB_LATEST;
+    // WHEN_EMPTY stops the DMA once every buffer holds a frame. With LATEST the
+    // driver overwrites continuously whenever nobody calls esp_camera_fb_get(),
+    // which is exactly what "cam_hal: FB-OVF" in the log was reporting.
+    config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
 
     // Use high resolution if PSRAM is available
     if (psramFound()) {
@@ -96,9 +99,10 @@ void initCamera() {
     esp_err_t err = esp_camera_init(&config);
     if (err != ESP_OK) {
         Serial.printf("[CAM ERROR] Camera init failed with error 0x%x\n", err);
-        return;
+        return false;
     }
     Serial.println("[CAM] Camera sensor initialized successfully.");
+    return true;
 }
 
 void connectWiFi() {
@@ -236,6 +240,17 @@ void runCaptureRound() {
     connectWiFi();
     esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
 
+    // The camera is powered down between rounds. Left initialised, its DMA runs
+    // free whenever nothing consumes frames — the 15 s idle wait between rounds
+    // floods both frame buffers and fills the log with "cam_hal: FB-OVF" while
+    // doing no useful work. That is what kept the board hot with the radio off.
+    if (!initCamera()) {
+        WiFi.disconnect(true);
+        WiFi.mode(WIFI_OFF);
+        Serial.println("[CAM] No camera this round, radio off.");
+        return;
+    }
+
     String mode = "real";
     bool shouldCapture = pollRemoteCaptureCommand(mode);
 
@@ -250,9 +265,13 @@ void runCaptureRound() {
         Serial.println("[CAM] No command queued, nothing to upload.");
     }
 
+    // Stop the sensor before the idle wait, or its DMA keeps filling buffers
+    // for the next SLEEP_INTERVAL_S seconds (cam_hal: FB-OVF).
+    esp_camera_deinit();
+
     WiFi.disconnect(true);
     WiFi.mode(WIFI_OFF);
-    Serial.println("[CAM] Radio off.");
+    Serial.println("[CAM] Radio and camera off.");
 }
 
 void handleSerialCommands() {
@@ -353,7 +372,8 @@ void setup() {
     setCpuFrequencyMhz(160);
     Serial.printf("[THERMAL CONTROL] CPU Clock adjusted to %d MHz (Cooler operation)\n", getCpuFrequencyMhz());
 
-    initCamera();
+    // The camera is initialised inside runCaptureRound(), not here: it must be
+    // down while the board idles, or its DMA floods the frame buffers.
     loadRuntimeConfig();
 
     // First round happens immediately so a freshly powered board reports in.
@@ -370,8 +390,9 @@ void loop() {
 
 #if CAM_SLEEP_ENABLED
         // Light sleep, not deep sleep: the USB CDC port stays enumerated so
-        // SET WIFI / SET SERVER over Serial still works, and the camera keeps
-        // its sensor settings. millis() is corrected across the sleep.
+        // SET WIFI / SET SERVER over Serial still works, and RAM is preserved
+        // (deep sleep would restart setup() every wake). millis() is corrected
+        // across the sleep, so the round timer does not drift.
         Serial.printf("[CAM] Sleeping %d s...\n", SLEEP_INTERVAL_S);
         Serial.flush();
         esp_sleep_enable_timer_wakeup((uint64_t)SLEEP_INTERVAL_S * 1000000ULL);

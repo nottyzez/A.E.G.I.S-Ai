@@ -90,6 +90,26 @@ class TestFirmwareAndUiHalves(unittest.TestCase):
         # the old 1.5 s command poll is what kept the board hot
         self.assertNotIn(">= 1500", src)
 
+    def test_camera_is_down_between_rounds(self):
+        """Left initialised, the sensor's DMA fills both frame buffers during the
+        15 s idle wait — the log fills with "cam_hal: FB-OVF" and the board
+        stays hot with the radio already off."""
+        src = CAM_SKETCH.read_text(encoding="utf-8")
+        # setup() must not init the camera; runCaptureRound() owns its lifetime
+        setup_start = src.index("void setup()")
+        setup_body = src[setup_start:src.index("\n}", setup_start)]
+        self.assertNotIn("initCamera();", setup_body,
+                         "camera is initialised in setup(); it must be up only during a round")
+        self.assertIn("initCamera();", src, "runCaptureRound lost its camera init")
+        # and the sensor is released before the idle wait
+        round_start = src.index("void runCaptureRound()")
+        round_body = src[round_start:src.index("\n}", round_start)]
+        self.assertIn("esp_camera_deinit();", round_body,
+                      "runCaptureRound must release the camera before idling")
+        # WHEN_EMPTY parks the DMA once the buffers are full
+        self.assertIn("CAMERA_GRAB_WHEN_EMPTY", src,
+                      "CAMERA_GRAB_LATEST floods the buffers when idle")
+
     def test_sleep_settings_are_configurable(self):
         cam = CAM_CONFIG.read_text(encoding="utf-8")
         self.assertIn("#define SLEEP_INTERVAL_S", cam)
