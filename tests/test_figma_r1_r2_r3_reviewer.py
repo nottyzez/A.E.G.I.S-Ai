@@ -205,7 +205,8 @@ class FigmaR2AssetsAndDualPathTest(unittest.TestCase):
         self.assertIn("window.__AEGIS_IS_FILE__ = window.location.protocol === 'file:'", html)
         self.assertIn("window.__AEGIS_ASSET_BASE__ = window.__AEGIS_IS_FILE__ ? '.' : '/static'", html)
         self.assertIn("dashboard_mountain_bg.png", html)
-        self.assertIn("window.__AEGIS_ASSET_RESOLVER__('back.jpg')", html)
+        # Home's back.jpg backdrop was removed for the GradientASCII hero.
+        self.assertNotIn("window.__AEGIS_ASSET_RESOLVER__('back.jpg')", html)
 
 
 class FigmaR3CosmicAndAtmosphericEffectsTest(unittest.TestCase):
@@ -257,26 +258,22 @@ class FigmaR3CosmicAndAtmosphericEffectsTest(unittest.TestCase):
         # Check JSX rendering under dashboard view. The dashboard branch is
         # `{!isHome && ( ... )}` (isHome = currentView === 'home'), so assert the
         # cloud layer sits inside that branch and nowhere else.
-        dash_block = re.search(r"\{!isHome\s*&&\s*\(([\s\S]*?)\{isHome\s*&&\s*\(", self.html)
+        dash_block = re.search(r"\{!isHome\s*&&\s*\(([\s\S]*?)</>\s*\)\}", self.html)
         self.assertIsNotNone(dash_block, "Dashboard backdrop branch ({!isHome && ...}) must exist")
         cloud_jsx = re.search(r'<div\s+className=["\']dashboard-clouds-layer["\']', dash_block.group(1))
         self.assertIsNotNone(cloud_jsx, "Dashboard drifting clouds must be rendered inside the non-home backdrop branch")
 
-    def test_r3_home_space_nebula_mouse_parallax(self):
-        """Verify stationary home horizon bloom with pointer-events: none and smooth mouse parallax."""
-        nebula_css = re.search(r"\.home-backdrop__bloom\s*\{([^}]+)\}", self.html)
-        self.assertIsNotNone(nebula_css)
-        self.assertIn("pointer-events: none", nebula_css.group(1))
-
-        # Check JSX rendering under home view
+    def test_r3_home_hero_uses_gradient_ascii_and_particles(self):
+        """Home paints no photograph; the hero is the ASCII/particle canvas."""
         self.assertIn("const isHome = currentView === 'home';", self.html)
-        home_block = re.search(r"\{isHome\s*&&\s*\(([\s\S]*?)<div ref=\{nebulaRef\}", self.html)
-        self.assertIsNotNone(home_block, "Home backdrop must only render under isHome (currentView === 'home')")
-        self.assertIn('className="home-backdrop"', home_block.group(1))
-        self.assertIn('ref={nebulaRef} className="home-backdrop__bloom"', self.html)
-
-        # Check parallax transform update
-        self.assertIn("nebulaRef.current.style.transform = `translate3d(${targetX * 28}px, ${targetY * 20}px, 0)`", self.html)
+        home_start = self.html.index("function HomeView")
+        home_end = self.html.index("function AnalyzeTabView", home_start)
+        home_body = self.html[home_start:home_end]
+        self.assertIn("<GradientASCII", home_body)
+        self.assertIn("<Particles", home_body)
+        self.assertIn("<Crosshair", home_body)
+        # A photographic backdrop would cover the ASCII layer; keep it out.
+        self.assertNotIn('<div className="home-backdrop">', self.html)
 
 
 if __name__ == "__main__":

@@ -62,7 +62,7 @@ check("Figma cards responsive max-width: 100%", html.count("max-width: 100%") >=
 # 5. Cosmic & Atmospheric Effects
 check("Drifting clouds keyframes", "cloudDriftSlow" in html and "cloudDriftFast" in html and "dashboard-clouds-layer" in html)
 check("Drifting clouds pointer-events: none", "pointer-events: none" in html and "dashboard-clouds-layer" in html)
-check("Mouse parallax horizon bloom", "home-backdrop__bloom" in html and "nebulaRef" in html)
+check("Home hero uses GradientASCII + Particles", "const GradientASCII" in html and "const Particles" in html)
 check("Reduced star particle count (280 far, 150 mid, 60 near = 490)", "createStarLayer(280" in html and "createStarLayer(150" in html and "createStarLayer(60" in html)
 check("Meteor frequency adjustment (Dashboard rare, Home disabled)", "Math.random() < 0.002" in html and "meteorGroup.visible = false" in html)
 

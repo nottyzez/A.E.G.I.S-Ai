@@ -658,7 +658,13 @@ class DashboardLayoutAndConsoleStabilityTest(unittest.TestCase):
             ("MagicBento", "<MagicBento")
         ]
         for name, tag in components:
-            self.assertIn(f"function {name}", self.html_content, f"React Bits component {name} definition missing")
+            # AnimatedContent / MagicBento are declared as const arrow components
+            # so the 2026-11-05 React Bits suite can match `const X =`.
+            self.assertRegex(
+                self.html_content,
+                "(?:function|const) " + name + "[ (=]",
+                f"React Bits component {name} definition missing",
+            )
             self.assertIn(tag, self.html_content, f"React Bits component {tag} JSX integration missing")
 
     def test_svg_bezier_path_syntax_generator_math(self):

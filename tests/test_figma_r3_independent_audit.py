@@ -256,12 +256,13 @@ class TestFigmaR3BackgroundImagesAndDualPath(unittest.TestCase):
             self.assertGreaterEqual(im.height, 500)
 
     def test_r2_background_application_in_html(self):
-        """Verify dashboard uses dashboard_mountain_bg.png and home uses back.jpg."""
+        """Verify the dashboard uses dashboard_mountain_bg.png; Home uses no photo."""
         html = INDEX_PATH.read_text(encoding="utf-8")
         self.assertIn("images_real/dashboard_mountain_bg.png", html)
-        self.assertIn("window.__AEGIS_ASSET_RESOLVER__('back.jpg')", html)
         self.assertIn('url("${mountainBg}")', html)
-        self.assertIn('url("${homeBack}")', html)
+        # Home's photographic backdrop was removed when the GradientASCII /
+        # Particles hero landed — see the 2026-11-05 control UX cleanup plan.
+        self.assertNotIn('url("${homeBack}")', html)
 
     def test_r2_dual_path_contract_comprehensive(self):
         """Test asset resolver contract with clean, prefixed, and edge-case relative paths."""
@@ -348,23 +349,18 @@ class TestFigmaR3CosmicAndAtmosphericEffects(unittest.TestCase):
         self.assertIn("currentView === 'dashboard' && (", self.html)
         self.assertIn("className=\"dashboard-clouds-layer\"", self.html)
 
-    def test_r3_home_space_nebula_mouse_parallax(self):
-        """Stationary home horizon bloom with pointer-events: none and smooth mouse parallax."""
-        nebula_css = re.search(r"\.home-backdrop__bloom\s*\{([^}]+)\}", self.html)
-        self.assertIsNotNone(nebula_css)
-        rules = nebula_css.group(1)
-        self.assertIn("pointer-events: none", rules)
-        self.assertIn("transition: transform 0.3s", rules)
-
-        # Smooth mouse parallax transform
-        self.assertIn("nebulaRef.current.style.transform = `translate3d(${targetX * 28}px, ${targetY * 20}px, 0)`", self.html)
-
-        # Rendered strictly on home view ({isHome && ( ... <div ref={nebulaRef} ...)
+    def test_r3_home_hero_uses_gradient_ascii_and_particles(self):
+        """Home no longer paints a photograph; the hero is the ASCII/particle canvas."""
         self.assertIn("const isHome = currentView === 'home';", self.html)
-        home_block = re.search(r"\{isHome\s*&&\s*\(([\s\S]*?)<div ref=\{nebulaRef\}", self.html)
-        self.assertIsNotNone(home_block, "Home backdrop must only render under isHome (currentView === 'home')")
-        self.assertIn('className="home-backdrop"', home_block.group(1))
-        self.assertIn('ref={nebulaRef} className="home-backdrop__bloom"', self.html)
+        home_start = self.html.index("function HomeView")
+        home_end = self.html.index("function AnalyzeTabView", home_start)
+        home_body = self.html[home_start:home_end]
+        self.assertIn("<GradientASCII", home_body)
+        self.assertIn("<Particles", home_body)
+        self.assertIn("<Crosshair", home_body)
+        # The photographic backdrop must not come back: it would sit on top of
+        # the GradientASCII layer and hide it.
+        self.assertNotIn('<div className="home-backdrop">', self.html)
 
 
 class TestFigmaR3NodeRuntimeAdversarialAndUnitProbabilities(unittest.TestCase):
