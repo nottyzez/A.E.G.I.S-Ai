@@ -45,14 +45,29 @@ And do not leave a public Droplet running with the pumps attached (§7).
 Choose **Ubuntu 24.04 LTS**, region closest to the greenhouse, and add your SSH
 key. Note the public IP once it boots.
 
+> **Check for "Private-only" before anything else.** A Droplet created without
+> public networking shows a `Private-only` badge and gets only a `10.x.x.x`
+> address. The ESP32 cannot reach that, and neither can you from outside
+> DigitalOcean — the failure looks exactly like a dead server. Fix it on the
+> Overview page: **Add public outbound or inbound access → Public IPv4**, or
+> the **Networking** tab. The Overview's Connection Details should then show a
+> Public IPv4 such as `165.245.x.x`. That is the address §6 uses.
+
 ## 2. Get the code onto the Droplet
 
 ```bash
 ssh root@<droplet-ip>
 apt-get update && apt-get install -y git
-git clone <your-repo-url> aegis
+git clone -b feature/dashboard-overhaul https://github.com/nottyzez/A.E.G.I.S-Ai.git aegis
 cd aegis
 ```
+
+The `-b` matters: the presentation work (runtime network config, CAM power
+saving, the DigitalOcean bundle itself) is not on `main`.
+
+If SSH is unavailable — no key was added at creation, or the key is not on this
+machine — use **Web Console** on the Droplet's Overview page. It is a browser
+terminal as root and needs nothing installed locally.
 
 The repo's untracked work (the calibration changes, the current plan) does not
 travel with `git clone`. If you have not committed yet, use `rsync` instead:
