@@ -136,5 +136,131 @@ class TestPosterBlueprints(unittest.TestCase):
         for cit in citations:
             self.assertIn(cit, content, f"Companion doc missing thesis citation '{cit}'")
 
+    def test_08_unified_combo_blueprint_exists_and_high_res(self):
+        """Verify the unified combo blueprint (Card 5) exists, is valid SVG & PNG, and >= 3000x2000 px."""
+        combo_svg = BLUEPRINTS_DIR / "blueprint_unified_results_metrics.svg"
+        combo_png = BLUEPRINTS_DIR / "blueprint_unified_results_metrics.png"
+        self.assertTrue(combo_svg.exists(), f"Unified combo SVG missing: {combo_svg}")
+        self.assertTrue(combo_png.exists(), f"Unified combo PNG missing: {combo_png}")
+        
+        # Verify PNG dimensions
+        with Image.open(combo_png) as img:
+            w, h = img.size
+            self.assertGreaterEqual(w, 3000, f"Combo PNG width {w} < 3000")
+            self.assertGreaterEqual(h, 2000, f"Combo PNG height {h} < 2000")
+            
+        # Verify SVG content has key metrics and citations
+        svg_content = combo_svg.read_text(encoding="utf-8")
+        self.assertIn("100.00%", svg_content)
+        self.assertIn("54.3", svg_content)
+        self.assertIn("Table 4.2", svg_content)
+
+    def test_09_flowchart_blueprint_exists_and_high_res(self):
+        """Verify the AI & ESP32 pump flowchart blueprint (Card 6) exists, is valid SVG & PNG, and >= 3000x2000 px."""
+        flow_svg = BLUEPRINTS_DIR / "blueprint_ai_esp32_flowchart.svg"
+        flow_png = BLUEPRINTS_DIR / "blueprint_ai_esp32_flowchart.png"
+        self.assertTrue(flow_svg.exists(), f"Flowchart SVG missing: {flow_svg}")
+        self.assertTrue(flow_png.exists(), f"Flowchart PNG missing: {flow_png}")
+        
+        # Verify PNG dimensions
+        with Image.open(flow_png) as img:
+            w, h = img.size
+            self.assertGreaterEqual(w, 3000, f"Flowchart PNG width {w} < 3000")
+            self.assertGreaterEqual(h, 2000, f"Flowchart PNG height {h} < 2000")
+            
+        # Verify SVG content has ESP32, GPIO pins, and Closed-loop terms
+        svg_content = flow_svg.read_text(encoding="utf-8")
+        self.assertIn("ESP32-S3", svg_content)
+        self.assertIn("GPIO 9", svg_content)
+        self.assertIn("CLOSED-LOOP", svg_content)
+
+    def test_10_compact_canva_blueprints_exist_and_high_res(self):
+        """Verify the 4:3 compact Canva blueprints (Cards 7 & 8) exist, are valid SVG & PNG, and >= 3000x3500 px."""
+        for base_name in ["blueprint_methodology_flowchart_compact", "blueprint_results_biomass_compact"]:
+            svg_path = BLUEPRINTS_DIR / f"{base_name}.svg"
+            png_path = BLUEPRINTS_DIR / f"{base_name}.png"
+            self.assertTrue(svg_path.exists(), f"Compact SVG missing: {svg_path}")
+            self.assertTrue(png_path.exists(), f"Compact PNG missing: {png_path}")
+            
+            # Check XML
+            tree = ET.parse(svg_path)
+            self.assertIn("svg", tree.getroot().tag.lower())
+            
+            # Check dimensions
+            with Image.open(png_path) as img:
+                w, h = img.size
+                self.assertGreaterEqual(w, 3000, f"Width {w} < 3000 in {png_path}")
+                self.assertGreaterEqual(h, 3500, f"Height {h} < 3500 in {png_path}")
+                
+        # Check content in Methodology compact
+        meth_svg = (BLUEPRINTS_DIR / "blueprint_methodology_flowchart_compact.svg").read_text(encoding="utf-8")
+        self.assertIn("100.00%", meth_svg)
+        self.assertIn("ESP32-S3", meth_svg)
+        self.assertIn("Closed-Loop", meth_svg)
+        
+        # Check content in Results compact
+        res_svg = (BLUEPRINTS_DIR / "blueprint_results_biomass_compact.svg").read_text(encoding="utf-8")
+        self.assertIn("100.00%", res_svg)
+        self.assertIn("12 / 12", res_svg)
+        self.assertIn("54.3", res_svg)
+        self.assertIn("19.8", res_svg)
+
+    def test_11_ai_workflow_and_growth_morphology_blueprints(self):
+        """Verify the dedicated 4-stage AI Flowchart (Card 9) and 3D Morphology (Card 10) blueprints exist and are valid."""
+        for base_name in ["blueprint_ai_workflow_flowchart", "blueprint_growth_morphology_3d"]:
+            svg_path = BLUEPRINTS_DIR / f"{base_name}.svg"
+            png_path = BLUEPRINTS_DIR / f"{base_name}.png"
+            self.assertTrue(svg_path.exists(), f"Blueprint SVG missing: {svg_path}")
+            self.assertTrue(png_path.exists(), f"Blueprint PNG missing: {png_path}")
+            
+            # Check XML
+            tree = ET.parse(svg_path)
+            self.assertIn("svg", tree.getroot().tag.lower())
+            
+            # Check dimensions
+            with Image.open(png_path) as img:
+                w, h = img.size
+                self.assertGreaterEqual(w, 3000, f"Width {w} < 3000 in {png_path}")
+                self.assertGreaterEqual(h, 3500, f"Height {h} < 3500 in {png_path}")
+
+        # Check AI Flowchart content
+        ai_svg = (BLUEPRINTS_DIR / "blueprint_ai_workflow_flowchart.svg").read_text(encoding="utf-8")
+        self.assertIn("100.00%", ai_svg)
+        self.assertIn("MobileNetV2", ai_svg)
+        self.assertIn("GBDT", ai_svg)
+        self.assertIn("ESP32-S3", ai_svg)
+
+        # Check Morphology content
+        growth_svg = (BLUEPRINTS_DIR / "blueprint_growth_morphology_3d.svg").read_text(encoding="utf-8")
+        self.assertIn("54.3", growth_svg)
+        self.assertIn("39.6", growth_svg)
+        self.assertIn("20.4", growth_svg)
+        self.assertIn("19.8", growth_svg)
+
+    def test_12_ai_evaluation_table_blueprint(self):
+        """Verify the AI Evaluation Table blueprint (Card 11) exists, is valid SVG & PNG, and >= 3000x2500 px."""
+        svg_path = BLUEPRINTS_DIR / "blueprint_ai_evaluation_table.svg"
+        png_path = BLUEPRINTS_DIR / "blueprint_ai_evaluation_table.png"
+        self.assertTrue(svg_path.exists(), f"Blueprint SVG missing: {svg_path}")
+        self.assertTrue(png_path.exists(), f"Blueprint PNG missing: {png_path}")
+        
+        # Check XML
+        tree = ET.parse(svg_path)
+        self.assertIn("svg", tree.getroot().tag.lower())
+        
+        # Check dimensions
+        with Image.open(png_path) as img:
+            w, h = img.size
+            self.assertGreaterEqual(w, 3000, f"Width {w} < 3000 in {png_path}")
+            self.assertGreaterEqual(h, 2500, f"Height {h} < 2500 in {png_path}")
+
+        # Check content
+        content = svg_path.read_text(encoding="utf-8")
+        self.assertIn("100.00%", content)
+        self.assertIn("12 / 12", content)
+        self.assertIn("83.96%", content)
+        self.assertIn("90.78%", content)
+        self.assertIn("72.60%", content)
+
 if __name__ == "__main__":
     unittest.main()

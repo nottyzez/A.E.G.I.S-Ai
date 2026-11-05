@@ -20,6 +20,12 @@ __pycache__/
 htmlcov/
 .mypy_cache/
 .keras_cache/
+.cache/
+
+# ------------------------------------------------------------------------------
+# 1b. Minecraft Presentation Assets (363 MB of SVGs, archived to D:/AEGIS-archive)
+# ------------------------------------------------------------------------------
+presentation/
 
 # ------------------------------------------------------------------------------
 # 2. Node.js & Package Managers

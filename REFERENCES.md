@@ -1,25 +1,9 @@
-# Academic References & Poster QR Documentation
+# Academic References (APA 7th Edition)
 
 > **Project:** A.E.G.I.S. (Autonomous Hydroponics NPK Care System)  
 > **Repository:** [https://github.com/nottyzez/A.E.G.I.S-Ai](https://github.com/nottyzez/A.E.G.I.S-Ai)  
-> **Direct References Page:** [https://github.com/nottyzez/A.E.G.I.S-Ai/blob/main/REFERENCES.md](https://github.com/nottyzez/A.E.G.I.S-Ai/blob/main/REFERENCES.md)  
-> **Standard:** APA 7th Edition (American Psychological Association)
-
----
-
-## Academic Research Poster QR Code
-
-<p align="center">
-  <img src="docs/assets/references_qr.png" alt="A.E.G.I.S. Academic References QR Code" width="240" height="240" />
-  <br />
-  <em>Scan with any mobile camera or QR reader to view this reference list and open-source project artifacts directly.</em>
-  <br />
-  <strong>Target URL:</strong> <code>https://github.com/nottyzez/A.E.G.I.S-Ai/blob/main/REFERENCES.md</code>
-</p>
-
-### High-Resolution QR Asset Downloads
-* **High-Resolution Raster (PNG):** [`docs/assets/references_qr.png`](docs/assets/references_qr.png) (1440 × 1440 px, 300+ DPI print-ready)
-* **Scalable Vector Graphic (SVG):** [`docs/assets/references_qr.svg`](docs/assets/references_qr.svg) (Lossless vector for professional poster printing)
+> **Standard:** APA 7th Edition (American Psychological Association)  
+> **Poster QR Assets:** For conference poster QR downloads and sizing guidelines, see [POSTER_QR_DOWNLOAD.md](POSTER_QR_DOWNLOAD.md).
 
 ---
 
@@ -129,3 +113,4 @@ For displaying this QR code on an academic conference poster (e.g., standard ANS
 * **Mounting Height:** Position between **1.2 m and 1.6 m** (47 in – 63 in) above floor level when the poster is pinned to the display easel, corresponding to typical adult chest/eye level.
 * **Accompanying CTA:** Always include a legible title or caption beneath the code, such as:
   > *"Scan for Full Literature References (APA 7th) & Open-Source Code Repository"*
+
