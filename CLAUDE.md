@@ -107,6 +107,16 @@ looks like a dead server. `SHOW` prints `IP:PORT`; check it before every run.
 
 State: 227 tests OK, verify_figma 26/26, check_jsx OK.
 
+**Everything is committed and pushed (2026-11-06).** Branch
+`feature/dashboard-overhaul` is at `aeec72b` on origin, tracking is set. Three
+commits: `d2a62a5` (firmware runtime network config, CAM power + modes,
+port override), `077e24e` (DigitalOcean bundle + `scripts/check_jsx.py`),
+`aeec72b` (poster blueprints, plans, notes). A clean clone on another path was
+checked: neither `config.h` nor `.env` leaks, and both `#ifndef` fallbacks
+survive, so the sketches compile from the clone. **The stack that has NOT been
+re-verified is the clean clone's test suite** — the run was blocked as
+external code; run it yourself in an empty clone before trusting the deploy.
+
 **ESP32-CAM power + two capture modes (2026-11-05, uncommitted).** The board
 ran hot because `loop()` polled `/api/cam_command` every 1.5 s forever. The
 radio is now powered only for a capture round: `runCaptureRound()` brings WiFi
