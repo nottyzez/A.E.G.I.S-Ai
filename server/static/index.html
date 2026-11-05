@@ -9704,63 +9704,49 @@
                       ยูนิตที่เลือก: <span className="text-[#C6C7F8] font-medium">{unitSummary.label}</span> (pH {unitSummary.ph} • EC {unitSummary.ec} mS/cm) • ชดเชยน้ำค้างสาย Priming {calibration.priming_delay_s}s
                     </p>
 
-                    <div className="space-y-3.5">
+                    <div className="grid grid-cols-3 gap-3">
                       {[
-                        { key: 'A', title: 'Stock A (N + Ca Chelate)', color: '#eab308', desc: 'แก้ปัญหาใบผักบุ้งเหลืองซีดจากภาวะขาดไนโตรเจน (-N)' },
-                        { key: 'B', title: 'Stock B (Phosphate + Micro)', color: '#a855f7', desc: 'แก้ปัญหาใบผักบุ้งเขียวคล้ำอมม่วงจากภาวะขาดฟอสฟอรัส (-P)' },
-                        { key: 'C', title: 'Stock C (Potassium + pH Buffer)', color: '#f97316', desc: 'แก้ปัญหาขอบใบผักบุ้งไหม้จากภาวะขาดโพแทสเซียม (-K)' },
-                      ].map((st) => {
-                        const pumpMs = calcPumpMs(stockAmounts[st.key], st.key);
-                        return (
-                          <div key={st.key} className="p-3.5 rounded-xl bg-white/5 border border-white/10 flex gap-3.5">
-                            <SloshGauge
-                              value={(stockAmounts[st.key] / 25) * 100}
-                              liquidColor={st.color}
-                              glassColor="#27272a"
-                              width={54}
-                              height={88}
-                              radius={14}
-                              ticks={4}
-                              viscosity={0.15}
-                              tilt={0.45}
-                              splash={0.42}
-                              showValue={false}
-                              interactive={false}
-                              ariaLabel={`ระดับ Stock ${st.key}`}
+                        { key: 'A', color: '#eab308' },
+                        { key: 'B', color: '#a855f7' },
+                        { key: 'C', color: '#f97316' },
+                      ].map((st) => (
+                        <div
+                          key={st.key}
+                          className="flex flex-col items-center gap-2 py-3 px-2 rounded-xl bg-white/5 border border-white/10"
+                        >
+                          <span className="text-xs font-inter font-semibold text-white">
+                            สูตร {st.key}
+                          </span>
+                          <SloshGauge
+                            value={(stockAmounts[st.key] / 25) * 100}
+                            onChange={(v) =>
+                              setStockAmounts({ ...stockAmounts, [st.key]: Math.round(v / 2) * 0.5 })
+                            }
+                            interactive
+                            liquidColor={st.color}
+                            glassColor="#27272a"
+                            width={64}
+                            height={118}
+                            radius={16}
+                            ticks={4}
+                            viscosity={0.15}
+                            tilt={0.45}
+                            splash={0.42}
+                            showValue={false}
+                            ariaLabel={`ปริมาณสารละลายสูตร ${st.key}`}
+                          />
+                          <span className="font-mono text-xs font-bold text-[#C6C7F8] whitespace-nowrap">
+                            <CountUp
+                              to={stockAmounts[st.key]}
+                              decimals={1}
+                              duration={0.6}
+                              suffix=" mL"
+                              replayOnHover
+                              className="inline-block"
                             />
-                            <div className="flex-1 min-w-0">
-                              <div className="flex justify-between items-center mb-1">
-                                <span className="text-xs font-inter font-semibold text-white">
-                                  {st.title}
-                                </span>
-                                <span className="font-mono text-xs font-bold text-[#C6C7F8]">
-                                  <CountUp
-                                    to={parseFloat(stockAmounts[st.key].toFixed(1))}
-                                    decimals={1}
-                                    duration={0.6}
-                                    suffix=" mL"
-                                    replayOnHover
-                                    className="inline-block"
-                                  />{' '}
-                                  ({pumpMs} ms)
-                                </span>
-                              </div>
-                              <p className="text-xs text-white/55 mb-2">{st.desc}</p>
-                              <input
-                                type="range"
-                                min="0"
-                                max="25"
-                                step="0.5"
-                                value={stockAmounts[st.key]}
-                                onChange={(e) =>
-                                  setStockAmounts({ ...stockAmounts, [st.key]: parseFloat(e.target.value) })
-                                }
-                                className="w-full accent-[#C6C7F8] cursor-pointer"
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
