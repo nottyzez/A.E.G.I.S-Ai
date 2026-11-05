@@ -1190,6 +1190,7 @@
     // =========================================================================
     const MotionShim = (() => {
       let tracking = null;
+      const inFlight = new WeakMap(); // motion value -> cancel(), so a newer tween wins
 
       const read = v => (v && typeof v.get === 'function' ? v.get() : v);
 
@@ -1211,6 +1212,7 @@
         const ms = Math.max(1, (opts.duration ?? 0.3) * 1000);
         const ease = typeof opts.ease === 'function' ? opts.ease : u => u;
         const target = from && typeof from.set === 'function' ? from : null;
+        if (target) inFlight.get(target)?.();
         const start = read(from);
         const end = read(to);
         const t0 = performance.now();
@@ -1218,6 +1220,15 @@
         let stopped = false;
         let settle;
         const done = new Promise(resolve => { settle = resolve; });
+        const release = () => {
+          if (target && inFlight.get(target) === cancel) inFlight.delete(target);
+        };
+        const cancel = () => {
+          stopped = true;
+          cancelAnimationFrame(raf);
+          settle();
+          release();
+        };
         const frame = now => {
           if (stopped) return;
           const p = Math.min(1, (now - t0) / ms);
@@ -1226,13 +1237,15 @@
           opts.onUpdate?.(value);
           if (p < 1) raf = requestAnimationFrame(frame);
           else {
+            release();
             opts.onComplete?.();
             settle();
           }
         };
+        if (target) inFlight.set(target, cancel);
         raf = requestAnimationFrame(frame);
         return {
-          stop() { stopped = true; cancelAnimationFrame(raf); settle(); },
+          stop: cancel,
           then(fn) { return done.then(fn); },
         };
       };
@@ -1267,17 +1280,18 @@
         if (!ref.current) {
           const subs = new Set();
           let value = initial;
-          ref.current = {
+          const mv = {
             get() {
-              if (tracking) tracking.add(ref.current);
+              if (tracking) tracking.add(mv);
               return value;
             },
             set(next) { value = next; subs.forEach(fn => fn()); },
             jump(next) { value = next; subs.forEach(fn => fn()); },
-            stop() {},
+            stop() { inFlight.get(mv)?.(); },
             getVelocity() { return 0; },
             subscribe(fn) { subs.add(fn); return () => subs.delete(fn); },
           };
+          ref.current = mv;
         }
         return ref.current;
       };
