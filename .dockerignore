@@ -1,0 +1,19 @@
+# Keep the build context small: these three are most of the repo's 4.4 GB and
+# none of them belong in the image.
+.git
+ai-env312
+node_modules
+**/__pycache__
+*.pyc
+*.log
+
+# Local secrets and machine-specific calibration never ship in an image.
+firmware/*/config.h
+
+# Generated/report artifacts the server does not serve.
+assets
+docs
+scripts
+tests
+.venv
+venv

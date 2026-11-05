@@ -1,0 +1,31 @@
+# Single-Droplet stack: Nginx terminates :80, uvicorn runs one worker on :8000.
+#
+# The bind mounts are files the app writes at runtime. Docker creates a
+# *directory* when a bind source is missing, which would break the app on the
+# next start — deploy/digitalocean/setup_droplet.sh pre-creates them.
+services:
+  aegis:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - deploy/digitalocean/.env
+    environment:
+      # Consumed by the cloud broker once Task 1 lands; 0 keeps the existing
+      # LAN behaviour and the current test suite green.
+      AEGIS_REQUIRE_AUTH: "${AEGIS_REQUIRE_AUTH:-0}"
+    volumes:
+      - ./server/runtime_state.db:/app/server/runtime_state.db
+      - ./server/calibration.json:/app/server/calibration.json
+      - ./test_captures:/app/test_captures
+    expose:
+      - "8000"
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    depends_on:
+      - aegis
+    ports:
+      - "80:80"
+    volumes:
+      - ./deploy/digitalocean/nginx.conf:/etc/nginx/conf.d/default.conf:ro
