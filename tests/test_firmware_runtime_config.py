@@ -50,6 +50,30 @@ class TestFirmwareRuntimeConfig(unittest.TestCase):
             self.assertIn("raw.substring(9)", src, f"{sketch.name}: SSID is uppercased")
             self.assertIn("raw.substring(11)", src, f"{sketch.name}: host is uppercased")
 
+    def test_ssid_and_password_may_contain_spaces(self):
+        """A phone hotspot is commonly called "Samsung S30 Ultra" — SET WIFI
+        splits on the first space, so it would store "Samsung" and the rest as
+        the password, and the board would fail to join with no useful error.
+        SET SSID / SET PASS take the whole rest of the line instead."""
+        for sketch in SKETCHES:
+            src = sketch.read_text(encoding="utf-8")
+            self.assertIn('input.startsWith("SET SSID ")', src,
+                          f"{sketch.name}: no SET SSID handler")
+            self.assertIn('input.startsWith("SET PASS ")', src,
+                          f"{sketch.name}: no SET PASS handler")
+
+            ssid_start = src.index('input.startsWith("SET SSID ")')
+            ssid_body = src[ssid_start:src.index("ESP.restart()", ssid_start)]
+            # the whole remainder, not a split on the first space
+            self.assertIn("raw.substring(9)", ssid_body,
+                          f"{sketch.name}: SET SSID does not take the whole line")
+            self.assertNotIn("indexOf(' ')", ssid_body,
+                             f"{sketch.name}: SET SSID still splits on a space")
+
+            pass_start = src.index('input.startsWith("SET PASS ")')
+            pass_body = src[pass_start:src.index("ESP.restart()", pass_start)]
+            self.assertIn('prefs.putString("pass"', pass_body)
+
     def test_wifi_uses_the_stored_credentials(self):
         for sketch in SKETCHES:
             src = sketch.read_text(encoding="utf-8")

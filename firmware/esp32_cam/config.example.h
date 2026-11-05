@@ -16,7 +16,9 @@
 // URL /predict และ /api/cam_command ถูกสร้างตอนรัน (runtime) จาก SERVER_HOST
 // ไม่ได้ hardcode ไว้แล้ว — ค่าด้านบนเป็นแค่ fallback เมื่อ NVS ว่าง
 // ตั้งค่าผ่าน Serial 115200 ได้โดยไม่ต้องคอมไพล์ใหม่:
-//   SET WIFI <ssid> <password>
+//   SET SSID <name>          (ทั้งบรรทัดที่เหลือ — ใส่ช่องว่างได้)
+//   SET PASS <password>      (ทั้งบรรทัดที่เหลือ — ใส่ช่องว่างได้)
+//   SET WIFI <ssid> <password>   (ทางลัดบรรทัดเดียว; ชื่อมีช่องว่างจะพัง)
 //   SET SERVER <ip> [port]
 //   SHOW
 //   RESET        (ล้าง NVS กลับไปใช้ค่าในไฟล์นี้)

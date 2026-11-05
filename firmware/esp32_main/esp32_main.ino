@@ -308,6 +308,34 @@ void handleSerialCommands() {
             Serial.printf("[NVS] Wi-Fi saved (%s). Rebooting...\n", rest.substring(0, sep).c_str());
             delay(300);
             ESP.restart();
+        } else if (input.startsWith("SET SSID ")) {
+            // The whole rest of the line is the SSID: phone hotspots are
+            // commonly named "Samsung S30 Ultra", and SET WIFI would split on
+            // the first space and store "Samsung" as the network name.
+            String ssid = raw.substring(9);
+            if (ssid.length() == 0) {
+                Serial.println("[NVS] Usage: SET SSID <network name, spaces allowed>");
+                return;
+            }
+            prefs.begin("aegis", false);
+            prefs.putString("ssid", ssid);
+            prefs.end();
+            Serial.printf("[NVS] SSID saved (%s). Rebooting...\n", ssid.c_str());
+            delay(300);
+            ESP.restart();
+        } else if (input.startsWith("SET PASS ")) {
+            // Same reason as SET SSID: a password may contain spaces.
+            String pass = raw.substring(9);
+            if (pass.length() == 0) {
+                Serial.println("[NVS] Usage: SET PASS <password, spaces allowed>");
+                return;
+            }
+            prefs.begin("aegis", false);
+            prefs.putString("pass", pass);
+            prefs.end();
+            Serial.printf("[NVS] Password saved (%u chars). Rebooting...\n", pass.length());
+            delay(300);
+            ESP.restart();
         } else if (input.startsWith("SET SERVER ")) {
             // Usage: SET SERVER <host> [port]  — the port defaults to SERVER_PORT.
             String rest = raw.substring(11);
@@ -349,7 +377,8 @@ void handleSerialCommands() {
             performSensorReadings();
         } else {
             Serial.println("\nCommands: START | STOP | READ | TEST <1-7> <ms>");
-            Serial.println("          SET WIFI <ssid> <password> | SET SERVER <ip> | SHOW | RESET");
+            Serial.println("          SET SSID <name> | SET PASS <password>   (spaces OK)");
+            Serial.println("          SET WIFI <ssid> <password> | SET SERVER <ip> [port] | SHOW | RESET");
         }
     }
 }

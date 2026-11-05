@@ -16,7 +16,9 @@
 // "http://" + <host> + ":" + SERVER_PORT + path at runtime so a venue's
 // network can be set without recompiling. The values above are only the
 // fallback used when NVS holds nothing. Over serial at 115200:
-//   SET WIFI <ssid> <password>
+//   SET SSID <name>          (whole rest of the line — spaces allowed)
+//   SET PASS <password>      (whole rest of the line — spaces allowed)
+//   SET WIFI <ssid> <password>   (one-line shortcut; breaks on names with spaces)
 //   SET SERVER <ip> [port]
 //   SHOW
 //   RESET        (clears NVS, back to the values in this file)
