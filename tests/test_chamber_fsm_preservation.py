@@ -177,6 +177,27 @@ class TestChamberFSMPreservation(unittest.TestCase):
         self.assertIsNotNone(ceiling_match)
         self.assertEqual(int(ceiling_match.group(1)), 30000)
 
+    def test_11_auto_cycle_skips_rinse_and_drain(self):
+        """Phase 4 must go straight to the soak: rinse/drain are manual-only now.
+
+        Phase 3 returns the whole sample to the tank, so the probes never meet
+        fertilised water and Phases 5/6 have nothing to clean. Their case blocks
+        stay for hand testing through MANUAL_RELAY. If a later edit re-links
+        Phase 4 -> Phase 5, the cycle silently regains 11 s of wasted RO water
+        and a power spike right after the dosing load.
+        """
+        p4_match = re.search(
+            r"case\s+PHASE_4_DOSING:\s*(.+?)break;",
+            self.ino_content,
+            re.DOTALL
+        )
+        self.assertIsNotNone(p4_match)
+        p4_code = p4_match.group(1)
+        self.assertIn("PHASE_7_PROBE_PRESERVATION", p4_code)
+        self.assertIn("TIME_PRESERVATION_SOAK_MS", p4_code)
+        self.assertNotIn("PHASE_5_PROBE_RINSE", p4_code)
+        self.assertNotIn("PIN_RELAY_PROBE_RINSE, RELAY_ON", p4_code)
+
 
 if __name__ == "__main__":
     unittest.main()

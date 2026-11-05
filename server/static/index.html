@@ -3667,14 +3667,12 @@
         // Phase 3 (Fusion): AI Inference
         // Phase 4 (Safety Check): R2 Diaphragm Return (GPIO 6)
         // Phase 5 (Dosing): R5, R6, R7 Peristaltic Stock A, B, C (GPIO 9, 10, 11)
-        // Phase 6 (Rinse & Drain): R3 Diaphragm Rinse (GPIO 7) & R4 Drain Valve (GPIO 8)
         const phaseRelayMap = {
           1: ['R1'],
           2: [],
           3: [],
           4: ['R2'],
           5: ['R5', 'R6', 'R7'],
-          6: ['R3', 'R4'],
         };
         const highlighted = phaseRelayMap[phaseStep] || [];
         setRelays((prev) =>
@@ -3711,10 +3709,10 @@
         setOverrideState({
           active: true,
           mode: 'START_CYCLE',
-          label: 'กำลังรันสาธิตครบ 6 ขั้นตอน (Full Closed-Loop Demo 18s) — ตารางเวลาอัตโนมัติยังทำงานอยู่',
+          label: 'กำลังรันสาธิตครบ 5 ขั้นตอน (Full Closed-Loop Demo 18s) — ตารางเวลาอัตโนมัติยังทำงานอยู่',
           remainingSec: totalDemoSec,
         });
-        pushCommandLog('START_CYCLE', 'สั่งรันสาธิต Closed-Loop ครบ 6 ขั้นตอนทันที (Sample Inflow R1/GPIO 5)');
+        pushCommandLog('START_CYCLE', 'สั่งรันสาธิต Closed-Loop ครบ 5 ขั้นตอนทันที (Sample Inflow R1/GPIO 5)');
         await sendApiRequest('/api/command', {
           command: 'START_CYCLE',
           duration_ms: totalDemoSec * 1000,
@@ -3902,7 +3900,10 @@
         { step: 3, title: '3. Symptom-Gated Fusion', desc: 'ผสานผล CNN + เซนเซอร์ (pH GPIO 1, EC GPIO 2, Temp GPIO 4)' },
         { step: 4, title: '4. Sample Return', desc: 'ปั๊มไดอะแฟรม 2 (GPIO 6) สูบน้ำตัวอย่างวนคืนถังปลูก 100% (7s)' },
         { step: 5, title: '5. Peristaltic Dosing', desc: 'ปั๊มรีดสาย R5–R7 (GPIO 9–11) จ่ายแม่ปุ๋ย Stock A, B, C ตามสูตร AI' },
-        { step: 6, title: '6. Probe Rinse & Drain', desc: 'ปั๊ม 3 (GPIO 7, 5s) ล้างโพรบ + โซเลนอยด์ (GPIO 8, 6s) ระบายน้ำทิ้ง' },
+        // Rinse + Drain (GPIO 7/8) removed from the demo deck: the automatic
+        // cycle skips them, and the GPIO 7 pump browning out the rail must not
+        // be one click away during a live presentation. Still reachable from
+        // the manual relay panel below.
       ];
 
       const scenarioPresets = [
@@ -4383,18 +4384,18 @@
                     6-Step Closed-Loop Autonomous Pipeline (คลิกแต่ละเฟสเพื่อกระโดดสาธิตทันที)
                   </h2>
                   <p className="text-xs text-white/55 mt-0.5">
-                    กดเลือกเฟสที่ต้องการโชว์กรรมการ หรือกดรันครบ 6 ขั้นตอนได้ทันทีโดยตารางเวลาอัตโนมัติไม่ถูกปิด
+                    กดเลือกเฟสที่ต้องการโชว์กรรมการ หรือกดรันครบ 5 ขั้นตอนได้ทันทีโดยตารางเวลาอัตโนมัติไม่ถูกปิด
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs font-mono text-[#C6C7F8] mr-2">
-                    Active Phase: Step {activePhase} / 6
+                    Active Phase: Step {activePhase} / 5
                   </span>
                   <button
                     onClick={handleStartFullCycleDemo}
                     className="px-3.5 py-1.5 rounded-xl bg-[#C6C7F8] hover:bg-[#d8d9fc] text-slate-950 font-inter font-bold text-xs transition-all shadow-[0_0_16px_rgba(198,199,248,0.35)]"
                   >
-                    ▶ สั่งรันครบ 6 ขั้นตอนทันที (START_CYCLE)
+                    ▶ สั่งรันครบ 5 ขั้นตอนทันที (START_CYCLE)
                   </button>
                   <button
                     onClick={handleTriggerCamCapture}
@@ -4414,7 +4415,7 @@
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 {closedLoopPhases.map((p) => {
                   const isCurrent = activePhase === p.step;
                   return (

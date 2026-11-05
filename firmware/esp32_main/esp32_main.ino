@@ -421,10 +421,14 @@ void loop() {
                 actuators.allRelaysOff();
                 Serial.println("[Phase 4 DONE] Fertilizer dosing complete and mixed.");
 
-                // Transition to Phase 5: Probe Rinse
-                actuators.setPhase(PHASE_5_PROBE_RINSE, TIME_RINSE_PROBE_MS);
-                digitalWrite(PIN_RELAY_PROBE_RINSE, RELAY_ON);
-                Serial.printf("[Phase 5] Diaphragm 3 (Clean Water Rinse) active for %lu ms\n", TIME_RINSE_PROBE_MS);
+                // Phase 3 already returned every drop of sample water to the
+                // culture tank, so the probes never touch fertilised water and
+                // Phases 5/6 (rinse + drain) have nothing to clean. Go straight
+                // to the preservation soak. Their case blocks stay below so the
+                // rinse pump can still be exercised by hand via MANUAL_RELAY.
+                actuators.setPhase(PHASE_7_PROBE_PRESERVATION, TIME_PRESERVATION_SOAK_MS);
+                digitalWrite(PIN_RELAY_SAMPLE_IN, RELAY_ON);
+                Serial.printf("[Phase 7] Diaphragm 1 (Probe Preservation Soak) active for %lu ms\n", TIME_PRESERVATION_SOAK_MS);
                 reportStatusToServer();
             }
             break;
