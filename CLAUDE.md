@@ -38,6 +38,30 @@ There is no build step for the frontend: `server/static/index.html` is a single 
 
 ## Current work (2026-11-05)
 
+**UI pass (2026-11-06, commit `ea401e4`).** Eleven React Bits components
+landed in `server/static/index.html`, each wrapped in its own IIFE
+(`const X = (() => { ... })()`) so their private helpers (`clamp`, `compile`,
+`link`, `VERTEX`, `FONT`) cannot collide. Home's `back.jpg` photograph is
+gone; the hero is `GradientASCII` + `Particles` + `TechText` + `Crosshair` +
+`SpecularButton`. `ElectronicControlTabView` is now four sub-tabs
+(`controlSubTab`: pumps / vision / simulation / pinout) — all five
+`id="settings-*"` strings survive, the pinout `<details>` moved into its own
+`<section id="settings-pinout">`. **There is no framer-motion or GSAP CDN
+tag**: `MotionShim` (~150 lines, `animate`/`cubicBezier`/`useInView`/
+`useMotionValue`/`useTransform`/`useReducedMotion`/`motion`) and `gsap.to()`
+shim the API subset those components call. `file://` still works, and
+`check_jsx.py` still gates. Three suites
+(`test_figma_r1_r2_r3_reviewer`, `test_figma_r2_independent_stress`,
+`test_figma_r3_independent_audit`) plus `verify_figma_implementation.py` used
+to assert the photographic backdrop; they now assert the ASCII/particle hero,
+which is why verify stayed at 26/26. New tests: `tests/test_control_ux_cleanup.py`
+(6, incl. "no `text-[10px]`/`text-[11px]` in ElectronicControlTabView") and
+`tests/test_motion_shim.py` (2 — runs the extracted shim IIFE in Node against a
+fake rAF clock; it pins that a newer tween on a motion value cancels the older
+one and that `.stop()` really stops). Suite is **237 tests OK**. Relay Thai roles follow
+`firmware/esp32_main/config.example.h` (GPIO 6 = sample return), not the
+spec's air-agitator label.
+
 **The automatic cycle is back to the full 8 phases: P0 → P1 → P2 → P3 → P4 →
 P5 (Probe Rinse, GPIO 7) → P6 (Drain Waste, GPIO 8) → P7 → IDLE.**
 Phase 5/6 were skipped in `d92a2bf` after the GPIO 7 pump brown-out; that pump's
