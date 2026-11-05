@@ -444,6 +444,8 @@ def post_dashboard_command(payload: dict):
         current_hardware_status["schedule"]["enabled"] = True
 
     cal = dosing_engine.get_calibration()
+    # Each pump has its own measured rate; the global value is only a fallback.
+    pump_rates = cal.get("pump_flow_rates") or {}
     flow_rate = max(0.1, float(cal.get("pump_flow_rate_ml_s", 1.5)))
     prime_ms = int(float(cal.get("priming_delay_s", 2.0)) * 1000)
 
@@ -486,15 +488,16 @@ def post_dashboard_command(payload: dict):
         vol_b = max(0.0, float(vols.get("B", vols.get("pump2_ml", 0.0))))
         vol_c = max(0.0, float(vols.get("C", vols.get("pump3_ml", 0.0))))
 
-        def calc_ms(v_ml: float) -> int:
+        def calc_ms(v_ml: float, pump_key: str) -> int:
             if v_ml <= 0.0:
                 return 0
-            return min(30000, int(round(prime_ms + (v_ml / flow_rate) * 1000.0)))
+            q = max(0.1, float(pump_rates.get(pump_key, flow_rate)))
+            return min(30000, int(round(prime_ms + (v_ml / q) * 1000.0)))
 
         dosing_ms = {
-            "pump1_ms": calc_ms(vol_a),
-            "pump2_ms": calc_ms(vol_b),
-            "pump3_ms": calc_ms(vol_c),
+            "pump1_ms": calc_ms(vol_a, "A"),
+            "pump2_ms": calc_ms(vol_b, "B"),
+            "pump3_ms": calc_ms(vol_c, "C"),
             "total_volume_ml": round(vol_a + vol_b + vol_c, 2),
         }
         max_ms = max(dosing_ms["pump1_ms"], dosing_ms["pump2_ms"], dosing_ms["pump3_ms"], 1000)

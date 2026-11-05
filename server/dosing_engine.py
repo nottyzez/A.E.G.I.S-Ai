@@ -11,13 +11,31 @@ Architecture:
       t_pump = t_prime + (V_i / Q * 1000 ms)  (if V_i > 0)
 """
 
+import json
+import logging
+from pathlib import Path
 from typing import Dict, Any
+
+logger = logging.getLogger(__name__)
 
 # Safety limits & default constants
 DEFAULT_TARGET_EC = 1.85      # mS/cm (Optimal for water spinach 1.6 - 2.0)
 DEFAULT_TANK_VOLUME = 23.3    # Liters (Standard DWC foam box 34x49 cm)
 DEFAULT_FLOW_RATE = 1.5       # ml/sec (Standard 12V peristaltic pump)
 DEFAULT_PRIMING_DELAY = 2.0   # seconds (Delay to draw liquid to nozzle tip)
+
+# Measured on the real rig: each peristaltic pump has its own tubing and rollers,
+# so no two deliver the same volume per second. Overwrite these with the values
+# the calibration wizard produces once you have measured a new set of pumps.
+DEFAULT_FLOW_RATES = {
+    "A": DEFAULT_FLOW_RATE,
+    "B": DEFAULT_FLOW_RATE,
+    "C": DEFAULT_FLOW_RATE,
+}
+
+# Calibration measured on this machine, kept out of git: it describes one set of
+# tubing, not the project. Delete the file to fall back to DEFAULT_FLOW_RATES.
+CALIBRATION_FILE = Path(__file__).resolve().parent / "calibration.json"
 K_EC_SLOPE = 0.38             # mS/cm per (ml of concentrated stock / L of water)
 HARD_MAX_EC = 3.2             # Above this, total nutrient lockout
 HARD_MIN_PH = 4.2             # Below this, extreme acidity lockout
@@ -38,14 +56,50 @@ class TwoTierDosingEngine:
         self.pump_flow_rate = float(pump_flow_rate_ml_s)
         self.priming_delay_s = float(priming_delay_s)
         self.k_ec_slope = float(k_ec_slope)
-        # Each peristaltic pump has its own tubing and rollers, so its delivered
-        # volume per second differs. The calibration wizard measures them one at a
-        # time; compute_dosing still uses the global pump_flow_rate for the plan.
-        self.pump_flow_rates = {
-            "A": float(pump_flow_rate_ml_s),
-            "B": float(pump_flow_rate_ml_s),
-            "C": float(pump_flow_rate_ml_s),
+        # Per-pump rates, measured one at a time by the calibration wizard and
+        # persisted so a restart does not throw the measurement away.
+        self.pump_flow_rates = dict(DEFAULT_FLOW_RATES)
+        self.load_calibration()
+
+    def load_calibration(self) -> bool:
+        """Restore measured rates from disk. Returns True when a file was read.
+
+        A missing file is normal (clean clone, first run) and stays silent; a
+        corrupt one is reported and ignored so a bad sidecar cannot stop the rig.
+        """
+        if not CALIBRATION_FILE.exists():
+            return False
+        try:
+            data = json.loads(CALIBRATION_FILE.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            logger.warning("[CALIBRATION] ignoring unreadable %s: %s", CALIBRATION_FILE, exc)
+            return False
+
+        rates = data.get("pump_flow_rates") or {}
+        for key in self.pump_flow_rates:
+            value = rates.get(key)
+            if isinstance(value, (int, float)) and value > 0:
+                self.pump_flow_rates[key] = float(value)
+        prime = data.get("priming_delay_s")
+        if isinstance(prime, (int, float)) and prime >= 0:
+            self.priming_delay_s = float(prime)
+        logger.info("[CALIBRATION] loaded %s", self.pump_flow_rates)
+        return True
+
+    def save_calibration(self) -> bool:
+        """Write measured rates to disk. Returns True on success."""
+        payload = {
+            "pump_flow_rates": {k: round(v, 3) for k, v in self.pump_flow_rates.items()},
+            "priming_delay_s": round(self.priming_delay_s, 2),
         }
+        try:
+            CALIBRATION_FILE.write_text(
+                json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8"
+            )
+        except OSError as exc:
+            logger.warning("[CALIBRATION] could not save %s: %s", CALIBRATION_FILE, exc)
+            return False
+        return True
 
     def update_calibration(
         self,
@@ -70,6 +124,7 @@ class TwoTierDosingEngine:
             "target_ec": round(self.target_ec, 2),
             "tank_volume_liters": round(self.tank_volume, 1),
             "pump_flow_rate_ml_s": round(self.pump_flow_rate, 2),
+            "pump_flow_rates": {k: round(v, 3) for k, v in self.pump_flow_rates.items()},
             "priming_delay_s": round(self.priming_delay_s, 2),
             "k_ec_slope": round(self.k_ec_slope, 3),
         }
@@ -115,6 +170,7 @@ class TwoTierDosingEngine:
         effective_time = max(0.5, float(test_duration_s) - float(observed_prime_s))
         calculated_q = max(0.1, round(float(collected_ml) / effective_time, 3))
         self.pump_flow_rates[key] = calculated_q
+        saved = self.save_calibration()
 
         return {
             "pump": key,
@@ -123,6 +179,7 @@ class TwoTierDosingEngine:
             "test_duration_s": float(test_duration_s),
             "collected_ml": float(collected_ml),
             "status": "success",
+            "persisted": saved,
             "message": f"Calibrated pump {key}: Flow Rate = {calculated_q} ml/s",
         }
 
@@ -230,8 +287,11 @@ class TwoTierDosingEngine:
         else:
             # V_total (ml) = (ΔEC * V_tank) / k_ec_slope
             v_total = (ec_deficit * self.tank_volume) / self.k_ec_slope
-            # Cap maximum single-dose total volume (based on max runtime)
-            max_allowable_vol = ((MAX_PUMP_DURATION_MS - self.priming_delay_s * 1000) / 1000.0) * self.pump_flow_rate * 3.0
+            # Cap total volume by the slowest pump: it sets the worst-case runtime,
+            # and an equal split of a larger total would push it past the 30 s ceiling.
+            budget_s = (MAX_PUMP_DURATION_MS - self.priming_delay_s * 1000) / 1000.0
+            slowest_rate = min(self.pump_flow_rates.values())
+            max_allowable_vol = budget_s * slowest_rate * 3.0
             v_total = max(3.0, min(v_total, max_allowable_vol))
 
         # ----------------------------------------------------------------------
@@ -243,9 +303,10 @@ class TwoTierDosingEngine:
             v3 = round(v_total * r3, 2)
             prime_ms = int(self.priming_delay_s * 1000)
 
-            t1 = int(round(prime_ms + (v1 / self.pump_flow_rate) * 1000)) if v1 > 0 else 0
-            t2 = int(round(prime_ms + (v2 / self.pump_flow_rate) * 1000)) if v2 > 0 else 0
-            t3 = int(round(prime_ms + (v3 / self.pump_flow_rate) * 1000)) if v3 > 0 else 0
+            rates = self.pump_flow_rates
+            t1 = int(round(prime_ms + (v1 / rates["A"]) * 1000)) if v1 > 0 else 0
+            t2 = int(round(prime_ms + (v2 / rates["B"]) * 1000)) if v2 > 0 else 0
+            t3 = int(round(prime_ms + (v3 / rates["C"]) * 1000)) if v3 > 0 else 0
 
             t1 = min(t1, MAX_PUMP_DURATION_MS)
             t2 = min(t2, MAX_PUMP_DURATION_MS)
@@ -280,6 +341,7 @@ class TwoTierDosingEngine:
             },
             "priming_delay_ms": prime_ms,
             "flow_rate_ml_s": round(self.pump_flow_rate, 2),
+            "pump_flow_rates_ml_s": {k: round(v, 3) for k, v in self.pump_flow_rates.items()},
             "tank_volume_liters": round(self.tank_volume, 1),
             "target_ec": round(self.target_ec, 2),
             "tier1_status": tier1_status,

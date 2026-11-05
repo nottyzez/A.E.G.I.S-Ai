@@ -3274,6 +3274,9 @@
       const targetEc = (calibration && calibration.target_ec) || 1.85;
       const tankVol = (calibration && calibration.tank_volume_liters) || 23.3;
       const flowRate = Math.max(0.1, (calibration && calibration.pump_flow_rate_ml_s) || 1.5);
+      // Each pump has its own measured rate; the global value is only a fallback.
+      const pumpRates = (calibration && calibration.pump_flow_rates) || {};
+      const rateFor = (key) => Math.max(0.1, pumpRates[key] || flowRate);
       const primeDelayS = (calibration && calibration.priming_delay_s) != null ? calibration.priming_delay_s : 2.0;
       const kSlope = (calibration && calibration.k_ec_slope) || 0.38;
 
@@ -3325,7 +3328,7 @@
       const v3 = +(totalMl * r3).toFixed(2);
       // 30 000 ms matches the three hard ceilings: firmware MAX_SAFETY_DOSING_MS,
       // server MAX_PUMP_DURATION_MS and main.py's min(30000, ...).
-      const calcMs = (v) => (v <= 0 ? 0 : Math.min(30000, Math.round(primeDelayS * 1000 + (v / flowRate) * 1000)));
+      const calcMs = (v, pumpKey) => (v <= 0 ? 0 : Math.min(30000, Math.round(primeDelayS * 1000 + (v / rateFor(pumpKey)) * 1000)));
 
       return {
         deficiency_class: aiClass,
@@ -3344,9 +3347,9 @@
           total_volume_ml: +(v1 + v2 + v3).toFixed(2),
         },
         dosing_plan: {
-          pump1_ms: calcMs(v1),
-          pump2_ms: calcMs(v2),
-          pump3_ms: calcMs(v3),
+          pump1_ms: calcMs(v1, 'A'),
+          pump2_ms: calcMs(v2, 'B'),
+          pump3_ms: calcMs(v3, 'C'),
           total_volume_ml: +(v1 + v2 + v3).toFixed(2),
         },
         ai_reason:
@@ -3440,7 +3443,8 @@
           return { ok: false, offline: true };
         }
         try {
-          const res = await fetch(endpoint, {
+          // GET when no payload is given, so the same guard covers reads too.
+          const res = await fetch(endpoint, payload === undefined ? {} : {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -3453,6 +3457,20 @@
         }
       };
 
+      // Pull the measured per-pump rates on mount: without this the page keeps
+      // its 1.5 mL/s defaults and every dose preview disagrees with the server.
+      useEffect(() => {
+        let cancelled = false;
+        sendApiRequest('/api/calibration').then((res) => {
+          if (cancelled || !res.ok || !res.data) return;
+          setCalibration((prev) => ({ ...prev, ...res.data }));
+          if (res.data.pump_flow_rates) {
+            setPumpFlowRates((prev) => ({ ...prev, ...res.data.pump_flow_rates }));
+          }
+        });
+        return () => { cancelled = true; };
+      }, []);
+
       // Compute live Two-Factor Dosing preview for the Scenario Simulator
       const simDosingResult = useMemo(
         () => computeLocalTwoFactorDosing(simEc, simPh, simTemp, simClass, simStage, calibration),
@@ -3460,11 +3478,11 @@
       );
 
       // Helper: calculate ms from mL with priming delay compensation (0 mL -> 0 ms)
-      const calcPumpMs = (mlVal) => {
+      const calcPumpMs = (mlVal, pumpKey = 'A') => {
         const v = parseFloat(mlVal) || 0;
         if (v <= 0) return 0;
         const primeMs = (calibration.priming_delay_s || 2.0) * 1000;
-        const q = Math.max(0.1, calibration.pump_flow_rate_ml_s || 1.5);
+        const q = Math.max(0.1, pumpFlowRates[pumpKey] || calibration.pump_flow_rate_ml_s || 1.5);
         // 30 000 ms matches the three hard ceilings: firmware MAX_SAFETY_DOSING_MS,
         // server MAX_PUMP_DURATION_MS and main.py's min(30000, ...).
         return Math.min(30000, Math.round(primeMs + (v / q) * 1000));
@@ -3722,9 +3740,9 @@
 
       // Action 5: Execute Manual Stock A/B/C Dosing Override
       const handleExecuteManualDose = async () => {
-        const msA = calcPumpMs(stockAmounts.A);
-        const msB = calcPumpMs(stockAmounts.B);
-        const msC = calcPumpMs(stockAmounts.C);
+        const msA = calcPumpMs(stockAmounts.A, 'A');
+        const msB = calcPumpMs(stockAmounts.B, 'B');
+        const msC = calcPumpMs(stockAmounts.C, 'C');
         const maxMs = Math.max(msA, msB, msC, 2000);
         const durSec = Math.max(2, Math.round(maxMs / 1000));
 
@@ -4142,7 +4160,7 @@
                         { key: 'B', title: 'Stock B (Phosphate + Micro)', color: '#a855f7', desc: 'แก้ปัญหาใบผักบุ้งเขียวคล้ำอมม่วงจากภาวะขาดฟอสฟอรัส (-P)' },
                         { key: 'C', title: 'Stock C (Potassium + pH Buffer)', color: '#f97316', desc: 'แก้ปัญหาขอบใบผักบุ้งไหม้จากภาวะขาดโพแทสเซียม (-K)' },
                       ].map((st) => {
-                        const pumpMs = calcPumpMs(stockAmounts[st.key]);
+                        const pumpMs = calcPumpMs(stockAmounts[st.key], st.key);
                         return (
                           <div key={st.key} className="p-3.5 rounded-xl bg-white/5 border border-white/10">
                             <div className="flex justify-between items-center mb-1">

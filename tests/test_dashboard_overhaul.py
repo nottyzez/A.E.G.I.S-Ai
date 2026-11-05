@@ -73,6 +73,21 @@ class TestServerRuntimeCeiling(unittest.TestCase):
 
 
 class TestPerPumpFlowCalibration(unittest.TestCase):
+    def setUp(self):
+        # calibrate_pump() persists; without this the run overwrites the real
+        # server/calibration.json with the made-up values below.
+        import tempfile
+        from unittest import mock
+        import dosing_engine as engine_module
+
+        self._tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._tmp.cleanup)
+        patcher = mock.patch.object(
+            engine_module, "CALIBRATION_FILE", Path(self._tmp.name) / "calibration.json"
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_each_pump_holds_its_own_flow_rate(self):
         from dosing_engine import TwoTierDosingEngine
         eng = TwoTierDosingEngine()

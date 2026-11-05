@@ -59,6 +59,10 @@ Ai มหาปลัย/dataset_real/images_cropped/
 server/static/images_real/*
 !server/static/images_real/*.png
 !server/static/images_real/*.jpg
+
+# Per-pump flow rates measured on one rig's tubing; not a project property.
+# Defaults live in server/dosing_engine.py DEFAULT_FLOW_RATES.
+server/calibration.json
 test_captures/
 *.log
 *.docx
