@@ -322,6 +322,7 @@ async def predict(
     raw_n:         float = Form(0.0),
     raw_p:         float = Form(0.0),
     device_id:     str   = Form("esp32-s3-cam-001"),
+    mode:          str   = Form("real"),
 ):
     """
     รับ multipart/form-data: ภาพมุมสูงจาก ESP32-S3 CAM + ค่าเซนเซอร์น้ำ
@@ -332,6 +333,18 @@ async def predict(
     try:
         img_bytes = await image.read()
         saved_file = save_incoming_test_image(img_bytes)
+        current_hardware_status["cam_last_mode"] = mode
+
+        # Test mode: archive the frame for framing/lighting checks without
+        # spending 2-4 s on the ensemble or polluting the diagnosis history.
+        if mode == "test":
+            logger.info(f"[{device_id}] TEST capture stored only: {saved_file}")
+            return {
+                "status": "test_only",
+                "mode": "test",
+                "device_id": device_id,
+                "saved_test_file": saved_file,
+            }
 
         result = run_ensemble_prediction(
             image_bytes=img_bytes,
@@ -694,13 +707,16 @@ def post_override_simulate(payload: dict):
 @app.post("/api/cam_command")
 def post_cam_command(payload: dict):
     """
-    แดชบอร์ดส่งคำสั่งให้ ESP32-CAM ถ่ายภาพ: {"command": "CAPTURE"}
+    แดชบอร์ดส่งคำสั่งให้ ESP32-CAM ถ่ายภาพ:
+    {"command": "CAPTURE", "mode": "test" | "real"}
     """
     global current_cam_command
     cmd = payload.get("command", "CAPTURE")
-    current_cam_command = {"command": cmd, "timestamp": datetime.now().isoformat()}
+    mode = payload.get("mode", "real")
+    current_cam_command = {"command": cmd, "mode": mode, "timestamp": datetime.now().isoformat()}
     current_hardware_status["schedule"]["enabled"] = True
-    append_command_log("CAM_CAPTURE", f"สั่ง ESP32-S3 CAM ถ่ายภาพใบผักบุ้ง ({cmd})", True)
+    label = "ทดสอบ (เก็บภาพอย่างเดียว)" if mode == "test" else "ส่งเข้า AI วิเคราะห์"
+    append_command_log("CAM_CAPTURE", f"สั่ง ESP32-S3 CAM ถ่ายภาพใบผักบุ้ง — {label}", True)
     logger.info(f"[CAM COMMAND QUEUED] {current_cam_command}")
     return {"status": "ok", "queued_command": current_cam_command}
 

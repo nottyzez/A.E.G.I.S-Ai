@@ -3273,7 +3273,7 @@
     function computeLocalTwoFactorDosing(ec, ph, temp, aiClass, aiStage, calibration) {
       const targetEc = (calibration && calibration.target_ec) || 1.85;
       const tankVol = (calibration && calibration.tank_volume_liters) || 23.3;
-      const flowRate = Math.max(0.1, (calibration && calibration.pump_flow_rate_ml_s) || 1.5);
+      const flowRate = Math.max(0.1, (calibration && calibration.pump_flow_rate_ml_s) || 1.0);
       // Each pump has its own measured rate; the global value is only a fallback.
       const pumpRates = (calibration && calibration.pump_flow_rates) || {};
       const rateFor = (key) => Math.max(0.1, pumpRates[key] || flowRate);
@@ -3380,7 +3380,7 @@
       // Manual pump runtime, hard-capped at 30 000 ms in UI, server and firmware alike.
       const [pumpRuntimeMs, setPumpRuntimeMs] = useState(5000);
       // Per-pump flow rates (mL/s) keyed A/B/C; the flow calculator updates these.
-      const [pumpFlowRates, setPumpFlowRates] = useState({ A: 1.5, B: 1.5, C: 1.5 });
+      const [pumpFlowRates, setPumpFlowRates] = useState({ A: 1.0, B: 1.0, C: 1.0 });
       const [activePhase, setActivePhase] = useState(2);
       const [isFullCycleDemoRunning, setIsFullCycleDemoRunning] = useState(false);
 
@@ -3401,7 +3401,7 @@
       const [calibration, setCalibration] = useState({
         target_ec: 1.85,
         tank_volume_liters: 23.3,
-        pump_flow_rate_ml_s: 1.5,
+        pump_flow_rate_ml_s: 1.0,
         priming_delay_s: 2.0,
         k_ec_slope: 0.38,
       });
@@ -3482,7 +3482,7 @@
         const v = parseFloat(mlVal) || 0;
         if (v <= 0) return 0;
         const primeMs = (calibration.priming_delay_s || 2.0) * 1000;
-        const q = Math.max(0.1, pumpFlowRates[pumpKey] || calibration.pump_flow_rate_ml_s || 1.5);
+        const q = Math.max(0.1, pumpFlowRates[pumpKey] || calibration.pump_flow_rate_ml_s || 1.0);
         // 30 000 ms matches the three hard ceilings: firmware MAX_SAFETY_DOSING_MS,
         // server MAX_PUMP_DURATION_MS and main.py's min(30000, ...).
         return Math.min(30000, Math.round(primeMs + (v / q) * 1000));
@@ -3491,7 +3491,7 @@
       // Volume actually delivered in `ms`, after subtracting the priming delay.
       // Pump 'A' is the reference pump for the runtime selector's mL readout.
       const estimateVolumeMl = (ms, pumpKey = 'A') => {
-        const q = Math.max(0.1, pumpFlowRates[pumpKey] || calibration.pump_flow_rate_ml_s || 1.5);
+        const q = Math.max(0.1, pumpFlowRates[pumpKey] || calibration.pump_flow_rate_ml_s || 1.0);
         const primeMs = (calibration.priming_delay_s || 2.0) * 1000;
         return Math.max(0, ((ms - primeMs) / 1000) * q);
       };
@@ -3667,12 +3667,14 @@
         // Phase 3 (Fusion): AI Inference
         // Phase 4 (Safety Check): R2 Diaphragm Return (GPIO 6)
         // Phase 5 (Dosing): R5, R6, R7 Peristaltic Stock A, B, C (GPIO 9, 10, 11)
+        // Phase 6 (Rinse & Drain): R3 Diaphragm Rinse (GPIO 7) & R4 Drain Valve (GPIO 8)
         const phaseRelayMap = {
           1: ['R1'],
           2: [],
           3: [],
           4: ['R2'],
           5: ['R5', 'R6', 'R7'],
+          6: ['R3', 'R4'],
         };
         const highlighted = phaseRelayMap[phaseStep] || [];
         setRelays((prev) =>
@@ -3709,10 +3711,10 @@
         setOverrideState({
           active: true,
           mode: 'START_CYCLE',
-          label: 'กำลังรันสาธิตครบ 5 ขั้นตอน (Full Closed-Loop Demo 18s) — ตารางเวลาอัตโนมัติยังทำงานอยู่',
+          label: 'กำลังรันสาธิตครบ 6 ขั้นตอน (Full Closed-Loop Demo 18s) — ตารางเวลาอัตโนมัติยังทำงานอยู่',
           remainingSec: totalDemoSec,
         });
-        pushCommandLog('START_CYCLE', 'สั่งรันสาธิต Closed-Loop ครบ 5 ขั้นตอนทันที (Sample Inflow R1/GPIO 5)');
+        pushCommandLog('START_CYCLE', 'สั่งรันสาธิต Closed-Loop ครบ 6 ขั้นตอนทันที (Sample Inflow R1/GPIO 5)');
         await sendApiRequest('/api/command', {
           command: 'START_CYCLE',
           duration_ms: totalDemoSec * 1000,
@@ -3721,18 +3723,29 @@
       };
 
       // Action 4: Trigger Instant ESP32-S3 CAM Leaf Capture
-      const handleTriggerCamCapture = async () => {
-        setCamStatusText('กำลังส่งคำสั่ง CAPTURE สั่ง ESP32-S3 CAM ถ่ายภาพใบผักบุ้ง...');
+      const handleTriggerCamCapture = async (mode = 'real') => {
+        const isTest = mode === 'test';
+        setCamStatusText(isTest
+          ? 'ส่งคำสั่งถ่ายภาพโหมดทดสอบ — กล้องจะทำงานในรอบตื่นถัดไป (ไม่เกิน 15 วิ)...'
+          : 'ส่งคำสั่งถ่ายภาพโหมดจริง — กล้องจะทำงานในรอบตื่นถัดไป (ไม่เกิน 15 วิ)...');
         setOverrideState({
           active: true,
           mode: 'CAM_CAPTURE',
-          label: 'สั่งกล้อง ESP32-S3 CAM ถ่ายภาพใบผักบุ้งและครอป CLAHE สดบนเวที (4s)',
+          label: isTest
+            ? 'ถ่ายภาพทดสอบผ่านกล้อง ESP32-S3 CAM (เก็บภาพอย่างเดียว ไม่รัน AI)'
+            : 'สั่งกล้อง ESP32-S3 CAM ถ่ายภาพใบผักบุ้งและครอป CLAHE สดบนเวที (4s)',
           remainingSec: Math.max(overrideState.remainingSec, 4),
         });
-        pushCommandLog('CAM_CAPTURE', 'ส่งคำสั่ง CAPTURE ไปยัง ESP32-S3 CAM (/api/cam_command)');
-        await sendApiRequest('/api/cam_command', { command: 'CAPTURE' });
+        pushCommandLog('CAM_CAPTURE', `ส่งคำสั่ง CAPTURE mode=${mode} ไปยัง ESP32-S3 CAM (/api/cam_command)`);
+        const res = await sendApiRequest('/api/cam_command', { command: 'CAPTURE', mode });
+        if (!res.ok) {
+          setCamStatusText('ส่งคำสั่งถึงเซิร์ฟเวอร์ไม่สำเร็จ — ตรวจว่า main.py ยังรันอยู่');
+          return;
+        }
         setTimeout(() => {
-          setCamStatusText(`ถ่ายภาพใบผักบุ้ง (${unitSummary.short}) และส่งเข้า Symptom-Gated AI สำเร็จ ✓`);
+          setCamStatusText(isTest
+            ? 'ถ่ายภาพทดสอบแล้ว — เก็บไว้ที่ test_captures/ เพื่อตรวจกรอบและแสง (ไม่ได้รัน AI)'
+            : `ถ่ายภาพใบผักบุ้ง (${unitSummary.short}) และส่งเข้า Symptom-Gated AI สำเร็จ ✓`);
         }, 1200);
       };
 
@@ -3900,10 +3913,7 @@
         { step: 3, title: '3. Symptom-Gated Fusion', desc: 'ผสานผล CNN + เซนเซอร์ (pH GPIO 1, EC GPIO 2, Temp GPIO 4)' },
         { step: 4, title: '4. Sample Return', desc: 'ปั๊มไดอะแฟรม 2 (GPIO 6) สูบน้ำตัวอย่างวนคืนถังปลูก 100% (7s)' },
         { step: 5, title: '5. Peristaltic Dosing', desc: 'ปั๊มรีดสาย R5–R7 (GPIO 9–11) จ่ายแม่ปุ๋ย Stock A, B, C ตามสูตร AI' },
-        // Rinse + Drain (GPIO 7/8) removed from the demo deck: the automatic
-        // cycle skips them, and the GPIO 7 pump browning out the rail must not
-        // be one click away during a live presentation. Still reachable from
-        // the manual relay panel below.
+        { step: 6, title: '6. Probe Rinse & Drain', desc: 'ปั๊ม 3 (GPIO 7, 5s) ล้างโพรบ + โซเลนอยด์ (GPIO 8, 6s) ระบายน้ำทิ้ง' },
       ];
 
       const scenarioPresets = [
@@ -4384,24 +4394,30 @@
                     6-Step Closed-Loop Autonomous Pipeline (คลิกแต่ละเฟสเพื่อกระโดดสาธิตทันที)
                   </h2>
                   <p className="text-xs text-white/55 mt-0.5">
-                    กดเลือกเฟสที่ต้องการโชว์กรรมการ หรือกดรันครบ 5 ขั้นตอนได้ทันทีโดยตารางเวลาอัตโนมัติไม่ถูกปิด
+                    กดเลือกเฟสที่ต้องการโชว์กรรมการ หรือกดรันครบ 6 ขั้นตอนได้ทันทีโดยตารางเวลาอัตโนมัติไม่ถูกปิด
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-xs font-mono text-[#C6C7F8] mr-2">
-                    Active Phase: Step {activePhase} / 5
+                    Active Phase: Step {activePhase} / 6
                   </span>
                   <button
                     onClick={handleStartFullCycleDemo}
                     className="px-3.5 py-1.5 rounded-xl bg-[#C6C7F8] hover:bg-[#d8d9fc] text-slate-950 font-inter font-bold text-xs transition-all shadow-[0_0_16px_rgba(198,199,248,0.35)]"
                   >
-                    ▶ สั่งรันครบ 5 ขั้นตอนทันที (START_CYCLE)
+                    ▶ สั่งรันครบ 6 ขั้นตอนทันที (START_CYCLE)
                   </button>
                   <button
-                    onClick={handleTriggerCamCapture}
+                    onClick={() => handleTriggerCamCapture('test')}
+                    className="px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 border border-white/15 font-inter font-semibold text-xs transition-all"
+                  >
+                    🧪 โหมดทดสอบ (เก็บภาพอย่างเดียว)
+                  </button>
+                  <button
+                    onClick={() => handleTriggerCamCapture('real')}
                     className="px-3.5 py-1.5 rounded-xl bg-[#A8C5DA]/20 hover:bg-[#A8C5DA]/30 text-[#A8C5DA] border border-[#A8C5DA]/40 font-inter font-semibold text-xs transition-all"
                   >
-                    📸 สั่งถ่ายภาพใบผักบุ้งทันที (ESP32-CAM)
+                    📸 โหมดส่งภาพจริง (ESP32-CAM → AI)
                   </button>
                 </div>
               </div>
@@ -4415,7 +4431,7 @@
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
                 {closedLoopPhases.map((p) => {
                   const isCurrent = activePhase === p.step;
                   return (

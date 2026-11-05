@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # Safety limits & default constants
 DEFAULT_TARGET_EC = 1.85      # mS/cm (Optimal for water spinach 1.6 - 2.0)
 DEFAULT_TANK_VOLUME = 23.3    # Liters (Standard DWC foam box 34x49 cm)
-DEFAULT_FLOW_RATE = 1.5       # ml/sec (Standard 12V peristaltic pump)
+DEFAULT_FLOW_RATE = 1.0       # ml/sec (measured on the rig 2026-11-05: all three pumps)
 DEFAULT_PRIMING_DELAY = 2.0   # seconds (Delay to draw liquid to nozzle tip)
 
 # Measured on the real rig: each peristaltic pump has its own tubing and rollers,

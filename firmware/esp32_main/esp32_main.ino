@@ -14,8 +14,16 @@
 #include <ArduinoJson.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <Preferences.h>
+#include <esp_pm.h>
 
 #include "config.h"
+
+// Fallback so a config.h copied before the power work still compiles.
+#ifndef ENABLE_AUTO_LIGHT_SLEEP
+#define ENABLE_AUTO_LIGHT_SLEEP 1
+#endif
+
 #include "sensor_filters.h"
 #include "actuator_controller.h"
 
@@ -26,6 +34,7 @@ ActuatorController actuators;
 
 // State and Timing
 unsigned long lastCommandPollTime = 0;
+unsigned long lastWifiRetry = 0;
 const unsigned long COMMAND_POLL_INTERVAL_MS = 1500;
 
 float latestPH = 6.20f;
@@ -33,12 +42,42 @@ float latestEC = 1.80f;
 float latestTemp = 26.5f;
 
 // ------------------------------------------------------------------------------
+// Runtime Config (NVS)
+// Set over Serial so moving the rig to another network never needs a recompile:
+//   SET WIFI <ssid> <password>   SET SERVER <ip>   SHOW   RESET
+// config.h values are the fallback used when NVS is empty.
+// ------------------------------------------------------------------------------
+Preferences prefs;
+String cfgSsid = WIFI_SSID;
+String cfgPass = WIFI_PASSWORD;
+String cfgHost = SERVER_HOST;
+String cfgPort = String(SERVER_PORT);
+
+void loadRuntimeConfig() {
+    prefs.begin("aegis", true);
+    cfgSsid = prefs.getString("ssid", WIFI_SSID);
+    cfgPass = prefs.getString("pass", WIFI_PASSWORD);
+    cfgHost = prefs.getString("host", SERVER_HOST);
+    cfgPort = prefs.getString("port", String(SERVER_PORT));
+    prefs.end();
+}
+
+// Endpoints are built from the NVS values, so SET SERVER takes effect without
+// a recompile. The old URL_* macros baked SERVER_HOST in at compile time.
+// The port is NVS too: a Droplet serves through Nginx on 80, not 8000, and
+// forgetting that would leave the board dialing a closed port with no error.
+String apiUrl(const char* path) {
+    return String("http://") + cfgHost + ":" + cfgPort + path;
+}
+
+// ------------------------------------------------------------------------------
 // WiFi Connection Helper
 // ------------------------------------------------------------------------------
 void connectWiFi() {
-    Serial.printf("\nConnecting to Wi-Fi SSID: %s ", WIFI_SSID);
+    Serial.printf("\nConnecting to Wi-Fi SSID: %s ", cfgSsid.c_str());
     WiFi.mode(WIFI_STA);
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    WiFi.setAutoReconnect(true);
+    WiFi.begin(cfgSsid.c_str(), cfgPass.c_str());
 
     unsigned long startAttempt = millis();
     while (WiFi.status() != WL_CONNECTED && millis() - startAttempt < 10000) {
@@ -99,7 +138,7 @@ bool sendTelemetryAndGetDosingPlan() {
     }
 
     HTTPClient http;
-    http.begin(URL_TELEMETRY);
+    http.begin(apiUrl("/api/sensor"));
     http.addHeader("Content-Type", "application/json");
 
     StaticJsonDocument<256> doc;
@@ -157,7 +196,7 @@ void reportStatusToServer() {
     if (WiFi.status() != WL_CONNECTED) return;
 
     HTTPClient http;
-    http.begin(URL_UPDATE_STATUS);
+    http.begin(apiUrl("/api/status"));
     http.addHeader("Content-Type", "application/json");
 
     StaticJsonDocument<256> doc;
@@ -184,7 +223,7 @@ void pollRemoteDashboardCommand() {
     if (WiFi.status() != WL_CONNECTED) return;
 
     HTTPClient http;
-    http.begin(URL_POLL_COMMAND);
+    http.begin(apiUrl("/api/command"));
     int code = http.GET();
 
     if (code == 200) {
@@ -247,11 +286,56 @@ void pollRemoteDashboardCommand() {
 // ------------------------------------------------------------------------------
 void handleSerialCommands() {
     if (Serial.available() > 0) {
-        String input = Serial.readStringUntil('\n');
-        input.trim();
+        String raw = Serial.readStringUntil('\n');
+        raw.trim();
+
+        // SET carries the rest of the line verbatim — an SSID or password is
+        // case-sensitive, so it must never go through toUpperCase().
+        String input = raw;
         input.toUpperCase();
 
-        if (input == "START" || input == "RUN") {
+        if (input.startsWith("SET WIFI ")) {
+            String rest = raw.substring(9);
+            int sep = rest.indexOf(' ');
+            if (sep < 1) {
+                Serial.println("[NVS] Usage: SET WIFI <ssid> <password>");
+                return;
+            }
+            prefs.begin("aegis", false);
+            prefs.putString("ssid", rest.substring(0, sep));
+            prefs.putString("pass", rest.substring(sep + 1));
+            prefs.end();
+            Serial.printf("[NVS] Wi-Fi saved (%s). Rebooting...\n", rest.substring(0, sep).c_str());
+            delay(300);
+            ESP.restart();
+        } else if (input.startsWith("SET SERVER ")) {
+            // Usage: SET SERVER <host> [port]  — the port defaults to SERVER_PORT.
+            String rest = raw.substring(11);
+            int sep = rest.indexOf(' ');
+            String host = (sep < 0) ? rest : rest.substring(0, sep);
+            String port = (sep < 0) ? String(SERVER_PORT) : rest.substring(sep + 1);
+            if (host.length() == 0 || port.length() == 0) {
+                Serial.println("[NVS] Usage: SET SERVER <ip> [port]");
+                return;
+            }
+            prefs.begin("aegis", false);
+            prefs.putString("host", host);
+            prefs.putString("port", port);
+            prefs.end();
+            Serial.printf("[NVS] Server set to %s:%s. Rebooting...\n", host.c_str(), port.c_str());
+            delay(300);
+            ESP.restart();
+        } else if (input == "SHOW") {
+            Serial.printf("[CFG] SSID: %s | SERVER: %s:%s\n",
+                          cfgSsid.c_str(), cfgHost.c_str(), cfgPort.c_str());
+        } else if (input == "RESET") {
+            prefs.begin("aegis", false);
+            prefs.clear();
+            prefs.end();
+            Serial.println("[NVS] Cleared, back to config.h defaults. Rebooting...");
+            delay(300);
+            ESP.restart();
+        } else if (input == "START" || input == "RUN") {
             actuators.startFullPresentationCycle();
         } else if (input == "STOP") {
             actuators.stopCycle();
@@ -264,7 +348,8 @@ void handleSerialCommands() {
         } else if (input == "READ") {
             performSensorReadings();
         } else {
-            Serial.println("\nCommands: START (run full cycle) | STOP | READ | TEST <1-7> <ms>");
+            Serial.println("\nCommands: START | STOP | READ | TEST <1-7> <ms>");
+            Serial.println("          SET WIFI <ssid> <password> | SET SERVER <ip> | SHOW | RESET");
         }
     }
 }
@@ -294,8 +379,21 @@ void setup() {
     analogReadResolution(12);
     analogSetAttenuation(ADC_11db); // Full range ~0 - 3.1V
 
-    // Connect WiFi
+    // NVS overrides (Serial-set) then connect WiFi
+    loadRuntimeConfig();
     connectWiFi();
+
+#if ENABLE_AUTO_LIGHT_SLEEP
+    // Idle the CPU in light sleep instead of spinning. millis() is corrected
+    // by the RTC across a light sleep, so the FSM's phase timers stay true.
+    esp_pm_config_t pm_config = {};
+    pm_config.max_freq_mhz = 240;
+    pm_config.min_freq_mhz = 80;
+    pm_config.light_sleep_enable = true;
+    esp_err_t pm_err = esp_pm_configure(&pm_config);
+    Serial.printf("[POWER] Auto light sleep: %s\n",
+                  pm_err == ESP_OK ? "on" : "unavailable (core built without CONFIG_PM_ENABLE)");
+#endif
 
     // Report initial ready status
     reportStatusToServer();
@@ -309,6 +407,13 @@ void loop() {
 
     // Release any manual relay whose runtime window has elapsed
     actuators.updateManualOverrides(now);
+
+    // The hotspot may come up after the board does; without this the board
+    // stays offline for the whole session after its one 10 s boot attempt.
+    if (WiFi.status() != WL_CONNECTED && now - lastWifiRetry > 5000) {
+        lastWifiRetry = now;
+        WiFi.reconnect();
+    }
 
     // Check Serial Inputs & Remote Dashboard Polling
     handleSerialCommands();
@@ -421,14 +526,10 @@ void loop() {
                 actuators.allRelaysOff();
                 Serial.println("[Phase 4 DONE] Fertilizer dosing complete and mixed.");
 
-                // Phase 3 already returned every drop of sample water to the
-                // culture tank, so the probes never touch fertilised water and
-                // Phases 5/6 (rinse + drain) have nothing to clean. Go straight
-                // to the preservation soak. Their case blocks stay below so the
-                // rinse pump can still be exercised by hand via MANUAL_RELAY.
-                actuators.setPhase(PHASE_7_PROBE_PRESERVATION, TIME_PRESERVATION_SOAK_MS);
-                digitalWrite(PIN_RELAY_SAMPLE_IN, RELAY_ON);
-                Serial.printf("[Phase 7] Diaphragm 1 (Probe Preservation Soak) active for %lu ms\n", TIME_PRESERVATION_SOAK_MS);
+                // Transition to Phase 5: Probe Rinse
+                actuators.setPhase(PHASE_5_PROBE_RINSE, TIME_RINSE_PROBE_MS);
+                digitalWrite(PIN_RELAY_PROBE_RINSE, RELAY_ON);
+                Serial.printf("[Phase 5] Diaphragm 3 (Clean Water Rinse) active for %lu ms\n", TIME_RINSE_PROBE_MS);
                 reportStatusToServer();
             }
             break;

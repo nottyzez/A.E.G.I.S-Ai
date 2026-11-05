@@ -10,12 +10,49 @@
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <esp_wifi.h>
+#include <esp_sleep.h>
+#include <Preferences.h>
 #include "esp_camera.h"
 #include "camera_pins.h"
 #include "config.h"
 
-unsigned long lastPollTime = 0;
+// Fallbacks so a config.h copied before the sleep work still compiles.
+#ifndef SLEEP_INTERVAL_S
+#define SLEEP_INTERVAL_S 15
+#endif
+#ifndef CAM_SLEEP_ENABLED
+#define CAM_SLEEP_ENABLED 1
+#endif
+
 unsigned long lastAutoCaptureTime = 0;
+unsigned long lastRoundTime = 0;
+
+// ------------------------------------------------------------------------------
+// Runtime Config (NVS) — same serial commands as esp32_main.ino:
+//   SET WIFI <ssid> <password>   SET SERVER <ip>   SHOW   RESET
+// ------------------------------------------------------------------------------
+Preferences prefs;
+String cfgSsid = WIFI_SSID;
+String cfgPass = WIFI_PASSWORD;
+String cfgHost = SERVER_HOST;
+String cfgPort = String(SERVER_PORT);
+
+void loadRuntimeConfig() {
+    prefs.begin("aegis", true);
+    cfgSsid = prefs.getString("ssid", WIFI_SSID);
+    cfgPass = prefs.getString("pass", WIFI_PASSWORD);
+    cfgHost = prefs.getString("host", SERVER_HOST);
+    cfgPort = prefs.getString("port", String(SERVER_PORT));
+    prefs.end();
+}
+
+// Endpoints are built from the NVS values, so SET SERVER takes effect without
+// a recompile. The old PREDICT_URL / URL_POLL_CAM_COMMAND macros baked
+// SERVER_HOST in at compile time. The port is NVS too: a Droplet serves
+// through Nginx on 80, not 8000.
+String apiUrl(const char* path) {
+    return String("http://") + cfgHost + ":" + cfgPort + path;
+}
 
 void initCamera() {
     camera_config_t config;
@@ -65,9 +102,10 @@ void initCamera() {
 }
 
 void connectWiFi() {
-    Serial.printf("[CAM] Connecting to Wi-Fi SSID: %s ", WIFI_SSID);
+    Serial.printf("[CAM] Connecting to Wi-Fi SSID: %s ", cfgSsid.c_str());
     WiFi.mode(WIFI_STA);
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    WiFi.setAutoReconnect(true);
+    WiFi.begin(cfgSsid.c_str(), cfgPass.c_str());
 
     unsigned long start = millis();
     while (WiFi.status() != WL_CONNECTED && millis() - start < 10000) {
@@ -84,23 +122,39 @@ void connectWiFi() {
     }
 }
 
-bool captureAndUpload() {
+bool captureAndUpload(const char* mode) {
     if (WiFi.status() != WL_CONNECTED) {
         Serial.println("[CAM] WiFi disconnected, skipping upload.");
         return false;
     }
 
     Serial.println("\n[CAM] Capturing top-down frame...");
+    // The sensor's XCLK stops during light sleep, so the first buffer after a
+    // wake can be a partial frame. Throw one away before the real capture.
+    camera_fb_t* stale = esp_camera_fb_get();
+    if (stale) esp_camera_fb_return(stale);
+
     camera_fb_t* fb = esp_camera_fb_get();
+    if (!fb) {
+        // After light sleep the sensor's clock has been stopped for a while;
+        // a driver that fails to recover the DMA path needs a fresh init.
+        Serial.println("[CAM] Frame grab failed after wake, re-initialising camera...");
+        esp_camera_deinit();
+        initCamera();
+        stale = esp_camera_fb_get();
+        if (stale) esp_camera_fb_return(stale);
+        fb = esp_camera_fb_get();
+    }
     if (!fb) {
         Serial.println("[CAM ERROR] Failed to grab frame buffer.");
         return false;
     }
 
-    Serial.printf("[CAM] Frame captured: %u bytes (%dx%d)\n", fb->len, fb->width, fb->height);
+    Serial.printf("[CAM] Frame captured: %u bytes (%dx%d) mode=%s\n",
+                  fb->len, fb->width, fb->height, mode);
 
     HTTPClient http;
-    http.begin(PREDICT_URL);
+    http.begin(apiUrl("/predict"));
 
     String boundary = "----WebKitFormBoundaryHydroSyncESP32";
     http.addHeader("Content-Type", "multipart/form-data; boundary=" + boundary);
@@ -109,6 +163,9 @@ bool captureAndUpload() {
     String head = "--" + boundary + "\r\n";
     head += "Content-Disposition: form-data; name=\"device_id\"\r\n\r\n";
     head += String(DEVICE_ID) + "\r\n";
+    head += "--" + boundary + "\r\n";
+    head += "Content-Disposition: form-data; name=\"mode\"\r\n\r\n";
+    head += String(mode) + "\r\n";
     head += "--" + boundary + "\r\n";
     head += "Content-Disposition: form-data; name=\"image\"; filename=\"topdown.jpg\"\r\n";
     head += "Content-Type: image/jpeg\r\n\r\n";
@@ -129,7 +186,7 @@ bool captureAndUpload() {
     memcpy(payload + head.length(), fb->buf, fb->len);
     memcpy(payload + head.length() + fb->len, tail.c_str(), tail.length());
 
-    Serial.printf("[CAM] Sending %u bytes to %s ...\n", totalLen, PREDICT_URL);
+    Serial.printf("[CAM] Sending %u bytes to %s ...\n", totalLen, apiUrl("/predict").c_str());
     int httpResponseCode = http.POST(payload, totalLen);
 
     free(payload);
@@ -147,34 +204,113 @@ bool captureAndUpload() {
     }
 }
 
-void pollRemoteCaptureCommand() {
-    if (WiFi.status() != WL_CONNECTED) return;
+// Returns true when the dashboard queued a CAPTURE, and fills `mode` with the
+// mode the operator asked for ("test" = archive only, "real" = run the AI).
+bool pollRemoteCaptureCommand(String& mode) {
+    if (WiFi.status() != WL_CONNECTED) return false;
 
     HTTPClient http;
-    http.begin(URL_POLL_CAM_COMMAND);
+    http.begin(apiUrl("/api/cam_command"));
     int code = http.GET();
+    bool capture = false;
     if (code == 200) {
         String payload = http.getString();
         StaticJsonDocument<256> doc;
         if (!deserializeJson(doc, payload)) {
             const char* cmd = doc["command"] | "";
             if (strcmp(cmd, "CAPTURE") == 0) {
-                Serial.println("[REMOTE DASHBOARD] 'Capture Photo Now' command received!");
-                captureAndUpload();
+                mode = String((const char*)(doc["mode"] | "real"));
+                Serial.printf("[REMOTE DASHBOARD] CAPTURE received (mode=%s)\n", mode.c_str());
+                capture = true;
             }
         }
     }
     http.end();
+    return capture;
+}
+
+// One round of work, then the radio is powered down. Nothing polls between
+// rounds — that 1.5 s command poll was what kept the board hot.
+void runCaptureRound() {
+    WiFi.mode(WIFI_STA);
+    connectWiFi();
+    esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
+
+    String mode = "real";
+    bool shouldCapture = pollRemoteCaptureCommand(mode);
+
+    if (millis() - lastAutoCaptureTime >= (unsigned long)CAPTURE_INTERVAL_S * 1000UL) {
+        lastAutoCaptureTime = millis();
+        shouldCapture = true;
+    }
+
+    if (shouldCapture) {
+        captureAndUpload(mode.c_str());
+    } else {
+        Serial.println("[CAM] No command queued, nothing to upload.");
+    }
+
+    WiFi.disconnect(true);
+    WiFi.mode(WIFI_OFF);
+    Serial.println("[CAM] Radio off.");
 }
 
 void handleSerialCommands() {
     if (Serial.available() > 0) {
-        String input = Serial.readStringUntil('\n');
-        input.trim();
+        String raw = Serial.readStringUntil('\n');
+        raw.trim();
+
+        // SET carries the rest of the line verbatim — an SSID or password is
+        // case-sensitive, so it must never go through toUpperCase().
+        String input = raw;
         input.toUpperCase();
-        if (input == "CAPTURE" || input == "SNAP" || input == "PHOTO") {
-            Serial.println("[SERIAL] Manual capture command triggered!");
-            captureAndUpload();
+
+        if (input.startsWith("SET WIFI ")) {
+            String rest = raw.substring(9);
+            int sep = rest.indexOf(' ');
+            if (sep < 1) {
+                Serial.println("[NVS] Usage: SET WIFI <ssid> <password>");
+                return;
+            }
+            prefs.begin("aegis", false);
+            prefs.putString("ssid", rest.substring(0, sep));
+            prefs.putString("pass", rest.substring(sep + 1));
+            prefs.end();
+            Serial.printf("[NVS] Wi-Fi saved (%s). Rebooting...\n", rest.substring(0, sep).c_str());
+            delay(300);
+            ESP.restart();
+        } else if (input.startsWith("SET SERVER ")) {
+            // Usage: SET SERVER <host> [port]  — the port defaults to SERVER_PORT.
+            String rest = raw.substring(11);
+            int sep = rest.indexOf(' ');
+            String host = (sep < 0) ? rest : rest.substring(0, sep);
+            String port = (sep < 0) ? String(SERVER_PORT) : rest.substring(sep + 1);
+            if (host.length() == 0 || port.length() == 0) {
+                Serial.println("[NVS] Usage: SET SERVER <ip> [port]");
+                return;
+            }
+            prefs.begin("aegis", false);
+            prefs.putString("host", host);
+            prefs.putString("port", port);
+            prefs.end();
+            Serial.printf("[NVS] Server set to %s:%s. Rebooting...\n", host.c_str(), port.c_str());
+            delay(300);
+            ESP.restart();
+        } else if (input == "SHOW") {
+            Serial.printf("[CFG] SSID: %s | SERVER: %s:%s\n",
+                          cfgSsid.c_str(), cfgHost.c_str(), cfgPort.c_str());
+        } else if (input == "RESET") {
+            prefs.begin("aegis", false);
+            prefs.clear();
+            prefs.end();
+            Serial.println("[NVS] Cleared, back to config.h defaults. Rebooting...");
+            delay(300);
+            ESP.restart();
+        } else if (input == "CAPTURE" || input == "SNAP" || input == "PHOTO") {
+            Serial.println("[SERIAL] Manual capture round triggered (real mode)!");
+            runCaptureRound();
+        } else {
+            Serial.println("\nCommands: CAPTURE | SET WIFI <ssid> <password> | SET SERVER <ip> | SHOW | RESET");
         }
     }
 }
@@ -189,28 +325,31 @@ void setup() {
     Serial.printf("[THERMAL CONTROL] CPU Clock adjusted to %d MHz (Cooler operation)\n", getCpuFrequencyMhz());
 
     initCamera();
-    connectWiFi();
+    loadRuntimeConfig();
 
-    // Enable WiFi power saving to keep RF chip cool when idle
-    esp_wifi_set_ps(WIFI_PS_MIN_MODEM);
-
-    // Initial capture on boot
-    captureAndUpload();
-    lastAutoCaptureTime = millis();
+    // First round happens immediately so a freshly powered board reports in.
+    lastAutoCaptureTime = millis() - (unsigned long)CAPTURE_INTERVAL_S * 1000UL;
+    lastRoundTime = millis() - (unsigned long)SLEEP_INTERVAL_S * 1000UL;
 }
 
 void loop() {
-    unsigned long now = millis();
     handleSerialCommands();
 
-    if (now - lastPollTime >= 1500) {
-        lastPollTime = now;
-        pollRemoteCaptureCommand();
-    }
+    if (millis() - lastRoundTime >= (unsigned long)SLEEP_INTERVAL_S * 1000UL) {
+        runCaptureRound();
+        lastRoundTime = millis();
 
-    if (now - lastAutoCaptureTime >= (unsigned long)CAPTURE_INTERVAL_S * 1000) {
-        lastAutoCaptureTime = now;
-        captureAndUpload();
+#if CAM_SLEEP_ENABLED
+        // Light sleep, not deep sleep: the USB CDC port stays enumerated so
+        // SET WIFI / SET SERVER over Serial still works, and the camera keeps
+        // its sensor settings. millis() is corrected across the sleep.
+        Serial.printf("[CAM] Sleeping %d s...\n", SLEEP_INTERVAL_S);
+        Serial.flush();
+        esp_sleep_enable_timer_wakeup((uint64_t)SLEEP_INTERVAL_S * 1000000ULL);
+        esp_light_sleep_start();
+        lastRoundTime = millis();
+        Serial.println("[CAM] Awake.");
+#endif
     }
 
     // Yield CPU time so cores don't spin at 100% duty cycle (drastically cools the board)

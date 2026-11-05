@@ -93,6 +93,15 @@ public:
     }
 
     void setPhase(CyclePhase newPhase, unsigned long durationMs) {
+        // Every phase that energizes a diaphragm pump is capped here, at the one
+        // choke point all transitions go through. A config or server value above
+        // MAX_SAFETY_PUMP_MS would otherwise hold the pump past the chamber's
+        // capacity and overflow it.
+        if (newPhase == PHASE_0_PRE_RETURN || newPhase == PHASE_1_SAMPLING_IN ||
+            newPhase == PHASE_3_SAMPLING_RETURN || newPhase == PHASE_5_PROBE_RINSE ||
+            newPhase == PHASE_7_PROBE_PRESERVATION) {
+            durationMs = min(durationMs, (unsigned long)MAX_SAFETY_PUMP_MS);
+        }
         currentPhase = newPhase;
         phaseStartTime = millis();
         phaseDuration = durationMs;
