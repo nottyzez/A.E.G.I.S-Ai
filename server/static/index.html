@@ -9577,6 +9577,7 @@
             >
               {/* PILLAR 3: Relay Matrix R1–R7 (7 Cols) with Timed Pulse Override */}
               <div className="lg:col-span-7 figma-card-dark magic-bento-card p-6">
+                <span className="magic-bento__light" aria-hidden="true" />
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
                   <div>
                     <h2 className="font-inter font-semibold text-lg text-white">
@@ -9696,6 +9697,7 @@
               {/* Peristaltic Fertilizer Dosing Deck (5 Cols) */}
               <div className="lg:col-span-5 flex flex-col gap-6">
                 <div className="figma-card-dark magic-bento-card p-6 flex-1 flex flex-col justify-between">
+                  <span className="magic-bento__light" aria-hidden="true" />
                   <div>
                     <h2 className="font-inter font-semibold text-lg text-white mb-1">
                       Manual &amp; AI Fertilizer Dosing (สั่งโดสปุ๋ยผักบุ้ง)
@@ -10246,6 +10248,44 @@
       const [isWarping, setIsWarping] = useState(false);
       const [dosingStatus, setDosingStatus] = useState('');
       const [liveScenarioOverride, setLiveScenarioOverride] = useState(null);
+
+      // Global cursor spotlight: every .magic-bento-card on every page follows
+      // the pointer, whether or not it sits inside a <MagicBento> grid.
+      useEffect(() => {
+        let cards = [];
+        let raf = 0;
+        let px = 0;
+        let py = 0;
+        const paint = () => {
+          raf = 0;
+          cards = Array.from(document.querySelectorAll('.magic-bento-card'));
+          cards.forEach((card) => {
+            const rect = card.getBoundingClientRect();
+            const x = px - rect.left;
+            const y = py - rect.top;
+            const inside = x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
+            card.style.setProperty('--mb-hot', inside ? '1' : '0');
+            if (inside) {
+              card.style.setProperty('--mb-x', `${x.toFixed(1)}px`);
+              card.style.setProperty('--mb-y', `${y.toFixed(1)}px`);
+            }
+          });
+        };
+        const onMove = (e) => {
+          if (e.pointerType === 'touch') return;
+          px = e.clientX;
+          py = e.clientY;
+          if (!raf) raf = requestAnimationFrame(paint);
+        };
+        const onLeave = () => cards.forEach((card) => card.style.setProperty('--mb-hot', '0'));
+        document.addEventListener('pointermove', onMove, { passive: true });
+        document.addEventListener('pointerleave', onLeave);
+        return () => {
+          cancelAnimationFrame(raf);
+          document.removeEventListener('pointermove', onMove);
+          document.removeEventListener('pointerleave', onLeave);
+        };
+      }, []);
 
       const unitSummary = useMemo(() => {
         const base = getUnitSensorSummary(selectedUnit);

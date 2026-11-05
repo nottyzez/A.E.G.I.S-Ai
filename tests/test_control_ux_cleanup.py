@@ -122,6 +122,14 @@ class TestControlUxUiCleanup(unittest.TestCase):
         undersized = [s for s in sizes if s < 12]
         self.assertEqual(undersized, [], f"Found undersized font classes: {undersized}")
 
+    def test_5_every_bento_card_can_light_up(self):
+        """A .magic-bento-card without a __light child renders no cursor spotlight."""
+        missing = []
+        for m in re.finditer(r'className="[^"]*\bmagic-bento-card\b[^"]*"', self.html):
+            if "magic-bento__light" not in self.html[m.end():m.end() + 600]:
+                missing.append(self.html[:m.start()].count("\n") + 1)
+        self.assertEqual(missing, [], f"magic-bento-card lines without a __light child: {missing}")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
