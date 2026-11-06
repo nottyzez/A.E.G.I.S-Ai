@@ -104,7 +104,9 @@ pair (gitignored — the hotspot password lives there, never in a tracked file).
 **`python main.py` dies with `lost sys.stderr` right after model load on this
 machine; `python -m uvicorn main:app --host 0.0.0.0 --port 8000` runs fine** — use
 the uvicorn form when starting it by hand. Windows Firewall already has an
-allow rule for TCP 8000.
+allow rule for TCP 8000. `deploy/lan-backup/{start,stop}-backup.bat` wrap both
+ends of that (start refuses when 8000 is taken; stop kills by port), pinned by
+`tests/test_lan_backup_deploy.py`.
 
 **The automatic cycle is back to the full 8 phases: P0 → P1 → P2 → P3 → P4 →
 P5 (Probe Rinse, GPIO 7) → P6 (Drain Waste, GPIO 8) → P7 → IDLE.**
