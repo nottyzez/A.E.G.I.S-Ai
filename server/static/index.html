@@ -8919,17 +8919,38 @@
       };
 
       // Helper to fire non-blocking API requests with automatic offline file:// fallback
-      const sendApiRequest = async (endpoint, payload) => {
+      // A droplet with AEGIS_REQUIRE_AUTH=1 answers 401 until the page holds the
+      // control token. Ask once, remember it, and retry the call.
+      const readControlToken = () => {
+        try {
+          return window.__AEGIS_CONTROL_TOKEN__ || localStorage.getItem('aegis_control_token') || '';
+        } catch (_e) {
+          return window.__AEGIS_CONTROL_TOKEN__ || '';
+        }
+      };
+
+      const sendApiRequest = async (endpoint, payload, retried) => {
         if (window.location.protocol === 'file:') {
           return { ok: false, offline: true };
         }
+        const token = readControlToken();
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers.Authorization = `Bearer ${token}`;
         try {
           // GET when no payload is given, so the same guard covers reads too.
           const res = await fetch(endpoint, payload === undefined ? {} : {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers,
             body: JSON.stringify(payload),
           });
+          if (res.status === 401 && !retried) {
+            const entered = window.prompt('เซิร์ฟเวอร์นี้ต้องใช้ Control Token:');
+            const next = (entered || '').trim();
+            if (!next) return { ok: false, unauthorized: true };
+            try { localStorage.setItem('aegis_control_token', next); } catch (_e) {}
+            window.__AEGIS_CONTROL_TOKEN__ = next;
+            return sendApiRequest(endpoint, payload, true);
+          }
           if (!res.ok) return { ok: false };
           const data = await res.json();
           return { ok: true, data };

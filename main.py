@@ -14,6 +14,8 @@ import numpy as np
 import base64
 from datetime import datetime
 from pathlib import Path
+import os
+import secrets
 import sys
 import logging
 
@@ -31,6 +33,45 @@ for p in [str(MODEL_SCRIPT_DIR), str(SERVER_DIR), str(ROOT_DIR)]:
 from dosing_engine import dosing_engine
 
 app = FastAPI(title="Kale NPK Symptom-Gated Ensemble API & Presentation Controller", version="3.1.0")
+
+# ── Control-plane auth ────────────────────────────────────────────────────────
+# These are the browser-facing writes — the ones that move pumps. The device
+# paths (GET /api/command, POST /api/sensor, POST /predict) stay open until the
+# cloud broker lands, so this guard needs no firmware re-flash.
+GUARDED_PREFIXES = (
+    "/api/command",
+    "/api/schedule",
+    "/api/override/",
+    "/api/calibration",
+    "/api/cam_command",
+)
+
+
+def auth_enabled() -> bool:
+    return os.getenv("AEGIS_REQUIRE_AUTH", "0").strip().lower() in ("1", "true", "yes", "on")
+
+
+def require_control_token(request: Request) -> None:
+    if not auth_enabled() or request.method == "GET":
+        return
+    if not request.url.path.startswith(GUARDED_PREFIXES):
+        return
+    expected = os.getenv("CONTROL_TOKEN", "").strip()
+    header = request.headers.get("authorization", "")
+    supplied = header[7:].strip() if header[:7].lower() == "bearer " else ""
+    # Fail closed: auth on with no token set must not silently mean "open".
+    # compare_digest wants bytes: a non-ASCII token would raise, not 401.
+    if not expected or not secrets.compare_digest(supplied.encode(), expected.encode()):
+        raise HTTPException(status_code=401, detail="Invalid or missing control token")
+
+
+@app.middleware("http")
+async def control_auth_middleware(request: Request, call_next):
+    try:
+        require_control_token(request)
+    except HTTPException as exc:
+        return JSONResponse({"detail": exc.detail}, status_code=exc.status_code)
+    return await call_next(request)
 
 # Mount static files for Dashboard
 STATIC_DIR = ROOT_DIR / "server" / "static"

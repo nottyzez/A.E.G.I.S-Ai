@@ -8,11 +8,10 @@ services:
     build: .
     restart: unless-stopped
     env_file:
+      # Supplies AEGIS_REQUIRE_AUTH too — do not also set it under
+      # `environment:`, an unset host shell variable would override it with 0
+      # and silently reopen the pump endpoints.
       - deploy/digitalocean/.env
-    environment:
-      # Consumed by the cloud broker once Task 1 lands; 0 keeps the existing
-      # LAN behaviour and the current test suite green.
-      AEGIS_REQUIRE_AUTH: "${AEGIS_REQUIRE_AUTH:-0}"
     volumes:
       - ./server/runtime_state.db:/app/server/runtime_state.db
       - ./server/calibration.json:/app/server/calibration.json

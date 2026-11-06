@@ -51,7 +51,12 @@ touch server/runtime_state.db server/calibration.json
 if [ ! -f deploy/digitalocean/.env ]; then
     cp deploy/digitalocean/.env.example deploy/digitalocean/.env
     chmod 600 deploy/digitalocean/.env
-    echo "Created deploy/digitalocean/.env from the template — edit the tokens before going public."
+    # A generated token, because the template ships an empty one and auth fails
+    # closed — an empty CONTROL_TOKEN means every pump button answers 401.
+    sed -i "s|^CONTROL_TOKEN=.*|CONTROL_TOKEN=$(openssl rand -hex 24)|" deploy/digitalocean/.env
+    echo "Created deploy/digitalocean/.env from the template."
+    echo "Your dashboard token (paste it into the browser prompt):"
+    grep '^CONTROL_TOKEN=' deploy/digitalocean/.env | cut -d= -f2-
 fi
 
 # ---------------------------------------------------------------------------

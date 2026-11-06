@@ -89,17 +89,26 @@ The script creates a 2 GB `/swapfile`, installs Docker, opens only ports 22 and
 
 First build takes 5–10 minutes (TensorFlow is ~600 MB to download).
 
-## 4. Set the tokens
+## 4. Find the control token
+
+`setup_droplet.sh` generates a random `CONTROL_TOKEN` and prints it once. To see
+it again:
 
 ```bash
-nano deploy/digitalocean/.env
+grep '^CONTROL_TOKEN=' deploy/digitalocean/.env
+```
+
+The first time the dashboard sends a pump command it gets a `401` and prompts
+for the token; the value is kept in that browser's localStorage, so each new
+browser or incognito window asks once. To rotate it:
+
+```bash
+nano deploy/digitalocean/.env          # change CONTROL_TOKEN
 docker compose -f docker-compose.digitalocean.yml up -d
 ```
 
-`CONTROL_TOKEN` and `DEVICE_API_KEY` are placeholders. Nothing reads them yet —
-they are consumed when the cloud broker lands. Change them before the URL goes
-public regardless, so the value is not the template string when it starts being
-enforced.
+`DEVICE_API_KEY` is still a placeholder — the ESP32 sketches do not send it yet,
+so nothing enforces it.
 
 ## 5. Verify
 
@@ -135,11 +144,18 @@ SET SERVER 192.168.43.5 8000
 
 ## 7. What is exposed
 
-- **Read-only:** the whole dashboard, sensor charts and AI results are public at
-  `http://<droplet-ip>/dashboard`.
-- **Write:** every pump button is reachable by anyone who can load the page
-  until the auth guard from the cloud plan is implemented. Do not leave the
-  Droplet running unattended with a public IP and pumps connected.
+- **Public reads:** the dashboard, sensor charts and AI results at
+  `http://<droplet-ip>/dashboard`, and `GET /api/*`.
+- **Token-gated writes:** `POST` on `/api/command`, `/api/schedule`,
+  `/api/override/*`, `/api/calibration*` and `/api/cam_command` requires
+  `Authorization: Bearer <CONTROL_TOKEN>`. Anyone can still *click* a pump
+  button, but without the token the request is a `401` and no relay moves.
+- **Still open, by design:** `GET /api/command` (the ESP32 polls it) and
+  `POST /api/sensor` / `POST /predict`. Those are device paths — they carry no
+  token until the firmware is re-flashed with one. A stranger can therefore
+  feed fake sensor readings and drain the command queue, but cannot actuate a
+  pump. Do not leave the Droplet exposed with pumps connected and no one
+  watching.
 
 ## Troubleshooting
 
