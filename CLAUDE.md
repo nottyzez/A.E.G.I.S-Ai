@@ -55,10 +55,18 @@ shim the API subset those components call. `file://` still works, and
 `test_figma_r3_independent_audit`) plus `verify_figma_implementation.py` used
 to assert the photographic backdrop; they now assert the ASCII/particle hero,
 which is why verify stayed at 26/26. New tests: `tests/test_control_ux_cleanup.py`
-(6, incl. "no `text-[10px]`/`text-[11px]` in ElectronicControlTabView") and
+(7, incl. "no `text-[10px]`/`text-[11px]` in ElectronicControlTabView") and
 `tests/test_motion_shim.py` (2 — runs the extracted shim IIFE in Node against a
 fake rAF clock; it pins that a newer tween on a motion value cancels the older
-one and that `.stop()` really stops). Suite is **237 tests OK**. Relay Thai roles follow
+one and that `.stop()` really stops). **The cursor spotlight is global, not
+per-grid** (`e33418c`): `MagicBento`'s own pointer engine only sees cards inside
+its wrapper, so `App` runs a document-level rAF loop that sets `--mb-x`/`--mb-y`/
+`--mb-hot` on *every* `.magic-bento-card`, re-querying each frame (Analyze cards
+never sit inside a `<MagicBento>` wrapper, so their spotlight was dead before).
+It deliberately applies **no** `--mb-tilt-*`/`--mb-magnet-*`: a transform shifts
+`getBoundingClientRect()`, and the chart's pointer → index mapping depends on that
+rect. `test_5_every_bento_card_can_light_up` fails if a card loses its
+`<span className="magic-bento__light">` child. Suite is **238 tests OK**. Relay Thai roles follow
 `firmware/esp32_main/config.example.h` (GPIO 6 = sample return), not the
 spec's air-agitator label.
 
