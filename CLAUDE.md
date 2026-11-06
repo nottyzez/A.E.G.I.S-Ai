@@ -186,7 +186,29 @@ while a laptop running `main.py` serves on **8000** — a compile-time port woul
 have left the board dialing a closed port and reporting a connection error that
 looks like a dead server. `SHOW` prints `IP:PORT`; check it before every run.
 
-State: 227 tests OK, verify_figma 26/26, check_jsx OK.
+**`/predict` works on the Droplet (2026-11-06).** It used to answer 500
+`'NoneType' object is not subscriptable`: `HydroponicEnsemblePredictor._load()`
+swallowed its unpickling error and left `scalers=None` while `main.py` still
+logged "Ensemble loaded", so DEMO mode never engaged. Three causes, all
+version drift in the image — `vision_a3_foliar_expert.pkl` needs
+`numpy.random._mt19937` (absent in numpy<2), and
+`sensor_ensemble_models.pkl` needs `sklearn._loss` to pickle back, which
+scikit-learn ≥1.9 does not (`No module named '_loss'`). `requirements.txt` now
+pins `numpy>=2,<3`, `keras==3.13.2`, `scikit-learn==1.8.0` — the versions the
+pickles were written with; do not relax them without re-running
+`POST /predict` on the Droplet. `_load()` records `load_error`, inference
+raises `RuntimeError` instead of a bare TypeError, `main.py` falls back to
+DEMO mode when `predictor.loaded` is false, and the real branch returns
+`ensemble_class` (the endpoint logs it; only the DEMO branch set it, which was
+the second 500 — `'ensemble_class'`). Pinned by
+`tests/test_predict_ensemble_load_guard.py` and
+`tests/test_predict_response_keys.py` (stubbed predictor, no 1.2 GB load).
+Verified end to end on the Droplet: `mode=real` → `healthy` /
+`PRE_SYMPTOMATIC_EARLY_WARNING` + a dosing plan. `server/calibration.json` in
+the image is 0 bytes, so every boot logs `[CALIBRATION] ignoring unreadable…`;
+harmless, not fixed.
+
+State: 254 tests OK, verify_figma 26/26, check_jsx OK.
 
 **Everything is committed and pushed (2026-11-06).** Branch
 `feature/dashboard-overhaul` is at `aeec72b` on origin, tracking is set. Three
