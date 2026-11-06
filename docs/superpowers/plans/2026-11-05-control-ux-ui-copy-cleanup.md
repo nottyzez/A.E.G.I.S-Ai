@@ -1,66 +1,43 @@
-# Home & Dashboard 11 React Bits Components + Electronic Control UX/UI Cleanup Plan
+# Complete All 11 React Bits Components & Electronic Control UX/UI Cleanup Plan (Gap-Closing Edition)
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Integrate 11 React Bits components into `server/static/index.html` — `<GradientASCII />` + `<Particles />` (Home background), `<TechText />` (`"A.E.G.I.S"` wordmark), `<Crosshair />` (Home HUD targeting reticle), `<SpecularButton />` (primary CTA buttons), `<CountUp />` (numeric readouts), `<DepthCarousel />` (3D leaf gallery in `VisionPanel`), `<MagicBento />` (every Bento card in `ElectronicControlTabView`), `<SloshGauge />` (water volume, flow rate, and fertilizer volume tanks in `#settings-pumps`), `<RubberSegment />` (category switchers), and `<AnimatedContent />` (staggered entrance animations across all 4 views: Home, Analyze, Model Architecture, Electronic Control) — while decluttering `ElectronicControlTabView` (`หน้าควบคุมวงจร`) into a compact top status/phase bar plus a 4-tab segmented view with Thai-first labels and separated `R1–R4` vs. `R5–R7` relay groups.
+**Goal:** Complete the integration of all **11 React Bits components** in `server/static/index.html` — fixing every partial/stubbed component left by the previous pass (`MotionShim`, `GsapShim`, `<AnimatedContent />`, `<MagicBento />`, interactive `<SloshGauge />` for water volume & flow rate, `<RubberSegment />` for category switchers, `<CountUp />` across `AnalyzeTabView` & `ElectronicControlTabView`, `<SpecularButton />` on remaining primary CTAs, and Thai-first relay titles).
 
-**Architecture:** We keep `server/static/index.html` as a self-contained React 18 + Tailwind CSS single-page app. All 11 React Bits components (`GradientASCII`, `Particles`, `TechText`, `Crosshair`, `SpecularButton`, `CountUp`, `DepthCarousel`, `MagicBento`, `SloshGauge`, `RubberSegment`, `AnimatedContent`) are embedded in IIFE modules (`const ComponentName = (() => { ... })();`) to prevent identifier collisions (`VERTEX`, `FRAGMENT`, `SHAPES`, `INTRO_SECONDS`, `clamp`, `clamp01`, `wrap`, `smoothstep`, `noise`, `compile`, `link`, `H`, `STEP`, `FONT`) and provide zero-dependency browser shims (`animate`, `cubicBezier`, `useInView`, `useMotionValue`, `useTransform`, `useReducedMotion`, `motion.div`, `gsap`, `ScrollTrigger`, and inline SVGs). In `ElectronicControlTabView`, inactive sub-tabs (`pumps`, `vision`, `simulation`, `pinout`) toggle visibility via CSS (`block` vs `hidden`) rather than unmounting, guaranteeing 100% DOM presence for existing test suites.
+**Architecture:** `server/static/index.html` (currently 10,535 lines) already contains the CSS and IIFE definitions for `GradientASCII`, `Particles`, `CountUp`, `TechText`, `DepthCarousel`, `SpecularButton`, `SloshGauge`, `RubberSegment`, and `Crosshair` (lines 1317–6165), but has **7 specific incomplete areas** where components were either stubbed or not wired into the views. This plan closes all 7 gaps with strict TDD tests in `tests/test_control_ux_cleanup.py`.
 
-**Tech Stack:** React 18 (Babel standalone JSX in `server/static/index.html`), WebGL2 (`GradientASCII`, `Particles`, `SpecularButton`), 2D Canvas (`TechText`, `Crosshair`), 3D CSS Perspective (`DepthCarousel`), `CountUp`, `MagicBento`, `SloshGauge`, `RubberSegment` & `AnimatedContent` (React Bits), Tailwind CSS, Python `unittest`.
+**Tech Stack:** React 18 (Babel standalone JSX in `server/static/index.html`), WebGL2, 2D Canvas, CSS 3D Perspective, Tailwind CSS, Python `unittest`.
 
 **Spec:** `docs/superpowers/specs/2026-11-05-control-ux-ui-copy-cleanup-design.md`
 
-## Component Source Code Locations (For Subagents / Other Agents)
+---
 
-All 11 React Bits component full JS + CSS sources provided by the user are stored in `C:\Users\Admin\.gemini\antigravity\brain\3db8a5a7-963d-4d8f-a985-fe689ed088ef\.system_generated\logs\transcript_full.jsonl` at the following exact line numbers (read with `StartLine` = `EndLine`):
+## Audit of Exact Gaps in `server/static/index.html` (What Was Left Incomplete)
 
-| Component | Line in `transcript_full.jsonl` | Step Index |
-|---|---|---|
-| `<Particles />` + `<GradientASCII />` | Line `5345` | `5142` |
-| `<CountUp />` | Line `5359` | `5156` |
-| `<TechText />` | Line `5371` | `5168` |
-| `<DepthCarousel />` | Line `5379` | `5176` |
-| `<SpecularButton />` | Line `5391` | `5188` |
-| `<MagicBento />` | Line `5399` | `5196` |
-| `<SloshGauge />` | Line `5409` | `5206` |
-| `<RubberSegment />` | Line `5415` | `5212` |
-| `<Crosshair />` + `<AnimatedContent />` | Line `5421` | `5218` |
-
-## Global Constraints
-
-- Zero `text-[10px]` or `text-[11px]` utility classes inside `ElectronicControlTabView` (`test_no_body_copy_below_twelve_pixels`).
-- Never use the forbidden substring `"Control (สมบูรณ์)"` or `"quickUnits"` in `server/static/index.html` (`TestAllSampleRemoval` in `tests/test_dashboard_overhaul.py`).
-- All Thai plant references must use `ผักบุ้ง` (Water Spinach).
-- On the Home page (`currentView === 'home'`), remove the old `home-backdrop` (`back.jpg`) and hide the Three.js starfield canvas, rendering the `<GradientASCII />` + `<Particles />` combo with the exact user-specified props.
-- In `HomeView`, render `<Crosshair containerRef={homeContainerRef} color="#ffffff" targetEffect="lock" thickness={1} opacity={0.85} smoothing={0.35} showCoordinates />`, `<TechText text="A.E.G.I.S" ... />`, and `<SpecularButton />` for the primary CTA buttons (`ENTER A.E.G.I.S ANALYZE`, `READ SYSTEM SPEC +`).
-- Wrap content sections across **every page/view in `server/static/index.html`** (`HomeView`, `AnalyzeTabView`, `ModelArchitectureTabView`, `ElectronicControlTabView`) with `<AnimatedContent distance={100} direction="vertical" duration={0.8} ease="power3.out" blur={0} stagger={0.08} threshold={0.1}>`.
-- Use `<SpecularButton />` selectively on primary action buttons in `ElectronicControlTabView` (`▶ รันอัตโนมัติครบ 6 ขั้นตอน`, `💧 สั่งฉีดปุ๋ยตามสูตรทันที`, `📸 สั่งถ่ายภาพใหม่`) so active WebGL2 contexts remain well within the browser limit (<= 6 per view).
-- Integrate `<CountUp />` for key numeric readouts across `AnalyzeTabView` (Temperature, pH, EC KPIs) and `ElectronicControlTabView` (dosing volumes/durations and simulated sensor metrics).
-- Integrate `<DepthCarousel />` inside `VisionPanel` (`#settings-vision`) to display the saved experimental ผักบุ้ง leaf photos in a 3D depth stack (`depth={220}`, `spread={90}`, `tilt={22}`, `tiltDirection="right"`, `perspective={1400}`, `visibleCards={4}`, `falloff={0.2}`, `blur={6}`, `autoplay`, `loop`).
-- Upgrade `<MagicBento />` to the full React Bits implementation (`enableBorderGlow={true}`, `enableSpotlight={true}`, `spotlightRadius={300}`, `clickEffect={true}`, `enableStars`, `enableTilt`, `enableMagnetism`) and wrap every Bento card in `ElectronicControlTabView` (`#settings-schedule`, `#settings-pumps`, `#settings-vision`, `#settings-simulation`, `#settings-pinout`) in `<MagicBento />` while keeping `<MagicBentoCard />` compatible for `AnalyzeTabView`.
-- Integrate `<SloshGauge />` inside `#settings-pumps` (`ElectronicControlTabView`) to interactively adjust **water volume / pump runtime (`pumpRuntimeMs`)**, **water flow rate (`calibration.pump_flow_rate_ml_s` / `pumpFlowRates`)**, and **Stock A/B/C dosing volumes (`stockAmounts`)**.
-- Integrate `<RubberSegment />` (`stretch={100}`, `squash={3}`, `speed={1}`, `glide={75}`, `draggable`) for **category selection** across `ElectronicControlTabView` (the 4 sub-tabs `pumps` / `vision` / `simulation` / `pinout` and the AI deficiency category in `#settings-simulation`), `VisionPanel` (leaf photo category filter), and `AnalyzeTabView` (experimental unit category selector).
-- Preserve all four section anchor IDs (`id="settings-schedule"`, `id="settings-pumps"`, `id="settings-vision"`, `id="settings-simulation"`) plus `id="settings-pinout"` inside `ElectronicControlTabView`.
-- Preserve all strings asserted by `tests/test_presentation_override.py` and `tests/test_dashboard_overhaul.py`.
+| # | Component / Area | Current State in `server/static/index.html` | Required Fix |
+|---|---|---|---|
+| **1** | **`MotionShim` & `GsapShim`** (lines 1191–1315) | `MotionShim.animate` ignores cubic-bezier array eases (`[0.23, 1, 0.32, 1]`) and spring physics (`type: 'spring'`), and `getVelocity()` returns `0`. `GsapShim` only has `gsap.to` (missing `gsap.set`, `gsap.context`, `gsap.timeline`, `gsap.registerPlugin`, `ScrollTrigger.create`). | Upgrade `MotionShim` to support cubic-bezier arrays, spring physics (`bounce`, `velocity`), and real velocity tracking in `useMotionValue`. Upgrade `GsapShim` with `gsap.set`, `gsap.context`, `gsap.timeline`, `gsap.registerPlugin`, and `ScrollTrigger.create`. |
+| **2** | **`<AnimatedContent />`** (lines 6565–6637) | Still uses the old CSS-transition stub (`distance = 20`, `duration = 0.45`) instead of the React Bits GSAP + `ScrollTrigger` component. | Replace lines 6565–6637 with the genuine React Bits `<AnimatedContent />` component (`WIPES`, `gsap.context`, `gsap.timeline`, `ScrollTrigger.create`, `distance = 100`, `duration = 0.8`, `ease = 'power3.out'`, `stagger = 0.08`, `threshold = 0.1`) and wrap the content sections of `HomeView`, `AnalyzeTabView`, and each sub-tab section of `ElectronicControlTabView`. |
+| **3** | **`<MagicBento />`** (lines 6641–6797 & `ElectronicControlTabView`) | Lines 6641–6733 are still the old simple wrapper, and `#settings-schedule` (line 9470), `#settings-vision` (line 9865), `#settings-simulation` (lines 9961, 10090), and `#settings-pinout` (line 10145) do NOT use `<MagicBento />`! | Upgrade `<MagicBento />` to support `.magic-bento__stars` 2D canvas star particles, spring tilt (`enableTilt`), magnetism (`enableMagnetism`), spotlight border glow (`enableBorderGlow`, `enableSpotlight`, `spotlightRadius={300}`), and click wave (`clickEffect={true}`), and wrap **every** Bento card in `ElectronicControlTabView` (`#settings-schedule`, `#settings-pumps`, `#settings-vision`, `#settings-simulation`, `#settings-pinout`) in `<MagicBento enableBorderGlow={true} enableSpotlight={true} spotlightRadius={300} clickEffect={true} enableStars enableTilt enableMagnetism>`. |
+| **4** | **`<SloshGauge />`** (lines 9605–9765 in `#settings-pumps`) | Rendered with `interactive={false}` and `showValue={false}` (lines 9717–9731) and no `onChange`! Missing water volume & water flow rate `<SloshGauge />` controllers (`"อันนี้เอาไว้ปรับ volume อัตราการไหลของน้ำ"`). | Add 2 interactive `<SloshGauge interactive showValue viscosity={0.15} tilt={0.45} splash={0.42} />` tanks in the left column of `#settings-pumps` to adjust **Water Volume / Pump Runtime (`pumpRuntimeMs`)** and **Water Flow Rate (`calibration.pump_flow_rate_ml_s` & `pumpFlowRates`)**, and change all 3 Stock A/B/C `<SloshGauge />` tanks (lines 9717–9731) to `interactive={true}` `showValue={true}` with `onChange` updating `stockAmounts`. |
+| **5** | **`<RubberSegment />`** (lines 9435–9458 & `#settings-simulation`) | Only used once in `VisionPanel`. The 4 main sub-tabs of `ElectronicControlTabView` (lines 9435–9458) are plain `<button>`s, and `#settings-simulation` has no `<RubberSegment />` category selector (`"เอาไปใช้กับการเลือกหมวดหมู่"`). | Replace the 4 sub-tab `<button>`s at lines 9435–9458 with `<RubberSegment items={SUB_TABS.map(t => ({ value: t.id, label: t.label }))} value={controlSubTab} onChange={setControlSubTab} stretch={100} squash={3} speed={1} glide={75} draggable />`, and add `<RubberSegment />` in `#settings-simulation` for selecting the AI deficiency category (`Control`, `-N`, `-P`, `-K`). |
+| **6** | **`<CountUp />`** (`AnalyzeTabView` lines 8122, 8196, 8224, 8604 & `#settings-simulation` lines 10000–10063) | Only used on Stock A/B/C mL in `#settings-pumps`. Missing in `AnalyzeTabView` (Temperature, PH sensor, EC sensor, Healthy/N/P/K %) and in `#settings-simulation` (`simEc`, `simPh`, `simTemp`, ratios, total mL, pump ms) (`"เอาไปใส่ในส่วนของตัวเลข"`). | Wrap numeric readouts in `AnalyzeTabView` (`activeTemp`, `unitSummary.ph`, `unitSummary.ec`, and the 4 NPK `%` values) and in `ElectronicControlTabView` (`pumpRuntimeMs / 1000`, `simEc`, `simPh`, `simTemp`, `r1_pct`/`r2_pct`/`r3_pct`, `total_volume_ml`, `pump1_ms`/`pump2_ms`/`pump3_ms`) with `<CountUp easing="expo" replayOnHover />`. |
+| **7** | **`<SpecularButton />` & Relay Thai Copy** (lines 7780, 8848–8855, 9662, 9880, 9893) | `READ SYSTEM SPEC +` on Home and `▶ สั่งรันครบ 6 ขั้นตอนทันที` / `📸 โหมดส่งภาพจริง` in `#settings-vision` are plain `<button>`s. Relay cards at line 9662 show English `{r.name}` as primary title, and `R2` role is missing `"ปั๊มลมกวนน้ำในกระบอก"`. | Upgrade those CTA buttons to `<SpecularButton />`. In `relays` state (lines 8848–8854), include `"ปั๊มลมกวนน้ำในกระบอก"` in `R2`, and at line 9662 display `{r.role}` as the visible primary title with `<span className="sr-only">{r.name}</span>` so hardware strings remain in DOM for tests. |
 
 ---
 
-### Task 1: Add TDD Verification Suite for All 11 React Bits Components & Control UX/UI Cleanup
+### Task 1: Tighten TDD Verification Suite in `tests/test_control_ux_cleanup.py` to Catch All 7 Gaps
 
 **Files:**
-- Create: `tests/test_control_ux_cleanup.py`
+- Modify: `tests/test_control_ux_cleanup.py`
 - Test: `tests/test_control_ux_cleanup.py`
 
-**Interfaces:**
-- Consumes: `server/static/index.html`
-- Produces: `TestControlUxUiCleanup` unittest suite verifying the 11 React Bits components (`GradientASCII`, `Particles`, `TechText`, `Crosshair`, `SpecularButton`, `CountUp`, `DepthCarousel`, `MagicBento`, `SloshGauge`, `RubberSegment`, `AnimatedContent`), the 4 sub-tabs, grouped `R1–R4` vs `R5–R7` relay cards, Thai-first action labels, and collapsible flow calibration drawer.
-
-- [ ] **Step 1: Write the failing test in `tests/test_control_ux_cleanup.py`**
+- [ ] **Step 1: Replace `tests/test_control_ux_cleanup.py` with strict assertions covering all 11 React Bits components and their exact placements**
 
 ```python
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""TDD verification for 11 React Bits components & Control UX/UI Cleanup."""
+"""Strict TDD verification for all 11 React Bits components & Control UX/UI Cleanup."""
 
 import re
 import unittest
@@ -74,80 +51,105 @@ class TestControlUxUiCleanup(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.html = INDEX_HTML.read_text(encoding="utf-8")
-        start = cls.html.index("function ElectronicControlTabView")
-        end = cls.html.index("function App()", start)
-        cls.control_body = cls.html[start:end]
+        home_start = cls.html.index("function HomeView")
+        home_end = cls.html.index("function AnalyzeTabView", home_start)
+        cls.home_body = cls.html[home_start:home_end]
 
-    def test_0_home_uses_gradient_ascii_particles_tech_text_crosshair_and_specular_button(self):
-        self.assertIn(".gradient-ascii-container", self.html)
-        self.assertIn(".particles-container", self.html)
-        self.assertIn(".tech-text-canvas", self.html)
-        self.assertIn(".specular-button__light", self.html)
-        self.assertIn("const GradientASCII =", self.html)
-        self.assertIn("const Particles =", self.html)
-        self.assertIn("const TechText =", self.html)
-        self.assertIn("const Crosshair =", self.html)
-        self.assertIn("const SpecularButton =", self.html)
-        self.assertIn("const AnimatedContent =", self.html)
-        self.assertIn('<GradientASCII', self.html)
-        self.assertIn('characters=" 01"', self.html)
-        self.assertIn('<Particles', self.html)
-        self.assertIn('particleCount={1680}', self.html)
-        self.assertIn('shape="sparkle"', self.html)
-        home_start = self.html.index("function HomeView")
-        home_end = self.html.index("function AnalyzeTabView", home_start)
-        home_body = self.html[home_start:home_end]
-        self.assertIn('<TechText', home_body)
-        self.assertIn('text="A.E.G.I.S"', home_body)
-        self.assertIn('reveal="letter"', home_body)
-        self.assertIn('<Crosshair', home_body)
-        self.assertIn('targetEffect="lock"', home_body)
-        self.assertIn('showCoordinates', home_body)
-        self.assertIn('<SpecularButton', home_body)
-        self.assertIn('<AnimatedContent', home_body)
-        cosmic_start = self.html.index("function CosmicThreeBackground")
-        cosmic_end = self.html.index("function getSavedGallery", cosmic_start)
-        cosmic_body = self.html[cosmic_start:cosmic_end]
-        self.assertNotIn('<div className="home-backdrop">', cosmic_body)
+        analyze_start = home_end
+        analyze_end = cls.html.index("function computeLocalTwoFactorDosing", analyze_start)
+        cls.analyze_body = cls.html[analyze_start:analyze_end]
 
-    def test_0b_all_views_use_animated_content_and_react_bits_suite(self):
-        self.assertIn("const CountUp =", self.html)
-        self.assertIn("const DepthCarousel =", self.html)
-        self.assertIn("const MagicBento =", self.html)
-        self.assertIn("const SloshGauge =", self.html)
-        self.assertIn("const RubberSegment =", self.html)
-        self.assertIn(".depth-carousel__stage", self.html)
-        self.assertIn(".magic-bento__star-layer", self.html)
-        self.assertIn(".slosh-gauge__liquid", self.html)
-        self.assertIn(".rubber-segment__thumb", self.html)
-        self.assertIn("<CountUp", self.html)
-        self.assertIn("replayOnHover", self.html)
-        self.assertIn("<CountUp", self.control_body)
-        self.assertIn("<SpecularButton", self.control_body)
-        self.assertIn("<MagicBento", self.control_body)
+        control_start = cls.html.index("function ElectronicControlTabView")
+        control_end = cls.html.index("function App()", control_start)
+        cls.control_body = cls.html[control_start:control_end]
+
+        vision_start = cls.html.index("function VisionPanel")
+        vision_end = cls.html.index("function HomeView", vision_start)
+        cls.vision_body = cls.html[vision_start:vision_end]
+
+    def test_0_home_uses_gradient_ascii_particles_tech_text_crosshair_and_two_specular_buttons(self):
+        self.assertIn("<GradientASCII", self.home_body)
+        self.assertIn("characters=\" 01\"", self.home_body)
+        self.assertIn("<Particles", self.home_body)
+        self.assertIn("particleCount={1680}", self.home_body)
+        self.assertIn("shape=\"sparkle\"", self.home_body)
+        self.assertIn("<TechText", self.home_body)
+        self.assertIn("text=\"A.E.G.I.S\"", self.home_body)
+        self.assertIn("reveal=\"letter\"", self.home_body)
+        self.assertIn("<Crosshair", self.home_body)
+        self.assertIn("targetEffect=\"lock\"", self.home_body)
+        self.assertIn("showCoordinates", self.home_body)
+        self.assertIn("<AnimatedContent", self.home_body)
+        self.assertGreaterEqual(
+            self.home_body.count("<SpecularButton"),
+            2,
+            "Both primary Home CTAs (ENTER A.E.G.I.S ANALYZE and READ SYSTEM SPEC) must use <SpecularButton>",
+        )
+
+    def test_0b_animated_content_is_real_react_bits_gsap_scrolltrigger_component(self):
+        ac_start = self.html.index("const AnimatedContent =")
+        ac_end = self.html.index("const MagicBento =", ac_start)
+        ac_def = self.html[ac_start:ac_end]
+        self.assertIn("ScrollTrigger.create", ac_def)
+        self.assertIn("gsap.timeline", ac_def)
+        self.assertIn("WIPES", ac_def)
+        self.assertIn("stagger", ac_def)
+
+    def test_0c_analyze_view_uses_count_up_animated_content_and_magic_bento(self):
+        self.assertIn("<AnimatedContent", self.analyze_body)
+        self.assertIn("<MagicBento", self.analyze_body)
+        self.assertGreaterEqual(
+            self.analyze_body.count("<CountUp"),
+            4,
+            "AnalyzeTabView must use <CountUp /> for Temperature, PH sensor, EC sensor, and NPK % readouts",
+        )
+
+    def test_0d_electronic_control_uses_all_react_bits_components_completely(self):
+        # 1. MagicBento must wrap cards across all sections in ElectronicControlTabView (at least 4 MagicBento grids)
+        self.assertGreaterEqual(
+            self.control_body.count("<MagicBento"),
+            4,
+            "Every Bento section in ElectronicControlTabView (#settings-schedule, #settings-pumps, #settings-vision, #settings-simulation, #settings-pinout) must use <MagicBento>",
+        )
         self.assertIn("enableStars", self.control_body)
         self.assertIn("enableTilt", self.control_body)
         self.assertIn("enableMagnetism", self.control_body)
-        self.assertIn("<SloshGauge", self.control_body)
+
+        # 2. SloshGauge must be interactive (interactive + onChange) for water volume, flow rate, and Stock A/B/C
+        self.assertNotIn("interactive={false}", self.control_body)
+        self.assertGreaterEqual(
+            self.control_body.count("<SloshGauge"),
+            3,
+            "ElectronicControlTabView must render interactive <SloshGauge /> tanks for water volume/flow rate and Stock A/B/C",
+        )
         self.assertIn("viscosity={0.15}", self.control_body)
-        self.assertIn("<RubberSegment", self.control_body)
+
+        # 3. RubberSegment must be used for the 4 main sub-tabs AND simulation category selection
+        self.assertGreaterEqual(
+            self.control_body.count("<RubberSegment"),
+            2,
+            "ElectronicControlTabView must use <RubberSegment /> for the 4 main sub-tabs and AI deficiency category selection",
+        )
         self.assertIn("stretch={100}", self.control_body)
-        self.assertIn("<AnimatedContent", self.control_body)
 
-        analyze_start = self.html.index("function AnalyzeTabView")
-        analyze_end = self.html.index("function ModelArchitectureTabView", analyze_start)
-        self.assertIn("<AnimatedContent", self.html[analyze_start:analyze_end])
+        # 4. CountUp must be used for dosing volumes AND simulation readouts
+        self.assertGreaterEqual(
+            self.control_body.count("<CountUp"),
+            5,
+            "ElectronicControlTabView must use <CountUp /> across dosing volumes, pump runtime, and simulation readouts",
+        )
 
-        model_start = self.html.index("function ModelArchitectureTabView")
-        model_end = self.html.index("function ElectronicControlTabView", model_start)
-        self.assertIn("<AnimatedContent", self.html[model_start:model_end])
+        # 5. SpecularButton must be used for primary action CTAs in ElectronicControlTabView
+        self.assertGreaterEqual(
+            self.control_body.count("<SpecularButton"),
+            3,
+            "ElectronicControlTabView must use <SpecularButton /> for primary CTAs (Full Cycle, Manual Dose, Camera Capture)",
+        )
 
-        vision_start = self.html.index("function VisionPanel")
-        vision_end = self.html.index("function HomeView", vision_start)
-        vision_body = self.html[vision_start:vision_end]
-        self.assertIn("<DepthCarousel", vision_body)
-        self.assertIn('tiltDirection="right"', vision_body)
-        self.assertIn("<RubberSegment", vision_body)
+        # 6. VisionPanel uses DepthCarousel and RubberSegment
+        self.assertIn("<DepthCarousel", self.vision_body)
+        self.assertIn('tiltDirection="right"', self.vision_body)
+        self.assertIn("<RubberSegment", self.vision_body)
 
     def test_1_segmented_subtabs_exist_with_pumps_default(self):
         self.assertIn("const [controlSubTab, setControlSubTab] = useState('pumps')", self.control_body)
@@ -159,7 +161,7 @@ class TestControlUxUiCleanup(unittest.TestCase):
         ):
             self.assertIn(label, self.control_body)
 
-    def test_2_relays_grouped_into_chamber_and_dosing_sets(self):
+    def test_2_relays_grouped_into_chamber_and_dosing_sets_with_thai_titles(self):
         self.assertIn("ชุดกระบอกตวงวัดน้ำ & ล้างหัววัด (R1–R4)", self.control_body)
         self.assertIn("ชุดปั๊มโดสปุ๋ย A / B / C (R5–R7)", self.control_body)
         for thai_name in (
@@ -172,6 +174,7 @@ class TestControlUxUiCleanup(unittest.TestCase):
             "ปั๊มปุ๋ย C (โพแทสเซียม K)",
         ):
             self.assertIn(thai_name, self.html)
+        self.assertIn('<span className="sr-only">{r.name}</span>', self.control_body)
 
     def test_3_clean_thai_action_buttons_and_collapsible_calibration(self):
         self.assertIn("สั่งฉีดปุ๋ยตามสูตรทันที", self.control_body)
@@ -188,71 +191,282 @@ if __name__ == "__main__":
     unittest.main(verbosity=2)
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] **Step 2: Run `tests/test_control_ux_cleanup.py` to confirm it fails on the 7 incomplete gaps**
 
 Run: `C:\Users\Admin\miniconda3\envs\ai-env312\python.exe -m unittest tests/test_control_ux_cleanup.py -v`
-Expected: FAIL on the new assertions.
+Expected: FAIL on `test_0`, `test_0b`, `test_0c`, `test_0d`, and `test_2`.
 
 ---
 
-### Task 2: Integrate All 11 React Bits Components (`MagicBento`, `SloshGauge`, `RubberSegment`, `CountUp`, `TechText`, `Crosshair`, `SpecularButton`, `DepthCarousel`, `AnimatedContent`, `GradientASCII`, `Particles`) & Apply Across Views
+### Task 2: Upgrade `MotionShim`, `GsapShim`, `<AnimatedContent />`, and `<MagicBento />` in `server/static/index.html`
 
 **Files:**
-- Modify: `server/static/index.html` (CSS styles around line 795, React Bits Component Suite around line 1425, `CosmicThreeBackground` around lines 1990-2045, `VisionPanel` around line 2061, `HomeView` around line 2293, `AnalyzeTabView`, and `ModelArchitectureTabView`)
-- Test: `tests/test_control_ux_cleanup.py`, `tests/test_dashboard_overhaul.py`
+- Modify: `server/static/index.html` (lines 1191–1315 for `MotionShim` and `GsapShim`; lines 6563–6797 for `AnimatedContent` and `MagicBento`)
+- Test: `tests/test_control_ux_cleanup.py`
 
-**Interfaces:**
-- Consumes: React `useState`, `useEffect`, `useLayoutEffect`, `useRef`, `useMemo`, `useCallback`, `useId`
-- Produces:
-  - CSS classes for all 11 React Bits components.
-  - IIFE-scoped `MagicBento`, `SloshGauge`, `RubberSegment`, `CountUp`, `TechText`, `Crosshair`, `SpecularButton`, `DepthCarousel`, `AnimatedContent`, `GradientASCII`, and `Particles`.
-  - Updated `CosmicThreeBackground` rendering `<GradientASCII />` + `<Particles />` when `isHome` is true.
-  - Updated `HomeView` rendering `<Crosshair />`, `<TechText text="A.E.G.I.S" ... />`, `<SpecularButton />` CTAs, and `<AnimatedContent />`.
-  - Updated `VisionPanel` rendering `<RubberSegment />` and `<DepthCarousel />`.
-  - Updated `AnalyzeTabView` and `ModelArchitectureTabView` with `<AnimatedContent />`, `<CountUp />`, and `<RubberSegment />`.
+- [ ] **Step 1: Upgrade `MotionShim` and `GsapShim` (lines 1191–1315 of `server/static/index.html`)**
 
-- [ ] **Step 1: Add CSS and all 11 IIFE-scoped React Bits components to `server/static/index.html` and wire `HomeView`, `VisionPanel`, `AnalyzeTabView`, and `ModelArchitectureTabView`**
+Update `MotionShim` so:
+- `useMotionValue` tracks velocity (`lastVal`, `lastTime`, `vel`) inside `set(v)` and returns `vel` from `getVelocity()`.
+- `animate(fromOrMv, to, opts)` supports:
+  - Cubic-bezier array `opts.ease` (`Array.isArray(opts.ease)` -> `cubicBezier(...opts.ease)`),
+  - Spring animation when `opts.type === 'spring'` (damped harmonic oscillator using `opts.duration`, `opts.bounce`, `opts.velocity`),
+  - Returning a Promise-like `{ stop, then }` object.
+Update `GsapShim` so it exports `{ gsap, ScrollTrigger }`:
+- `gsap.registerPlugin = () => {}`
+- `gsap.set(targets, vars)` applies `visibility`, `opacity`, `x`, `y`, `scale`, `rotation`, `filter`, `maskImage`, `webkitMaskImage`, or `clearProps` to an element or array of elements.
+- `gsap.context(fn, scope)` executes `fn()` and returns `{ revert: () => {} }`.
+- `gsap.timeline({ paused, onStart, onComplete })` provides `.fromTo(targets, fromVars, toVars, delaySec)` with `stagger` support (`toVars.stagger?.each`), `.play()`, and `.reverse()`.
+- `ScrollTrigger.create({ trigger, start, once, onEnter, onLeaveBack, animation, scrub })` uses `IntersectionObserver` (threshold `0.1`) to call `onEnter()` / `animation?.play()` as soon as `trigger` enters the viewport (or immediately on mount if already visible).
 
-- [ ] **Step 2: Run `test_0_home_uses_gradient_ascii_particles_tech_text_crosshair_and_specular_button`, `TestHomeSimplification`, and `TestVisionPanel`**
+- [ ] **Step 2: Replace `AnimatedContent` (lines 6565–6637) with the genuine React Bits `<AnimatedContent />` component**
 
-Run: `C:\Users\Admin\miniconda3\envs\ai-env312\python.exe -m unittest tests.test_control_ux_cleanup.TestControlUxUiCleanup.test_0_home_uses_gradient_ascii_particles_tech_text_crosshair_and_specular_button tests.test_dashboard_overhaul.TestHomeSimplification tests.test_dashboard_overhaul.TestVisionPanel -v`
-Expected: PASS.
+Use the exact React Bits `AnimatedContent` implementation (with `WIPES`, `gsap.context`, `gsap.set`, `gsap.timeline`, `tl.fromTo`, `ScrollTrigger.create`, `distance = 100`, `direction = 'vertical'`, `duration = 0.8`, `ease = 'power3.out'`, `blur = 0`, `stagger = 0.08`, `threshold = 0.1`, `trigger = 'scroll'`).
+
+- [ ] **Step 3: Upgrade `MagicBento` (lines 6641–6797) to include `.magic-bento__stars` particle canvas, spring tilt, magnetism, and click wave**
+
+In `MagicBento` (lines 6641–6733), add:
+- Automatic `.magic-bento__stars` 2D canvas particle spawner inside each `.magic-bento-card` when `enableStars` is true, drawing rising glowing specks near the pointer (`particleCount = 24`).
+- Click wave ring (`--mb-wx`, `--mb-wy`, `--mb-wr`, `--mb-wa`) when `clickEffect` is true.
+- Support for `enableBorderGlow`, `enableSpotlight`, `spotlightRadius`, `enableStars`, `enableTilt`, and `enableMagnetism`.
 
 ---
 
-### Task 3: Update `RELAY_CHANNELS` & `CHAMBER_PHASES` Copy to Clean Thai-First Metadata
+### Task 3: Wire `<SpecularButton />` on `HomeView` and `<CountUp />` on `AnalyzeTabView`
 
 **Files:**
-- Modify: `server/static/index.html` (`CHAMBER_PHASES` and `RELAY_CHANNELS`)
-- Test: `tests/test_control_ux_cleanup.py`, `tests/test_presentation_override.py`
+- Modify: `server/static/index.html` (`HomeView` around line 7780, `AnalyzeTabView` around lines 8120–8615)
+- Test: `tests/test_control_ux_cleanup.py`
 
-- [ ] **Step 1: Update `CHAMBER_PHASES` and `RELAY_CHANNELS` in `server/static/index.html`**
+- [ ] **Step 1: Upgrade `READ SYSTEM SPEC +` in `HomeView` (line 7780) to `<SpecularButton />`**
 
-- [ ] **Step 2: Verify existing hardware pinout tests still pass**
+Replace the plain `<button onClick={() => setShowModal(true)} ...>READ SYSTEM SPEC +</button>` at line 7780 with:
+```jsx
+<SpecularButton
+  size="lg"
+  radius={18}
+  tint="#0a1120"
+  tintOpacity={0.45}
+  textColor="#f5f5f5"
+  lineColor="#88deec"
+  baseColor="#334155"
+  intensity={0.9}
+  idleIntensity={0.3}
+  shineSize={10}
+  shineFade={34}
+  thickness={1.2}
+  glow={0.9}
+  followMouse
+  proximity={250}
+  className="font-display tracking-[0.2em] uppercase"
+  onClick={() => setShowModal(true)}
+>
+  READ SYSTEM SPEC +
+</SpecularButton>
+```
 
-Run: `C:\Users\Admin\miniconda3\envs\ai-env312\python.exe -m unittest tests/test_presentation_override.py -v`
-Expected: PASS.
+- [ ] **Step 2: Wire `<CountUp />` to the 4 KPI / probability readouts in `AnalyzeTabView` (lines 8122, 8196, 8224, 8604)**
+
+1. **Temperature card (line 8122):**
+   Replace `{activeTemp}°C` with:
+   `<CountUp to={parseFloat(activeTemp) || 0} decimals={1} duration={0.8} suffix="°C" easing="expo" replayOnHover />`
+2. **PH sensor KPI card (line 8196):**
+   Replace `{unitSummary.ph}` with:
+   `<CountUp to={parseFloat(unitSummary.ph) || 0} decimals={2} duration={0.8} easing="expo" replayOnHover />`
+3. **EC sensor KPI card (line 8224):**
+   Replace `{unitSummary.ec}` with:
+   `<CountUp to={parseFloat(unitSummary.ec) || 0} decimals={3} duration={0.8} easing="expo" replayOnHover />`
+4. **4 NPK Class Progress Strips (`Healthy`, `N`, `P`, `K` at line 8604):**
+   Replace `{pct}%` with:
+   `<CountUp to={pct} decimals={0} duration={0.7} suffix="%" easing="expo" replayOnHover />`
 
 ---
 
-### Task 4: Refactor `ElectronicControlTabView` with `<MagicBento />`, `<RubberSegment />`, `<SloshGauge />`, `<CountUp />`, `<SpecularButton />`, and `<AnimatedContent />`
+### Task 4: Complete `<RubberSegment />`, Interactive `<SloshGauge />`, `<MagicBento />`, `<CountUp />`, `<SpecularButton />`, and Thai Relay Titles in `ElectronicControlTabView`
 
 **Files:**
-- Modify: `server/static/index.html` (`ElectronicControlTabView`)
+- Modify: `server/static/index.html` (`ElectronicControlTabView`, lines 8847–10250)
 - Test: `tests/test_control_ux_cleanup.py`, `tests/test_dashboard_overhaul.py`, `tests/test_presentation_override.py`
 
-- [ ] **Step 1: Refactor `ElectronicControlTabView` JSX in `server/static/index.html`**
+- [ ] **Step 1: Add `"ปั๊มลมกวนน้ำในกระบอก"` to `relays` metadata (lines 8848–8855) and show Thai role as primary title at line 9662**
 
-Wrap sections in `<AnimatedContent />`, wrap all Bento cards in `<MagicBento />`, render `<RubberSegment />` for the 4 sub-tab categories and AI deficiency category selection, integrate interactive `<SloshGauge />` liquid tanks for water volume/flow rate and Stock A/B/C dosing volumes, implement the compact `#settings-schedule` bar, the split `R1–R4` / `R5–R7` relay groups, the clean dosing deck with `<CountUp />` readouts, `<SpecularButton />` primary CTAs, collapsible `<details>` calibration drawer, and CSS visibility toggling (`block` / `hidden`) across the 4 sub-tabs.
+In `relays` initial state (lines 8848–8854):
+- `R1`: `role: 'ดูดน้ำเข้ากระบอกตวง (สูบน้ำจากถังปลูกเข้ากระบอกวัด)'`
+- `R2`: `role: 'ปั๊มลมกวนน้ำในกระบอก / สูบน้ำตัวอย่างวนคืนถังปลูก'`
+- `R3`: `role: 'ปั๊มน้ำดีล้างและแช่หัววัด'`
+- `R4`: `role: 'โซลินอยด์วาล์วปล่อยน้ำทิ้ง'`
+- `R5`: `role: 'ปั๊มปุ๋ย A (เร่งใบ N)'`
+- `R6`: `role: 'ปั๊มปุ๋ย B (โครงสร้าง P)'`
+- `R7`: `role: 'ปั๊มปุ๋ย C (โพแทสเซียม K)'`
 
-- [ ] **Step 2: Run all 3 test suites to verify everything passes**
+And at line 9662 (inside `renderRelayCard`), replace:
+```jsx
+<span className="font-inter font-semibold text-sm text-white">
+  {r.name}
+</span>
+```
+with:
+```jsx
+<span className="font-inter font-semibold text-sm text-white" title={r.name}>
+  {r.role}
+</span>
+<span className="sr-only">{r.name}</span>
+```
+
+- [ ] **Step 2: Replace the 4 sub-tab `<button>`s (lines 9435–9458) with `<RubberSegment />`**
+
+Replace `<nav aria-label="หมวดการควบคุม" ...>` (lines 9435–9458) with:
+```jsx
+<div className="mb-6">
+  <RubberSegment
+    items={SUB_TABS.map((tab) => ({ value: tab.id, label: tab.label }))}
+    value={controlSubTab}
+    onChange={(val) => setControlSubTab(val)}
+    trackColor="#18181b"
+    thumbColor="#C6C7F8"
+    textColor="#fafafa"
+    activeTextColor="#090d16"
+    size="lg"
+    radius={14}
+    inset={4}
+    equalSlots
+    stretch={100}
+    squash={3}
+    speed={1}
+    glide={75}
+    draggable
+    aria-label="หมวดการควบคุม"
+  />
+</div>
+```
+
+- [ ] **Step 3: Wrap `#settings-schedule`, `#settings-vision`, `#settings-simulation`, and `#settings-pinout` cards in `<MagicBento />`**
+
+Wrap the `.figma-card-dark` cards inside `#settings-schedule` (line 9470), `#settings-vision` (line 9865), `#settings-simulation` (line 9959), and `#settings-pinout` (line 10145) with:
+```jsx
+<MagicBento
+  glowColor="198, 199, 248"
+  spotlightRadius={300}
+  enableBorderGlow={true}
+  enableSpotlight={true}
+  clickEffect={true}
+  enableStars
+  enableTilt
+  enableMagnetism
+>
+```
+and add the `magic-bento-card` class to each `.figma-card-dark` card inside them so every Bento card in `ElectronicControlTabView` has full spotlight, border glow, 3D tilt, magnetism, and star particles.
+
+- [ ] **Step 4: Make `<SloshGauge />` interactive for Water Volume (`pumpRuntimeMs`), Water Flow Rate (`pumpFlowRates`), and Stock A/B/C Volumes (`stockAmounts`) in `#settings-pumps`**
+
+1. Inside the Manual Pump Runtime & Water Flow box (lines 9620–9652), add two interactive `<SloshGauge />` liquid tanks side-by-side:
+   - **Tank 1 (ปริมาตรน้ำเดินปั๊ม / Water Volume):**
+     ```jsx
+     <SloshGauge
+       value={Math.round((pumpRuntimeMs / 30000) * 100)}
+       onChange={(lvl) => setPumpRuntimeMs(Math.max(300, Math.round((lvl / 100) * 30000)))}
+       interactive
+       showValue
+       liquidColor="#38bdf8"
+       glassColor="#27272a"
+       width={68}
+       height={120}
+       radius={16}
+       ticks={4}
+       viscosity={0.15}
+       tilt={0.45}
+       splash={0.42}
+       unit="%"
+       ariaLabel="ปรับปริมาตรน้ำเดินปั๊ม"
+     />
+     ```
+   - **Tank 2 (อัตราการไหลของน้ำ / Water Flow Rate `Q` mL/s):**
+     ```jsx
+     <SloshGauge
+       value={Math.round(((calibration.pump_flow_rate_ml_s || 1.0) / 3.0) * 100)}
+       onChange={(lvl) => {
+         const q = +Math.max(0.2, (lvl / 100) * 3.0).toFixed(2);
+         setCalibration((prev) => ({ ...prev, pump_flow_rate_ml_s: q }));
+         setPumpFlowRates({ A: q, B: q, C: q });
+       }}
+       interactive
+       showValue
+       liquidColor="#22d3ee"
+       glassColor="#27272a"
+       width={68}
+       height={120}
+       radius={16}
+       ticks={4}
+       viscosity={0.15}
+       tilt={0.45}
+       splash={0.42}
+       unit="%"
+       ariaLabel="ปรับอัตราการไหลของน้ำ"
+     />
+     ```
+2. On all 3 Stock A / B / C `<SloshGauge />` tanks (lines 9717–9731), change `showValue={false}` `interactive={false}` to:
+   ```jsx
+   <SloshGauge
+     value={Math.min(100, Math.round((stockAmounts[st.key] / 25) * 100))}
+     onChange={(lvl) =>
+       setStockAmounts((prev) => ({
+         ...prev,
+         [st.key]: +((lvl / 100) * 25).toFixed(1),
+       }))
+     }
+     interactive
+     showValue
+     liquidColor={st.color}
+     glassColor="#27272a"
+     width={56}
+     height={108}
+     radius={14}
+     ticks={3}
+     viscosity={0.15}
+     tilt={0.45}
+     splash={0.42}
+     unit="%"
+     ariaLabel={st.title}
+   />
+   ```
+   and wrap `(pumpRuntimeMs / 1000).toFixed(1)` at line 9626 with `<CountUp to={+(pumpRuntimeMs / 1000).toFixed(1)} decimals={1} duration={0.5} suffix="s" easing="expo" replayOnHover />`.
+
+- [ ] **Step 5: Upgrade `#settings-vision` CTAs to `<SpecularButton />` and add `<RubberSegment />` + `<CountUp />` to `#settings-simulation`**
+
+1. In `#settings-vision` (lines 9879–9896), replace the `▶ สั่งรันครบ 6 ขั้นตอนทันที (START_CYCLE)` button and the `📸 โหมดส่งภาพจริง (ESP32-CAM → AI)` button with `<SpecularButton size="md" radius={12} followMouse proximity={220} ...>`.
+2. In `#settings-simulation` (right below the 5 scenario preset buttons at line 9994), add a `<RubberSegment />` category selector for `simClass`:
+   ```jsx
+   <div className="mb-4">
+     <div className="text-xs text-white/60 mb-1.5">เลือกหมวดหมู่อาการขาดธาตุอาหาร (AI Category):</div>
+     <RubberSegment
+       items={[
+         { value: 'Control', label: 'Control (ปกติ)' },
+         { value: 'N_Deficiency', label: 'ขาดไนโตรเจน (-N)' },
+         { value: 'P_Deficiency', label: 'ขาดฟอสฟอรัส (-P)' },
+         { value: 'K_Deficiency', label: 'ขาดโพแทสเซียม (-K)' },
+       ]}
+       value={simClass}
+       onChange={(val) => setSimClass(val)}
+       trackColor="#27272a"
+       thumbColor="#C6C7F8"
+       textColor="#fafafa"
+       activeTextColor="#18181b"
+       size="md"
+       radius={10}
+       inset={3}
+       equalSlots
+       stretch={100}
+       squash={3}
+       speed={1}
+       glide={75}
+       draggable
+       aria-label="หมวดหมู่อาการขาดธาตุอาหาร"
+     />
+   </div>
+   ```
+3. In `#settings-simulation` (lines 10000, 10016, 10032, 10052, 10058), replace `{simEc.toFixed(2)} mS/cm`, `{simPh.toFixed(2)}`, `{simTemp.toFixed(1)} °C`, and `{simDosingResult.volumes_ml.total_volume_ml.toFixed(2)} mL` with `<CountUp easing="expo" replayOnHover ... />`.
+
+- [ ] **Step 6: Run all 3 verification test suites**
 
 Run: `C:\Users\Admin\miniconda3\envs\ai-env312\python.exe -m unittest tests/test_control_ux_cleanup.py tests/test_dashboard_overhaul.py tests/test_presentation_override.py -v`
-Expected: PASS (all tests in all 3 suites pass with 0 errors).
-
-- [ ] **Step 3: Commit changes**
-
-```bash
-git add server/static/index.html tests/test_control_ux_cleanup.py docs/superpowers/specs/2026-11-05-control-ux-ui-copy-cleanup-design.md docs/superpowers/plans/2026-11-05-control-ux-ui-copy-cleanup.md
-git commit -m "feat(ui): integrate 11 React Bits components and declutter Electronic Control"
-```
+Expected: PASS (100% pass across all 3 test files).

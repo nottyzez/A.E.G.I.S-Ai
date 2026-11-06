@@ -107,7 +107,7 @@ class FigmaR1ComponentAndTypographyTest(unittest.TestCase):
         self.assertIn("rgba(255, 255, 255, 0.05)", rules)
         self.assertIn("16px", rules)
 
-        temp_card_jsx = re.search(r'figma-card-temperature[\s\S]*?(<IconThermometerFigma[\s\S]*?\{activeTemp\}°C[\s\S]*?)<\/div>', self.html)
+        temp_card_jsx = re.search(r'figma-card-temperature[\s\S]*?(<IconThermometerFigma[\s\S]*?<CountUp to=\{parseFloat\(activeTemp\)[\s\S]*?suffix="°C"[\s\S]*?)<\/div>', self.html)
         self.assertIsNotNone(temp_card_jsx, "Temperature card must contain IconThermometerFigma and activeTemp readout")
         self.assertIn("64px", temp_card_jsx.group(1))
         self.assertIn("font-work font-bold", temp_card_jsx.group(1))
@@ -152,7 +152,7 @@ class FigmaR1ComponentAndTypographyTest(unittest.TestCase):
 
         # Progress strip layout: Bold label on left (Work Sans 700 20px), percentage value on right (Inter 12px)
         strip_jsx = re.search(
-            r'font-work\s+font-bold\s+text-\[20px\][^>]*>\{item\.label\}</span>\s*<span[^>]*font-inter\s+text-\[12px\][^>]*>\{pct\}%</span>',
+            r'font-work\s+font-bold\s+text-\[20px\][^>]*>\{item\.label\}</span>\s*<span[^>]*font-inter\s+text-\[12px\][^>]*>\s*<CountUp to=\{pct\}[^>]*suffix="%"',
             self.html
         )
         self.assertIsNotNone(strip_jsx, "Progress strip must position bold label (Work Sans 700 20px) on left and percentage (Inter 12px) on right")

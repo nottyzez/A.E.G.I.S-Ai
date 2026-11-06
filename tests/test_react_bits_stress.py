@@ -452,14 +452,21 @@ class TestTier2BranchedMenuAndAnimatedContentStress(unittest.TestCase):
     def test_animated_content_lifecycle_and_unmount_resilience(self):
         """2.4 Verify <AnimatedContent /> unmounting cleans up requestAnimationFrame."""
         html = read_index_html()
-        self.assertIn("cancelAnimationFrame(rafId)", html,
-                      "Missing cancelAnimationFrame cleanup in AnimatedContent useEffect return")
+        self.assertIn("st.kill();", html,
+                      "AnimatedContent must kill its ScrollTrigger on unmount")
+        self.assertIn("tl.kill();", html,
+                      "AnimatedContent must kill its gsap timeline on unmount")
+        self.assertIn("io.disconnect();", html,
+                      "ScrollTrigger.kill must disconnect its IntersectionObserver")
 
     def test_animated_content_reduced_motion_immediate_resolution(self):
         """2.5 Verify <AnimatedContent /> respects prefers-reduced-motion without waiting for timer."""
         html = read_index_html()
         self.assertIn("prefers-reduced-motion: reduce", html)
-        self.assertIn("setMounted(true)", html)
+        # The reduced branch settles the element immediately and completes
+        # synchronously — no timeline, no observer, no timer.
+        self.assertIn("if (reduced || trigger === 'mount')", html)
+        self.assertIn("gsap.set(targets, settle);", html)
 
 
 # ==============================================================================
@@ -622,8 +629,9 @@ class TestTier4ErrorResilienceAndNodeHarness(unittest.TestCase):
         self.assertIn("card.removeEventListener('pointermove', handlePointerMove)", html)
         self.assertIn("card.removeEventListener('pointerleave', handlePointerLeave)", html)
 
-        # AnimatedContent: cancelAnimationFrame
-        self.assertIn("cancelAnimationFrame(rafId)", html)
+        # AnimatedContent: ScrollTrigger + timeline killed on unmount
+        self.assertIn("st.kill();", html)
+        self.assertIn("tl.kill();", html)
 
     def test_empirical_node_v8_stress_harness(self):
         """4.3 Execute Node.js V8 empirical harness with 10,000 synthetic operations on extracted JS."""

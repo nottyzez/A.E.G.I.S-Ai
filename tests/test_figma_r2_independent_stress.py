@@ -200,7 +200,7 @@ class TestReviewer2FigmaR1LayoutAndComponents(unittest.TestCase):
 
         # Typography check: Bold label on left (Work Sans 700 20px), percentage on right (Inter 12px)
         self.assertTrue(
-            bool(re.search(r'font-work\s+font-bold\s+text-\[20px\][^>]*>\{item\.label\}</span>\s*<span[^>]*font-inter\s+text-\[12px\][^>]*>\{pct\}%</span>', self.html)),
+            bool(re.search(r'font-work\s+font-bold\s+text-\[20px\][^>]*>\{item\.label\}</span>\s*<span[^>]*font-inter\s+text-\[12px\][^>]*>\s*<CountUp to=\{pct\}[^>]*suffix="%"', self.html)),
             "Each strip must have bold label on the left (Work Sans 700, 20px) and percentage value on the right (Inter 12px)"
         )
 

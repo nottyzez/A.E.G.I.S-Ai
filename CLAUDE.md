@@ -71,6 +71,24 @@ flash on tap (there is no hover on a phone). `test_5_every_bento_card_can_light_
 `firmware/esp32_main/config.example.h` (GPIO 6 = sample return), not the
 spec's air-agitator label.
 
+**React Bits integration completed (2026-11-06, working tree).** The plan
+`docs/superpowers/plans/2026-11-05-control-ux-ui-copy-cleanup.md` is done:
+`GsapShim` gained `set`/`timeline`/`context`/`registerPlugin`/`ScrollTrigger.create`
+(IntersectionObserver, fail-visible fallback), `AnimatedContent` is the React Bits
+form (`WIPES` clip-path, paused `gsap.timeline`, `stagger: {each}`,
+`ScrollTrigger.create({trigger, start:'top 90%', once:true})`), Home has two
+`<SpecularButton>`s, Analyze has 4 `<CountUp>`, and Control renders
+`<RubberSegment>` for the sub-tabs **and** the simulation category, two
+interactive `<SloshGauge>` (water volume → 300–30 000 ms runtime, flow rate →
+0.2–3.0 mL/s), `<CountUp>` on the simulation readouts, `<SpecularButton>` on the
+vision CTAs, and `<MagicBento>` on schedule / pumps / vision / simulation.
+Pinned by `test_0c`/`test_0d`/`test_0e` in `tests/test_control_ux_cleanup.py`;
+9 of their 10 assertions fail against `HEAD`'s `index.html`, so they gate the
+change rather than describe it. Three Figma suites had asserted the literal
+`{activeTemp}°C` / `{pct}%` text that `<CountUp>` replaced — their regexes now
+match the CountUp form. Suite is **249 tests OK**, verify_figma 26/26,
+check_jsx OK.
+
 **The automatic cycle is back to the full 8 phases: P0 → P1 → P2 → P3 → P4 →
 P5 (Probe Rinse, GPIO 7) → P6 (Drain Waste, GPIO 8) → P7 → IDLE.**
 Phase 5/6 were skipped in `d92a2bf` after the GPIO 7 pump brown-out; that pump's

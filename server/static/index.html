@@ -1316,7 +1316,9 @@
 
     const { animate, cubicBezier, useInView, useMotionValue, useTransform, useReducedMotion, motion } = MotionShim;
 
-    // gsap.to() on a numeric proxy is all <DepthCarousel /> needs.
+    // GsapShim: `to` drives <DepthCarousel />'s numeric proxy; `set`,
+    // `timeline` and `ScrollTrigger.create` are the subset <AnimatedContent />
+    // calls. There is no gsap CDN tag — this is the whole API.
     const gsap = (() => {
       const EASES = {
         none: u => u,
@@ -1352,8 +1354,104 @@
         raf = requestAnimationFrame(frame);
         return { kill() { killed = true; cancelAnimationFrame(raf); } };
       };
-      return { to };
+
+      const list = targets => (Array.isArray(targets) ? targets : [targets]).filter(Boolean);
+
+      const style = (el, v) => {
+        if (!el || !el.style) return;
+        if (v.clearProps) {
+          v.clearProps.split(',').forEach(p => el.style.removeProperty(p.trim()));
+          return;
+        }
+        if (v.x !== undefined || v.y !== undefined || v.scale !== undefined) {
+          el.style.transform = `translate(${v.x ?? 0}px, ${v.y ?? 0}px) scale(${v.scale ?? 1})`;
+        }
+        if (v.rotate !== undefined) el.style.rotate = `${v.rotate}deg`;
+        if (v.opacity !== undefined) el.style.opacity = String(v.opacity);
+        if (v.visibility !== undefined) el.style.visibility = v.visibility;
+        if (v.filter !== undefined) el.style.filter = v.filter;
+        if (v.clipPath !== undefined) el.style.clipPath = v.clipPath;
+      };
+
+      const set = (targets, vars = {}) => list(targets).forEach(el => style(el, vars));
+
+      // Two rAFs so the browser commits the `from` values before the `to`
+      // values land, which is what makes the CSS transition run at all.
+      const timeline = (opts = {}) => {
+        const steps = [];
+        let played = false;
+        const tl = {
+          fromTo(targets, fromVars, toVars, delaySec = 0) {
+            steps.push({ targets: list(targets), fromVars, toVars, delaySec });
+            return tl;
+          },
+          to(targets, vars, delaySec = 0) {
+            steps.push({ targets: list(targets), fromVars: {}, toVars: vars, delaySec });
+            return tl;
+          },
+          play() {
+            if (played) return tl;
+            played = true;
+            let span = 0;
+            steps.forEach(step => {
+              const stagger = step.toVars.stagger?.each ?? 0;
+              step.targets.forEach((el, i) => {
+                const ms = Math.max(0, (step.toVars.duration ?? 0.5) * 1000);
+                const wait = Math.max(0, (step.delaySec + i * stagger) * 1000);
+                span = Math.max(span, ms + wait);
+                if (Object.keys(step.fromVars).length) style(el, step.fromVars);
+                const ease = step.toVars.ease === 'linear' ? 'linear' : 'cubic-bezier(0.22, 1, 0.36, 1)';
+                el.style.transition =
+                  `transform ${ms}ms ${ease} ${wait}ms, opacity ${ms}ms ${ease} ${wait}ms, ` +
+                  `filter ${ms}ms ${ease} ${wait}ms, clip-path ${ms}ms ${ease} ${wait}ms`;
+                requestAnimationFrame(() => requestAnimationFrame(() => style(el, step.toVars)));
+              });
+            });
+            setTimeout(() => opts.onComplete?.(), span + 40);
+            return tl;
+          },
+          reverse() {
+            steps.forEach(step => step.targets.forEach(el => style(el, step.fromVars)));
+            return tl;
+          },
+          kill() {
+            steps.length = 0;
+          },
+        };
+        if (!opts.paused) tl.play();
+        return tl;
+      };
+
+      // Fail visible: if IntersectionObserver or the ref is missing, reveal
+      // immediately rather than leave content stuck at opacity 0.
+      const ScrollTrigger = {
+        create(opts = {}) {
+          let io = null;
+          let done = false;
+          const fire = () => {
+            if (done) return;
+            done = true;
+            if (io) io.disconnect();
+            opts.onEnter?.();
+            opts.animation?.play?.();
+          };
+          if (!opts.trigger || typeof IntersectionObserver === 'undefined') {
+            fire();
+            return { kill() {} };
+          }
+          io = new IntersectionObserver(
+            entries => { if (entries.some(e => e.isIntersecting)) fire(); },
+            { threshold: opts.threshold ?? 0.1 }
+          );
+          io.observe(opts.trigger);
+          return { kill() { done = true; io.disconnect(); } };
+        },
+      };
+
+      return { to, set, timeline, context: fn => { fn?.(); return { revert() {} }; }, registerPlugin: () => {}, ScrollTrigger };
     })();
+
+    const { ScrollTrigger } = gsap;
 
     // =========================================================================
     // REACT BITS COMPONENT SUITE (SELF-CONTAINED BABEL / REACT 18 COMPATIBLE)
@@ -6561,76 +6659,82 @@
     }
 
     // --- Component 3: <AnimatedContent /> ---
-    // Motion Reveal Wrapper with Slide, Fade, Blur, and Scale Transitions
+    // React Bits reveal: a gsap timeline gated by ScrollTrigger, staggering the
+    // direct children. `gsap`/`ScrollTrigger` are the shims defined above.
+    const WIPES = {
+      none: 'inset(0 0 0 0)',
+      up: 'inset(100% 0 0 0)',
+      down: 'inset(0 0 100% 0)',
+      left: 'inset(0 100% 0 0)',
+      right: 'inset(0 0 0 100%)',
+    };
+
     const AnimatedContent = ({
       children,
-      distance = 20,
+      distance = 100,
       direction = 'vertical',
       reverse = false,
-      duration = 0.45,
-      ease = 'cubic-bezier(0.22, 1, 0.36, 1)',
+      duration = 0.8,
+      ease = 'power3.out',
       initialOpacity = 0,
       animateOpacity = true,
       scale = 1,
-      blur = 4,
+      blur = 0,
+      stagger = 0.08,
+      threshold = 0.1,
       delay = 0,
-      trigger = 'mount',
+      trigger = 'scroll',
+      wipe = 'none',
       onStart,
       onComplete,
       className = '',
       style = {},
       ...props
     }) => {
-      const [mounted, setMounted] = useState(false);
       const containerRef = useRef(null);
 
       useEffect(() => {
-        const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
-        if (reduced) {
-          setMounted(true);
+        const el = containerRef.current;
+        if (!el) return undefined;
+        const reduced =
+          typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const targets = el.children.length ? Array.from(el.children) : [el];
+        const axis = direction === 'horizontal' ? 'x' : 'y';
+        const from = {
+          [axis]: (reverse ? -1 : 1) * distance,
+          scale,
+          opacity: animateOpacity ? initialOpacity : 1,
+          filter: blur ? `blur(${blur}px)` : 'blur(0px)',
+          clipPath: WIPES[wipe] || WIPES.none,
+        };
+        const settle = { x: 0, y: 0, scale: 1, opacity: 1, filter: 'blur(0px)', clipPath: WIPES.none };
+
+        if (reduced || trigger === 'mount') {
+          gsap.set(targets, settle);
           onComplete?.();
-          return;
+          return undefined;
         }
 
+        gsap.set(targets, from);
         onStart?.();
-        const rafId = requestAnimationFrame(() => {
-          setMounted(true);
-          const timer = setTimeout(() => {
-            onComplete?.();
-          }, (duration + delay) * 1000);
-          return () => clearTimeout(timer);
+        const tl = gsap.timeline({ paused: true, onComplete });
+        tl.fromTo(targets, from, { ...settle, duration, ease, delay, stagger: { each: stagger } });
+        const st = ScrollTrigger.create({
+          trigger: el,
+          start: 'top 90%',
+          threshold,
+          once: true,
+          onEnter: () => tl.play(),
         });
-
-        return () => cancelAnimationFrame(rafId);
-      }, [trigger, duration, delay]);
-
-      const sign = reverse ? -1 : 1;
-      const isHoriz = direction === 'horizontal';
-      const translateStyle = !mounted
-        ? isHoriz
-          ? `translateX(${distance * sign}px)`
-          : `translateY(${distance * sign}px)`
-        : 'translate(0px, 0px)';
-
-      const currentScale = !mounted && scale !== 1 ? ` scale(${scale})` : ' scale(1)';
-      const currentBlur = !mounted && blur > 0 ? `blur(${blur}px)` : 'blur(0px)';
-      const currentOpacity = !mounted ? (animateOpacity ? initialOpacity : 1) : 1;
+        return () => {
+          st.kill();
+          tl.kill();
+        };
+      }, [trigger, duration, delay, distance, direction, reverse, stagger, threshold, wipe, scale, blur]);
 
       return (
-        <div
-          ref={containerRef}
-          className={`animated-content ${className}`}
-          style={{
-            opacity: currentOpacity,
-            transform: `${translateStyle}${currentScale}`,
-            filter: currentBlur,
-            transition: mounted
-              ? `opacity ${duration}s ${ease} ${delay}s, transform ${duration}s ${ease} ${delay}s, filter ${duration}s ${ease} ${delay}s`
-              : 'none',
-            ...style,
-          }}
-          {...props}
-        >
+        <div ref={containerRef} className={`animated-content ${className}`} style={style} {...props}>
           {children}
         </div>
       );
@@ -7777,12 +7881,23 @@
               >
                 ENTER A.E.G.I.S ANALYZE →
               </SpecularButton>
-              <button
+              <SpecularButton
+                size="md"
+                radius={24}
+                tint="#0a1120"
+                tintOpacity={0.45}
+                lineColor="#88deec"
+                baseColor="#334155"
+                intensity={0.9}
+                idleIntensity={0.3}
+                glow={0.9}
+                followMouse
+                proximity={220}
+                className="font-display tracking-[0.2em] uppercase"
                 onClick={() => setShowModal(true)}
-                className="px-6 py-3.5 rounded-full bg-[#0a1120]/45 hover:bg-[#0a1120]/30 border border-white/20 backdrop-blur-xl text-xs font-display tracking-[0.2em] uppercase text-white/85 hover:text-white transition-all"
               >
                 READ SYSTEM SPEC +
-              </button>
+              </SpecularButton>
             </div>
           </div>
 
@@ -8119,7 +8234,7 @@
                       className="font-work font-bold text-white tracking-[-0.02em] leading-none select-all"
                       style={{ fontSize: '64px', fontWeight: 700 }}
                     >
-                      {activeTemp}°C
+                      <CountUp to={parseFloat(activeTemp) || 0} decimals={1} duration={0.8} suffix="°C" easing="expo" replayOnHover />
                     </div>
                     <div className="text-[10px] font-mono text-white/50 pt-1">
                       {activeTempTimestamp}
@@ -8193,7 +8308,7 @@
                         className="font-work font-bold text-white tracking-[-0.02em]"
                         style={{ fontSize: '32px', lineHeight: '36px' }}
                       >
-                        {unitSummary.ph}
+                        <CountUp to={parseFloat(unitSummary.ph) || 0} decimals={2} duration={0.8} easing="expo" replayOnHover />
                       </span>
                       <span className="font-inter text-[12px] leading-[16px] text-white flex items-center gap-1">
                         <span>{unitSummary.phDelta}</span>
@@ -8221,7 +8336,7 @@
                         className="font-work font-bold text-white tracking-[-0.02em]"
                         style={{ fontSize: '32px', lineHeight: '36px' }}
                       >
-                        {unitSummary.ec}
+                        <CountUp to={parseFloat(unitSummary.ec) || 0} decimals={3} duration={0.8} easing="expo" replayOnHover />
                       </span>
                       <span className="font-inter text-[12px] leading-[16px] text-white flex items-center gap-1">
                         <span>{unitSummary.ecDelta}</span>
@@ -8600,7 +8715,9 @@
                         <div key={item.key} className="flex flex-col gap-0.5">
                           <div className="flex items-baseline justify-between">
                             <span className="font-work font-bold text-[20px] leading-[22px] text-white">{item.label}</span>
-                            <span className="font-inter text-[12px] leading-[16px] text-white/80">{pct}%</span>
+                            <span className="font-inter text-[12px] leading-[16px] text-white/80">
+                              <CountUp to={pct} decimals={0} duration={0.7} suffix="%" easing="expo" replayOnHover />
+                            </span>
                           </div>
                           <div className="figma-strip-track">
                             <div
@@ -8845,7 +8962,7 @@
     }) {
       const [relays, setRelays] = useState([
         { id: 'R1', num: 1, name: 'Diaphragm Pump 1 (Sample Inflow)', pin: 'GPIO 5', defaultSec: 6, active: false, isScheduledBase: false, remainingSec: 0, group: 'chamber', role: 'ดูดน้ำเข้ากระบอกตวง' },
-        { id: 'R2', num: 2, name: 'Diaphragm Pump 2 (Sample Return)', pin: 'GPIO 6', defaultSec: 7, active: false, isScheduledBase: false, remainingSec: 0, group: 'chamber', role: 'สูบน้ำตัวอย่างวนคืนถังปลูก' },
+        { id: 'R2', num: 2, name: 'Diaphragm Pump 2 (Sample Return)', pin: 'GPIO 6', defaultSec: 7, active: false, isScheduledBase: false, remainingSec: 0, group: 'chamber', role: 'ปั๊มลมกวนน้ำในกระบอก / สูบน้ำตัวอย่างวนคืนถังปลูก' },
         { id: 'R3', num: 3, name: 'Diaphragm Pump 3 (Probe Rinse)', pin: 'GPIO 7', defaultSec: 5, active: false, isScheduledBase: false, remainingSec: 0, group: 'chamber', role: 'ปั๊มน้ำดีล้างและแช่หัววัด' },
         { id: 'R4', num: 4, name: 'Solenoid Valve (Drain Valve)', pin: 'GPIO 8', defaultSec: 6, active: false, isScheduledBase: false, remainingSec: 0, group: 'chamber', role: 'โซลินอยด์วาล์วปล่อยน้ำทิ้ง' },
         { id: 'R5', num: 5, name: 'Peristaltic Pump 1 (Stock A: High-N)', pin: 'GPIO 9', defaultSec: 10, active: false, isScheduledBase: false, remainingSec: 0, group: 'dosing', role: 'ปั๊มปุ๋ย A (เร่งใบ N)' },
@@ -8856,6 +8973,12 @@
       // Only one settings group is on screen at a time; the page used to stack
       // all four and the relay matrix was thousands of pixels below the fold.
       const [controlSubTab, setControlSubTab] = useState('pumps');
+      const CONTROL_SUB_TABS = [
+        { value: 'pumps', label: '1. สั่งปั๊ม & โดสปุ๋ย' },
+        { value: 'vision', label: '2. กล้อง & ภาพใบผักบุ้ง' },
+        { value: 'simulation', label: '3. จำลองค่า & ประวัติคำสั่ง' },
+        { value: 'pinout', label: '4. ผังพินบอร์ด (GPIO)' },
+      ];
 
       const [stockAmounts, setStockAmounts] = useState({ A: 8.0, B: 8.0, C: 4.0 });
       // Manual pump runtime, hard-capped at 30 000 ms in UI, server and firmware alike.
@@ -9452,30 +9575,22 @@
           </div>
 
           {/* Segmented sub-tabs — one settings group on screen at a time. */}
-          <nav
-            aria-label="Control sections"
-            className="mb-6 flex flex-wrap gap-1.5 rounded-xl border border-white/10 bg-white/[0.04] p-1.5"
-          >
-            {[
-              { key: 'pumps', label: '1. สั่งปั๊ม & โดสปุ๋ย' },
-              { key: 'vision', label: '2. กล้อง & ภาพใบผักบุ้ง' },
-              { key: 'simulation', label: '3. จำลองค่า & ประวัติคำสั่ง' },
-              { key: 'pinout', label: '4. ผังพินบอร์ด (GPIO)' },
-            ].map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setControlSubTab(tab.key)}
-                aria-current={controlSubTab === tab.key ? 'page' : undefined}
-                className={`flex-1 min-w-[168px] px-3.5 py-2 rounded-lg font-inter text-xs font-semibold transition-all ${
-                  controlSubTab === tab.key
-                    ? 'bg-[#C6C7F8] text-slate-950 shadow-[0_0_18px_rgba(198,199,248,0.35)]'
-                    : 'text-white/65 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
+          <div className="mb-6">
+            <RubberSegment
+              items={CONTROL_SUB_TABS}
+              value={controlSubTab}
+              onChange={(val) => setControlSubTab(val)}
+              trackColor="#1e1e22"
+              thumbColor="#C6F8F7"
+              textColor="#fafafa"
+              activeTextColor="#10141d"
+              size="lg"
+              radius={12}
+              stretch={100}
+              glide={0.8}
+              aria-label="หมวดการควบคุม"
+            />
+          </div>
 
           <section id="settings-schedule" className="mb-8 scroll-mt-24">
             <div className="flex items-baseline justify-between gap-3 mb-3 pb-2 border-b border-white/10">
@@ -9487,7 +9602,16 @@
               </p>
             </div>
             {/* PILLAR 1: Dual-State Schedule & Presentation Override Coexistence Banner */}
-            <div className="figma-card-dark p-5 mb-6 border border-[#C6C7F8]/25">
+            <MagicBento
+              className="mb-6"
+              glowColor="198, 199, 248"
+              enableStars
+              enableTilt
+              enableMagnetism
+              spotlightRadius={300}
+            >
+            <div className="figma-card-dark magic-bento-card p-5 border border-[#C6C7F8]/25">
+              <span className="magic-bento__light" aria-hidden="true" />
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
                 {/* Left 6 Cols: Background Scheduled Automation Status (Never Disabled) */}
                 <div className="lg:col-span-6 flex flex-col gap-2.5 pr-0 lg:pr-4 lg:border-r border-white/10">
@@ -9574,6 +9698,7 @@
                 </div>
               </div>
             </div>
+            </MagicBento>
           </section>
 
           <section
@@ -9649,8 +9774,51 @@
                     />
                     <span className="text-xs font-mono text-white/45">ms</span>
                     <span className="text-xs font-mono text-[#A8C5DA] px-1">
-                      ≈ {estimateVolumeMl(pumpRuntimeMs, 'A').toFixed(1)} mL
+                      ≈ <CountUp to={+estimateVolumeMl(pumpRuntimeMs, 'A').toFixed(1)} decimals={1} duration={0.5} suffix=" mL" easing="expo" replayOnHover />
                     </span>
+                  </div>
+
+                  {/* Water volume & flow rate, dragged as liquid level */}
+                  <div className="flex items-end gap-3 mt-3">
+                    <SloshGauge
+                      value={Math.round((pumpRuntimeMs / 30000) * 100)}
+                      onChange={(lvl) => setPumpRuntimeMs(Math.max(300, Math.round((lvl / 100) * 30000)))}
+                      interactive
+                      showValue
+                      liquidColor="#38bdf8"
+                      glassColor="#27272a"
+                      width={64}
+                      height={112}
+                      radius={16}
+                      ticks={4}
+                      viscosity={0.15}
+                      tilt={0.45}
+                      splash={0.42}
+                      ariaLabel="ปรับปริมาตรน้ำเดินปั๊ม"
+                    />
+                    <SloshGauge
+                      value={Math.round(((pumpFlowRates.A || 1.0) / 3.0) * 100)}
+                      onChange={(lvl) => {
+                        const q = +Math.max(0.2, (lvl / 100) * 3.0).toFixed(2);
+                        setPumpFlowRates({ A: q, B: q, C: q });
+                      }}
+                      interactive
+                      showValue
+                      liquidColor="#22d3ee"
+                      glassColor="#27272a"
+                      width={68}
+                      height={120}
+                      radius={16}
+                      ticks={4}
+                      viscosity={0.15}
+                      tilt={0.45}
+                      splash={0.42}
+                      ariaLabel="ปรับอัตราการไหลของน้ำ"
+                    />
+                    <div className="text-xs text-white/50 leading-relaxed pb-2">
+                      <div>ปริมาตรน้ำที่เดินปั๊ม</div>
+                      <div>อัตราการไหล Q (mL/s)</div>
+                    </div>
                   </div>
                 </div>
 
@@ -9680,7 +9848,8 @@
                         </span>
                         <div>
                           <div className="text-sm font-inter font-medium text-white flex flex-wrap items-center gap-2">
-                            <span>{r.name}</span>
+                            <span title={r.name}>{r.role}</span>
+                            <span className="sr-only">{r.name}</span>
                             <span className="text-xs font-mono px-2 py-0.5 rounded bg-white/10 text-white/60">
                               {r.pin}
                             </span>
@@ -9870,7 +10039,9 @@
               </p>
             </div>
             {/* PILLAR 2: 6-Step Closed-Loop Pipeline + Stage Jump & ESP32-CAM Triggers */}
-            <div className="figma-card-dark p-6 mb-6">
+            <MagicBento className="mb-6" glowColor="198, 199, 248" enableStars enableTilt enableMagnetism spotlightRadius={300}>
+            <div className="figma-card-dark magic-bento-card p-6">
+              <span className="magic-bento__light" aria-hidden="true" />
               <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
                 <div>
                   <h2 className="font-inter font-semibold text-base text-white">
@@ -9884,24 +10055,44 @@
                   <span className="text-xs font-mono text-[#C6C7F8] mr-2">
                     Active Phase: Step {activePhase} / 6
                   </span>
-                  <button
+                  <SpecularButton
+                    size="sm"
+                    radius={12}
+                    tint="#C6C7F8"
+                    tintOpacity={0.95}
+                    textColor="#090d16"
+                    lineColor="#C6C7F8"
+                    baseColor="#94a3b8"
+                    glow={0.9}
+                    followMouse
+                    proximity={220}
+                    className="font-inter font-bold"
                     onClick={handleStartFullCycleDemo}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#C6C7F8] hover:bg-[#d8d9fc] text-slate-950 font-inter font-bold text-xs transition-all shadow-[0_0_16px_rgba(198,199,248,0.35)]"
                   >
                     ▶ สั่งรันครบ 6 ขั้นตอนทันที (START_CYCLE)
-                  </button>
+                  </SpecularButton>
                   <button
                     onClick={() => handleTriggerCamCapture('test')}
                     className="px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 border border-white/15 font-inter font-semibold text-xs transition-all"
                   >
                     🧪 โหมดทดสอบ (เก็บภาพอย่างเดียว)
                   </button>
-                  <button
+                  <SpecularButton
+                    size="sm"
+                    radius={12}
+                    tint="#A8C5DA"
+                    tintOpacity={0.2}
+                    textColor="#A8C5DA"
+                    lineColor="#A8C5DA"
+                    baseColor="#475569"
+                    glow={0.7}
+                    followMouse
+                    proximity={220}
+                    className="font-inter font-semibold"
                     onClick={() => handleTriggerCamCapture('real')}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#A8C5DA]/20 hover:bg-[#A8C5DA]/30 text-[#A8C5DA] border border-[#A8C5DA]/40 font-inter font-semibold text-xs transition-all"
                   >
                     📸 โหมดส่งภาพจริง (ESP32-CAM → AI)
-                  </button>
+                  </SpecularButton>
                 </div>
               </div>
 
@@ -9945,6 +10136,7 @@
                 })}
               </div>
             </div>
+            </MagicBento>
 
             <div className="mt-4">
               <VisionPanel selectedUnit={selectedUnit} />
@@ -9964,9 +10156,17 @@
               </p>
             </div>
             {/* PILLAR 4: Live AI & Sensor Scenario Simulator + Live Command & Coexistence Telemetry Log */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <MagicBento
+              className="grid grid-cols-1 lg:grid-cols-12 gap-6"
+              glowColor="198, 199, 248"
+              enableStars
+              enableTilt
+              enableMagnetism
+              spotlightRadius={300}
+            >
               {/* Left 7 Cols: Live AI & Sensor Scenario Simulator */}
-              <div className="lg:col-span-7 figma-card-dark p-6">
+              <div className="lg:col-span-7 figma-card-dark magic-bento-card p-6">
+                <span className="magic-bento__light" aria-hidden="true" />
                 <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
                   <div>
                     <h2 className="font-inter font-semibold text-lg text-white">
@@ -9987,6 +10187,29 @@
                   </span>
                 </div>
 
+                {/* AI deficiency category */}
+                <div className="mb-4">
+                  <div className="text-xs text-white/60 mb-1.5">เลือกหมวดหมู่อาการขาดธาตุอาหาร (AI Category):</div>
+                  <RubberSegment
+                    items={[
+                      { value: 'Control', label: 'Control (ปกติ)' },
+                      { value: 'N_Deficiency', label: 'ขาดไนโตรเจน (-N)' },
+                      { value: 'P_Deficiency', label: 'ขาดฟอสฟอรัส (-P)' },
+                      { value: 'K_Deficiency', label: 'ขาดโพแทสเซียม (-K)' },
+                    ]}
+                    value={simClass}
+                    onChange={(val) => setSimClass(val)}
+                    trackColor="#27272a"
+                    thumbColor="#C6C7F8"
+                    textColor="#fafafa"
+                    activeTextColor="#18181b"
+                    size="md"
+                    radius={10}
+                    stretch={100}
+                    aria-label="หมวดหมู่อาการขาดธาตุอาหาร"
+                  />
+                </div>
+
                 {/* 5 Quick Scenario Presets */}
                 <div className="flex flex-wrap gap-2 mb-4">
                   {scenarioPresets.map((pr) => (
@@ -10005,7 +10228,9 @@
                   <div className="p-3 rounded-xl bg-white/5 border border-white/10">
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-white/70">Simulated EC</span>
-                      <span className="font-mono font-bold text-[#A8C5DA]">{simEc.toFixed(2)} mS/cm</span>
+                      <span className="font-mono font-bold text-[#A8C5DA]">
+                        <CountUp to={simEc} decimals={2} duration={0.5} suffix=" mS/cm" easing="expo" replayOnHover />
+                      </span>
                     </div>
                     <input
                       type="range"
@@ -10021,7 +10246,9 @@
                   <div className="p-3 rounded-xl bg-white/5 border border-white/10">
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-white/70">Simulated pH</span>
-                      <span className="font-mono font-bold text-[#C6C7F8]">{simPh.toFixed(2)}</span>
+                      <span className="font-mono font-bold text-[#C6C7F8]">
+                        <CountUp to={simPh} decimals={2} duration={0.5} easing="expo" replayOnHover />
+                      </span>
                     </div>
                     <input
                       type="range"
@@ -10037,7 +10264,9 @@
                   <div className="p-3 rounded-xl bg-white/5 border border-white/10">
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-white/70">Water Temp</span>
-                      <span className="font-mono font-bold text-white">{simTemp.toFixed(1)} °C</span>
+                      <span className="font-mono font-bold text-white">
+                        <CountUp to={simTemp} decimals={1} duration={0.5} suffix=" °C" easing="expo" replayOnHover />
+                      </span>
                     </div>
                     <input
                       type="range"
@@ -10129,7 +10358,7 @@
                   <span>Auto-Revert Active</span>
                 </div>
               </div>
-            </div>
+            </MagicBento>
           </section>
 
           <section

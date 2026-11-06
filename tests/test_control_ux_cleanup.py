@@ -43,7 +43,11 @@ class TestControlUxUiCleanup(unittest.TestCase):
         self.assertIn('<Crosshair', home_body)
         self.assertIn('targetEffect="lock"', home_body)
         self.assertIn('showCoordinates', home_body)
-        self.assertIn('<SpecularButton', home_body)
+        self.assertGreaterEqual(
+            home_body.count("<SpecularButton"),
+            2,
+            "Both primary Home CTAs (ENTER A.E.G.I.S ANALYZE and READ SYSTEM SPEC) must use <SpecularButton>",
+        )
         self.assertIn('<AnimatedContent', home_body)
         cosmic_start = self.html.index("function CosmicThreeBackground")
         cosmic_end = self.html.index("function getSavedGallery", cosmic_start)
@@ -84,6 +88,39 @@ class TestControlUxUiCleanup(unittest.TestCase):
         self.assertIn("<DepthCarousel", vision_body)
         self.assertIn('tiltDirection="right"', vision_body)
         self.assertIn("<RubberSegment", vision_body)
+
+    def test_0c_animated_content_is_real_react_bits_gsap_scrolltrigger_component(self):
+        ac_start = self.html.index("const AnimatedContent =")
+        ac_end = self.html.index("const MagicBento =", ac_start)
+        ac_def = self.html[ac_start:ac_end]
+        for token in ("ScrollTrigger.create", "gsap.timeline", "WIPES", "stagger"):
+            self.assertIn(token, ac_def, f"AnimatedContent must use {token}")
+
+    def test_0d_analyze_view_uses_count_up_animated_content_and_magic_bento(self):
+        analyze_start = self.html.index("function AnalyzeTabView")
+        analyze_end = self.html.index("function ElectronicControlTabView", analyze_start)
+        analyze_body = self.html[analyze_start:analyze_end]
+        self.assertIn("<AnimatedContent", analyze_body)
+        self.assertIn("<MagicBento", analyze_body)
+        self.assertGreaterEqual(
+            analyze_body.count("<CountUp"),
+            4,
+            "AnalyzeTabView must use <CountUp /> for Temperature, PH sensor, EC sensor, and NPK % readouts",
+        )
+
+    def test_0e_control_uses_the_whole_react_bits_suite(self):
+        for count, token, why in (
+            (4, "<MagicBento", "every Bento section"),
+            (3, "<SloshGauge", "water volume/flow rate and Stock A/B/C"),
+            (2, "<RubberSegment", "the 4 sub-tabs and the AI deficiency category"),
+            (5, "<CountUp", "dosing volumes, pump runtime, simulation readouts"),
+            (3, "<SpecularButton", "primary CTAs"),
+        ):
+            self.assertGreaterEqual(
+                self.control_body.count(token), count,
+                f"ElectronicControlTabView must use {token} in {why} (at least {count})",
+            )
+        self.assertNotIn("interactive={false}", self.control_body)
 
     def test_1_segmented_subtabs_exist_with_pumps_default(self):
         self.assertIn("const [controlSubTab, setControlSubTab] = useState('pumps')", self.control_body)
