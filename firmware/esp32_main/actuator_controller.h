@@ -27,6 +27,11 @@ public:
     unsigned long phaseStartTime;
     unsigned long phaseDuration;
 
+    // No-drain mode: the rig has no drip tray, so Phase 6 would put water on the
+    // floor. The Phase 5 rinse is skipped with it — that water has nowhere to go
+    // and would add ~200 mL to the chamber every cycle until it overflows.
+    bool wasteDrainEnabled;
+
     // Planned Dosing durations (ms) computed by AI
     unsigned long dosePump1Ms;
     unsigned long dosePump2Ms;
@@ -47,6 +52,7 @@ public:
         currentPhase = PHASE_IDLE;
         phaseStartTime = 0;
         phaseDuration = 0;
+        wasteDrainEnabled = true;
         dosePump1Ms = 0;
         dosePump2Ms = 0;
         dosePump3Ms = 0;
@@ -105,6 +111,13 @@ public:
         currentPhase = newPhase;
         phaseStartTime = millis();
         phaseDuration = durationMs;
+    }
+
+    void setWasteDrainEnabled(bool enabled) {
+        wasteDrainEnabled = enabled;
+        Serial.printf("[DRAIN] Waste drain %s (Phase 5 rinse %s)\n",
+                      enabled ? "ENABLED" : "DISABLED",
+                      enabled ? "runs" : "skipped too — no drain, no overflow");
     }
 
     void stopCycle() {

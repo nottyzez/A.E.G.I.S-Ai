@@ -8987,6 +8987,9 @@
       const [pumpFlowRates, setPumpFlowRates] = useState({ A: 1.0, B: 1.0, C: 1.0 });
       const [activePhase, setActivePhase] = useState(2);
       const [isFullCycleDemoRunning, setIsFullCycleDemoRunning] = useState(false);
+      // No tray under the waste outlet: Phase 6 is skipped, and the Phase 5
+      // rinse with it — the firmware does the same (SET DRAIN).
+      const [noDrainMode, setNoDrainMode] = useState(false);
 
       // Background Schedule State (ALWAYS enabled — Non-Destructive Coexistence)
       const [scheduleIntervalSec, setScheduleIntervalSec] = useState(1800);
@@ -9345,6 +9348,17 @@
           duration_ms: totalDemoSec * 1000,
           preserve_schedule: true,
         });
+      };
+
+      // Action 3b: Turn the Phase 6 drain valve off (no drip tray on the rig).
+      // The firmware also skips the Phase 5 rinse — its water has nowhere to go.
+      const handleToggleNoDrain = async () => {
+        const next = !noDrainMode;
+        setNoDrainMode(next);
+        pushCommandLog('SET_DRAIN', next
+          ? 'ปิดวาล์วทิ้งน้ำ — รอบถัดไปข้าม Rinse+Drain (ไม่มีถาดรองน้ำ)'
+          : 'เปิดวาล์วทิ้งน้ำกลับเป็นปกติ');
+        await sendApiRequest('/api/command', { command: 'SET_DRAIN', enabled: !next });
       };
 
       // Action 4: Trigger Instant ESP32-S3 CAM Leaf Capture
@@ -10071,6 +10085,17 @@
                   >
                     ▶ สั่งรันครบ 6 ขั้นตอนทันที (START_CYCLE)
                   </SpecularButton>
+                  <button
+                    onClick={handleToggleNoDrain}
+                    title="ไม่มีถาดรองน้ำใต้ท่อทิ้ง: เปิดแล้วรอบถัดไปจะข้าม Rinse+Drain ไม่มีน้ำไหลออกพื้น"
+                    className={`px-3.5 py-1.5 rounded-xl border font-inter font-semibold text-xs transition-all ${
+                      noDrainMode
+                        ? 'bg-[#C6C7F8]/20 border-[#C6C7F8]/60 text-[#C6C7F8]'
+                        : 'bg-white/5 hover:bg-white/10 border-white/15 text-white/70'
+                    }`}
+                  >
+                    {noDrainMode ? '🚱 ไม่ทิ้งน้ำ: เปิด (ข้าม Rinse+Drain)' : '🚱 ไม่ทิ้งน้ำ: ปิด'}
+                  </button>
                   <button
                     onClick={() => handleTriggerCamCapture('test')}
                     className="px-3.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/70 border border-white/15 font-inter font-semibold text-xs transition-all"

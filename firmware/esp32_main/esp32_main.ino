@@ -285,6 +285,11 @@ void pollRemoteDashboardCommand() {
                 if (p1 > 0) actuators.manualTriggerRelay(5, p1);
                 if (p2 > 0) actuators.manualTriggerRelay(6, p2);
                 if (p3 > 0) actuators.manualTriggerRelay(7, p3);
+            } else if (strcmp(cmd, "SET_DRAIN") == 0) {
+                // No-drain mode: the rig has no drip tray under the waste outlet.
+                bool enabled = doc["enabled"] | false;
+                Serial.printf("[REMOTE DASHBOARD] Waste drain %s\n", enabled ? "ON" : "OFF");
+                actuators.setWasteDrainEnabled(enabled);
             } else if (strcmp(cmd, "STOP") == 0) {
                 actuators.clearManualOverrides();
                 actuators.stopCycle();
@@ -376,6 +381,14 @@ void handleSerialCommands() {
             Serial.println("[NVS] Cleared, back to config.h defaults. Rebooting...");
             delay(300);
             ESP.restart();
+        } else if (input.startsWith("SET DRAIN ")) {
+            // SET DRAIN ON|OFF — no tray under the waste outlet means OFF.
+            String val = input.substring(10);
+            if (val != "ON" && val != "OFF") {
+                Serial.println("[DRAIN] Usage: SET DRAIN ON|OFF");
+                return;
+            }
+            actuators.setWasteDrainEnabled(val == "ON");
         } else if (input == "START" || input == "RUN") {
             actuators.startFullPresentationCycle();
         } else if (input == "STOP") {
@@ -389,7 +402,7 @@ void handleSerialCommands() {
         } else if (input == "READ") {
             performSensorReadings();
         } else {
-            Serial.println("\nCommands: START | STOP | READ | TEST <1-7> <ms>");
+            Serial.println("\nCommands: START | STOP | READ | TEST <1-7> <ms> | SET DRAIN ON|OFF");
             Serial.println("          SET SSID <name> | SET PASS <password>   (spaces OK)");
             Serial.println("          SET WIFI <ssid> <password> | SET SERVER <ip> [port] | SHOW | RESET");
         }
@@ -570,10 +583,19 @@ void loop() {
                 actuators.allRelaysOff();
                 Serial.println("[Phase 4 DONE] Fertilizer dosing complete and mixed.");
 
-                // Transition to Phase 5: Probe Rinse
-                actuators.setPhase(PHASE_5_PROBE_RINSE, TIME_RINSE_PROBE_MS);
-                digitalWrite(PIN_RELAY_PROBE_RINSE, RELAY_ON);
-                Serial.printf("[Phase 5] Diaphragm 3 (Clean Water Rinse) active for %lu ms\n", TIME_RINSE_PROBE_MS);
+                if (!actuators.wasteDrainEnabled) {
+                    // No drip tray fitted: skip P5 as well as P6. The rinse water
+                    // is what the drain would have removed; keeping it would add
+                    // ~200 mL to the chamber every cycle until it overflows.
+                    actuators.setPhase(PHASE_7_PROBE_PRESERVATION, TIME_PRESERVATION_SOAK_MS);
+                    digitalWrite(PIN_RELAY_SAMPLE_IN, RELAY_ON);
+                    Serial.printf("[Phase 7] Drain disabled — skipping rinse. Diaphragm 1 (Soak) active for %lu ms\n", TIME_PRESERVATION_SOAK_MS);
+                } else {
+                    // Transition to Phase 5: Probe Rinse
+                    actuators.setPhase(PHASE_5_PROBE_RINSE, TIME_RINSE_PROBE_MS);
+                    digitalWrite(PIN_RELAY_PROBE_RINSE, RELAY_ON);
+                    Serial.printf("[Phase 5] Diaphragm 3 (Clean Water Rinse) active for %lu ms\n", TIME_RINSE_PROBE_MS);
+                }
                 reportStatusToServer();
             }
             break;

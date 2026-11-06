@@ -112,6 +112,7 @@ current_hardware_status = {
     "latest_image_url": "/static/latest_capture.jpg",
     "latest_capture_at": None,
     "latest_test_file": "None",
+    "waste_drain_enabled": True,
     "calibration": dosing_engine.get_calibration(),
     "refill_status": {
         "stage": "IDLE",
@@ -540,6 +541,17 @@ def post_dashboard_command(payload: dict):
         }
         extra_fields["phase_id"] = phase_id
         append_command_log("JUMP_PHASE", f"ข้ามไปสาธิต {phase_title}", preserve_schedule)
+
+    elif cmd == "SET_DRAIN":
+        # The rig has no drip tray, so the dashboard can turn Phase 6 off. The
+        # firmware skips the Phase 5 rinse with it — see esp32_main.ino.
+        extra_fields["enabled"] = bool(payload.get("enabled", False))
+        current_hardware_status["waste_drain_enabled"] = extra_fields["enabled"]
+        append_command_log(
+            "SET_DRAIN",
+            "เปิดวาล์วทิ้งน้ำ (Phase 6)" if extra_fields["enabled"] else "ปิดวาล์วทิ้งน้ำ — ไม่มีถาดรอง",
+            preserve_schedule,
+        )
 
     elif cmd == "MANUAL_DOSE":
         vols = payload.get("volumes_ml", {})

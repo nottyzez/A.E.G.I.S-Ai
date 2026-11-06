@@ -108,6 +108,16 @@ allow rule for TCP 8000. `deploy/lan-backup/{start,stop}-backup.bat` wrap both
 ends of that (start refuses when 8000 is taken; stop kills by port), pinned by
 `tests/test_lan_backup_deploy.py`.
 
+**No-drain mode (2026-11-06).** The rig has no drip tray under the waste outlet,
+so Phase 6 puts water on the floor. `ActuatorController::wasteDrainEnabled`
+(default `true`) is set by `SET DRAIN ON|OFF` on serial or
+`POST /api/command {"command":"SET_DRAIN","enabled":false}` from the dashboard
+toggle next to START_CYCLE. With it off, Phase 4 jumps **straight to Phase 7**:
+the Phase 5 rinse is skipped too, because the rinse water is exactly what the
+drain would have removed and would otherwise add ~200 mL per cycle until the
+700 mL chamber overflows. Flag lives in RAM only — a reboot re-enables the
+drain. Pinned by `tests/test_no_drain_mode.py` (5).
+
 **The automatic cycle is back to the full 8 phases: P0 → P1 → P2 → P3 → P4 →
 P5 (Probe Rinse, GPIO 7) → P6 (Drain Waste, GPIO 8) → P7 → IDLE.**
 Phase 5/6 were skipped in `d92a2bf` after the GPIO 7 pump brown-out; that pump's
