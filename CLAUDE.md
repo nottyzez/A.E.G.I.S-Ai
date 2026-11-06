@@ -65,7 +65,8 @@ its wrapper, so `App` runs a document-level rAF loop that sets `--mb-x`/`--mb-y`
 never sit inside a `<MagicBento>` wrapper, so their spotlight was dead before).
 It deliberately applies **no** `--mb-tilt-*`/`--mb-magnet-*`: a transform shifts
 `getBoundingClientRect()`, and the chart's pointer → index mapping depends on that
-rect. `test_5_every_bento_card_can_light_up` fails if a card loses its
+rect. It is disabled under `prefers-reduced-motion`, and a touch gets a 700 ms
+flash on tap (there is no hover on a phone). `test_5_every_bento_card_can_light_up` fails if a card loses its
 `<span className="magic-bento__light">` child. Suite is **238 tests OK**. Relay Thai roles follow
 `firmware/esp32_main/config.example.h` (GPIO 6 = sample return), not the
 spec's air-agitator label.

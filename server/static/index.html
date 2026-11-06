@@ -10252,18 +10252,21 @@
       // Global cursor spotlight: every .magic-bento-card on every page follows
       // the pointer, whether or not it sits inside a <MagicBento> grid.
       useEffect(() => {
-        let cards = [];
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          return undefined;
+        }
         let raf = 0;
         let px = 0;
         let py = 0;
+        let lit = false;
+        let fade = 0;
         const paint = () => {
           raf = 0;
-          cards = Array.from(document.querySelectorAll('.magic-bento-card'));
-          cards.forEach((card) => {
+          document.querySelectorAll('.magic-bento-card').forEach((card) => {
             const rect = card.getBoundingClientRect();
             const x = px - rect.left;
             const y = py - rect.top;
-            const inside = x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
+            const inside = lit && x >= 0 && x <= rect.width && y >= 0 && y <= rect.height;
             card.style.setProperty('--mb-hot', inside ? '1' : '0');
             if (inside) {
               card.style.setProperty('--mb-x', `${x.toFixed(1)}px`);
@@ -10271,19 +10274,43 @@
             }
           });
         };
-        const onMove = (e) => {
-          if (e.pointerType === 'touch') return;
-          px = e.clientX;
-          py = e.clientY;
+        const schedule = () => {
           if (!raf) raf = requestAnimationFrame(paint);
         };
-        const onLeave = () => cards.forEach((card) => card.style.setProperty('--mb-hot', '0'));
-        document.addEventListener('pointermove', onMove, { passive: true });
-        document.addEventListener('pointerleave', onLeave);
+        const aim = (x, y) => {
+          px = x;
+          py = y;
+          lit = true;
+          schedule();
+        };
+        const hide = () => {
+          lit = false;
+          schedule();
+        };
+        const move = (e) => {
+          if (e.pointerType !== 'touch') aim(e.clientX, e.clientY);
+        };
+        // Touch has no hover: light the tapped card briefly so phones still see it.
+        const onTouch = (e) => {
+          if (e.pointerType !== 'touch') return;
+          clearTimeout(fade);
+          aim(e.clientX, e.clientY);
+          fade = setTimeout(hide, 700);
+        };
+        const root = document.documentElement;
+        root.addEventListener('pointermove', move, { passive: true });
+        root.addEventListener('pointerdown', onTouch, { passive: true });
+        root.addEventListener('pointerleave', hide);
+        root.addEventListener('pointercancel', hide);
+        window.addEventListener('blur', hide);
         return () => {
-          cancelAnimationFrame(raf);
-          document.removeEventListener('pointermove', onMove);
-          document.removeEventListener('pointerleave', onLeave);
+          if (raf) cancelAnimationFrame(raf);
+          clearTimeout(fade);
+          root.removeEventListener('pointermove', move);
+          root.removeEventListener('pointerdown', onTouch);
+          root.removeEventListener('pointerleave', hide);
+          root.removeEventListener('pointercancel', hide);
+          window.removeEventListener('blur', hide);
         };
       }, []);
 
