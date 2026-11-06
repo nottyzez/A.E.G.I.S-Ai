@@ -97,6 +97,15 @@ needs ~75 s before `/health` answers. `AEGIS_REQUIRE_AUTH=1` is on — a token-l
 stays 200. The token lives only in `/root/aegis/deploy/digitalocean/.env`; read
 it there, never paste it into this file. The board needs `SET SERVER 165.245.191.33 80`.
 
+**LAN backup server (2026-11-06).** The laptop is a client on the `AEGIS`
+hotspot at **`10.187.70.201:8000`**, so the rig works with no internet:
+`SET SERVER 10.187.70.201 8000`. Both `firmware/*/config.h` now default to that
+pair (gitignored — the hotspot password lives there, never in a tracked file).
+**`python main.py` dies with `lost sys.stderr` right after model load on this
+machine; `python -m uvicorn main:app --host 0.0.0.0 --port 8000` runs fine** — use
+the uvicorn form when starting it by hand. Windows Firewall already has an
+allow rule for TCP 8000.
+
 **The automatic cycle is back to the full 8 phases: P0 → P1 → P2 → P3 → P4 →
 P5 (Probe Rinse, GPIO 7) → P6 (Drain Waste, GPIO 8) → P7 → IDLE.**
 Phase 5/6 were skipped in `d92a2bf` after the GPIO 7 pump brown-out; that pump's
