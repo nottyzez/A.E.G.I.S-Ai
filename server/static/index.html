@@ -9059,6 +9059,11 @@
         if (window.location.protocol === 'file:') {
           return { ok: false, offline: true };
         }
+        // A payload means a POST, i.e. a command. Reads (no payload) still run,
+        // so the page keeps updating; only actuation is refused.
+        if (VIEW_ONLY && payload !== undefined) {
+          return { ok: false, readOnly: true };
+        }
         const token = readControlToken();
         const headers = { 'Content-Type': 'application/json' };
         if (token) headers.Authorization = `Bearer ${token}`;
@@ -10514,6 +10519,11 @@
     // =========================================================================
     // 7. MAIN APPLICATION (WARP TRANSITION + FIGMA SNOWUI SHELL)
     // =========================================================================
+    // Read-only cockpit: open /dashboard?readonly and no button can actuate the
+    // rig. Every mutation funnels through sendApiRequest, so one guard there
+    // covers all of them; the banner is the only affordance needed.
+    const VIEW_ONLY = new URLSearchParams(window.location.search).has('readonly');
+
     function App() {
       const [currentView, setCurrentView] = useState('home'); // 'home' | 'dashboard'
       const [activeTab, setActiveTab] = useState('Analyze'); // 'Analyze' | 'Electronic Control'
@@ -10646,6 +10656,12 @@
         <div className="relative min-h-screen w-full overflow-x-hidden select-none">
           {/* 3D Layered Stars + Periodic Meteor Shower + Mountain Night Sky */}
           <CosmicThreeBackground currentView={currentView} isWarping={isWarping} />
+
+          {VIEW_ONLY && (
+            <div className="fixed top-3 left-1/2 -translate-x-1/2 z-[999] px-4 py-1.5 rounded-full bg-[#C6C7F8]/15 border border-[#C6C7F8]/50 text-[#C6C7F8] font-mono text-xs backdrop-blur-md pointer-events-none">
+              👁 โหมดดูอย่างเดียว — คำสั่งทั้งหมดถูกบล็อก ไม่ส่งไปที่เครื่อง
+            </div>
+          )}
 
           {/* VIEW 1: HOME PAGE */}
           {currentView === 'home' && (
