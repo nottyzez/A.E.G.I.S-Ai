@@ -326,6 +326,7 @@ def run_ensemble_prediction(
     return {
         **cmd,
         "deficiency": cls,
+        "ensemble_class": cls,
         "class_th": ens_res["final_class_thai"],
         "stage": ens_res["diagnostic_stage"],
         "stage_th": ens_res["diagnostic_message_thai"],
