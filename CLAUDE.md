@@ -110,12 +110,23 @@ calibration, and `scripts/generate_poster_blueprints.py` still emits the old
 `.dockerignore`, `docker-compose.digitalocean.yml`, `deploy/digitalocean/{nginx.conf,
 .env.example,setup_droplet.sh}`, `docs/digitalocean_deployment_guide.md`, pinned
 by `tests/test_digitalocean_cloud_backend.py`. The cloud broker
-(`server/cloud_broker.py`), the state store, the firmware ACK/auth path and the
-UI cockpit are **not** implemented; `AEGIS_REQUIRE_AUTH` defaults to 0 and
-nothing reads `CONTROL_TOKEN`/`DEVICE_API_KEY` yet. So the deployed URL exposes
-every pump button to anyone who loads it — do not leave a Droplet running
-unattended with the rig attached. `CONTROL_TOKEN` is in `.env.example` only;
-the real `.env` is gitignored (`*.env`).
+(`server/cloud_broker.py`), the state store and the UI cockpit are still **not**
+implemented, and `DEVICE_API_KEY` is unused — but the control-plane guard is
+(2026-11-06, `820d6c2`). With `AEGIS_REQUIRE_AUTH=1`, `require_control_token`
+in `main.py` rejects any non-GET on `/api/command`, `/api/schedule`,
+`/api/override/*`, `/api/calibration*` or `/api/cam_command` without
+`Authorization: Bearer $CONTROL_TOKEN`; an empty token fails **closed**. It is
+an `@app.middleware("http")` wrapper, not a per-route `Depends`, so a new
+mutating route is protected only if its path is added to `GUARDED_PREFIXES`.
+`GET /api/command`, `POST /api/sensor` and `/predict` stay open on purpose — the
+firmware carries no token — so a stranger can inject fake readings and drain
+the command queue but cannot actuate a pump. The dashboard prompts for the token
+on its first 401 and caches it in `localStorage['aegis_control_token']`.
+`setup_droplet.sh` now generates a random token; the compose file deliberately
+has **no** `environment:` entry for `AEGIS_REQUIRE_AUTH`, because
+`"${AEGIS_REQUIRE_AUTH:-0}"` reads the host shell, not `.env`, and would
+override it back to 0. Pinned by `tests/test_control_auth.py` (8).
+The real `.env` is gitignored (`*.env`).
 
 **Network config is now runtime, not compile-time (2026-11-05, uncommitted).**
 The presentation runs on a phone hotspot, where the laptop's IP comes from
