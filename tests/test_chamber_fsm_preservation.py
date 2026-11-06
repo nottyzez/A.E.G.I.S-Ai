@@ -33,11 +33,31 @@ class TestChamberFSMPreservation(unittest.TestCase):
 
         pre_return_match = re.search(r"#define\s+TIME_PRE_RETURN_MS\s+(\d+)", self.config_content)
         self.assertIsNotNone(pre_return_match)
-        self.assertEqual(int(pre_return_match.group(1)), 8000, "TIME_PRE_RETURN_MS should be 8000ms (300 mL @ 38 mL/s)")
+        self.assertEqual(int(pre_return_match.group(1)), 5263, "TIME_PRE_RETURN_MS should be 5263ms (200 mL @ 38 mL/s)")
 
         soak_match = re.search(r"#define\s+TIME_PRESERVATION_SOAK_MS\s+(\d+)", self.config_content)
         self.assertIsNotNone(soak_match)
-        self.assertEqual(int(soak_match.group(1)), 10000, "TIME_PRESERVATION_SOAK_MS should be 10000ms (300 mL @ 30 mL/s)")
+        self.assertEqual(int(soak_match.group(1)), 6667, "TIME_PRESERVATION_SOAK_MS should be 6667ms (200 mL @ 30 mL/s)")
+
+    def test_01b_every_diaphragm_transfer_fits_the_700ml_chamber(self):
+        """The chamber holds 700 mL and the gravity drain does not always empty it,
+        so two or three 300 mL transfers stacked past 700 mL and overflowed the cup
+        (seen on the rig 2026-11-06). Cap every transfer at 200 mL."""
+        rates = {
+            "TIME_PRE_RETURN_MS": 38.0,        # D2, GPIO 6
+            "TIME_SAMPLE_IN_MS": 30.0,         # D1, GPIO 5
+            "TIME_SAMPLE_RETURN_MS": 38.0,     # D2, GPIO 6
+            "TIME_RINSE_PROBE_MS": 30.0,       # D3, GPIO 7
+            "TIME_PRESERVATION_SOAK_MS": 30.0, # D1, GPIO 5
+        }
+        for macro, rate in rates.items():
+            match = re.search(rf"#define\s+{macro}\s+(\d+)", self.config_content)
+            self.assertIsNotNone(match, f"{macro} missing from config.example.h")
+            ml = int(match.group(1)) / 1000.0 * rate
+            self.assertLessEqual(
+                ml, 201.0,
+                f"{macro} moves {ml:.0f} mL; every transfer must stay at or below 200 mL",
+            )
 
     def test_02_cycle_phase_enum(self):
         """Verify CyclePhase enum includes Phase 0 and Phase 7."""

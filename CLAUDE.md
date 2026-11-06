@@ -124,13 +124,18 @@ the 12 V rail); it needs the firmware's separated sequence, not that old card.
 three 1.5 fallbacks in `index.html`). This **halves** every dose runtime for the
 same mL — `MANUAL_DOSE` and the local preview agree because both read it.
 Diaphragms: GPIO 5 = 30 mL/s, GPIO 6 = 38 mL/s, GPIO 7 = 30 mL/s, recorded as
-`DIAPHRAGM{1,2,3}_ML_S` in `config.example.h`. Target volumes: chamber
-fill/return/rinse **and the standby soak** are all 300 mL (the soak must submerse
-the pH bulb too). Phase timings re-derived from those rates: **P0 8 000, P1
-10 000, P3 8 000, P5 10 000, P7 10 000 ms** (P2 settling 3 000 and P6 drain
-6 000 unchanged — drain is gravity, flow-independent). **P0 must return exactly
-what P7 leaves behind** (300 mL @ 38 mL/s = 8 000 ms); shrink P0 without
-shrinking P7 and water accumulates in the chamber every cycle.
+`DIAPHRAGM{1,2,3}_ML_S` in `config.example.h`. Target volumes: **200 mL** per
+transfer — fill/return/rinse and the standby soak alike (the soak must submerse
+the pH bulb too). The chamber cup holds **700 mL**; at the old 300 mL per
+transfer a cycle that stacked P5 + P7 + leftover rinse water overflowed it on
+the rig (2026-11-06), so every transfer is now capped at 200 mL — three stacked
+= 600 mL still fits. Phase timings: **P0 5 263, P1 6 667, P3 5 263, P5 6 667,
+P7 6 667 ms** (P2 settling 3 000 and P6 drain 6 000 unchanged — drain is
+gravity, flow-independent). **P0 must return exactly what P7 leaves behind**
+(200 mL @ 38 mL/s = 5 263 ms); shrink P0 without shrinking P7 and water
+accumulates in the chamber every cycle. Changing any of these means re-flashing
+the main board and updating `tests/test_chamber_fsm_preservation.py`
+(`test_01` pins P0/P7 exactly, `test_01b` fails if any transfer exceeds 200 mL).
 `setPhase()` now clamps P0/P1/P3/P5/P7 at `MAX_SAFETY_PUMP_MS` (15 000) — that
 macro was declared but never enforced until 2026-11-05. `test_12` fails if any
 `TIME_*` diaphragm runtime exceeds it, so raising a phase time means raising the

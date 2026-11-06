@@ -60,13 +60,13 @@
 #define DIAPHRAGM2_ML_S           38.0f   // D2 GPIO 6: pre-return + sample return (measured 2026-11-05)
 #define DIAPHRAGM3_ML_S           30.0f   // D3 GPIO 7: RO probe rinse (measured 2026-11-05)
 
-#define TIME_PRE_RETURN_MS        8000    // 300 mL / 38 mL/s: return the resting soak water to the tank
-#define TIME_SAMPLE_IN_MS        10000    // 300 mL / 30 mL/s: fill measuring cup past the probes
+#define TIME_PRE_RETURN_MS        5263  // 200 mL / 38 mL/s: return the resting soak water to the tank
+#define TIME_SAMPLE_IN_MS         6667  // 200 mL / 30 mL/s: fill measuring cup past the probes
 #define TIME_SETTLING_DELAY_MS   3000    // 3 seconds wait for water to stabilize before ADC read
-#define TIME_SAMPLE_RETURN_MS     8000    // 300 mL / 38 mL/s: pump water back into main box
-#define TIME_RINSE_PROBE_MS      10000    // 300 mL / 30 mL/s: RO rinse with clean water
+#define TIME_SAMPLE_RETURN_MS     5263  // 200 mL / 38 mL/s: pump water back into main box
+#define TIME_RINSE_PROBE_MS       6667  // 200 mL / 30 mL/s: RO rinse with clean water
 #define TIME_DRAIN_VALVE_MS      6000    // 6 seconds open solenoid valve to drain wash water (gravity, flow-independent)
-#define TIME_PRESERVATION_SOAK_MS 10000  // 300 mL / 30 mL/s: fill the chamber to soak the pH bulb during standby
+#define TIME_PRESERVATION_SOAK_MS 6667  // 200 mL / 30 mL/s: fill the chamber to soak the pH bulb during standby
 #define TIME_PRE_CIRCULATION_MS  120000  // 2 minutes pre-circulation delay for water mixing
 #define TIME_POST_CIRCULATION_MS 300000  // 5 minutes post-dosing circulation delay before re-verify
 
