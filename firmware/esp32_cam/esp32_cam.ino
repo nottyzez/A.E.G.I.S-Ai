@@ -108,6 +108,9 @@ bool initCamera() {
 void connectWiFi() {
     Serial.printf("[CAM] Connecting to Wi-Fi SSID: %s ", cfgSsid.c_str());
     WiFi.mode(WIFI_STA);
+    // Full TX power pulls ~350 mA peak during association, which can brown out
+    // a marginal 5 V rail and reset the board mid-connect.
+    WiFi.setTxPower(WIFI_POWER_8_5dBm);
     WiFi.setAutoReconnect(true);
     WiFi.begin(cfgSsid.c_str(), cfgPass.c_str());
 

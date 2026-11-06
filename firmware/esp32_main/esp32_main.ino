@@ -76,6 +76,10 @@ String apiUrl(const char* path) {
 void connectWiFi() {
     Serial.printf("\nConnecting to Wi-Fi SSID: %s ", cfgSsid.c_str());
     WiFi.mode(WIFI_STA);
+    // Association pulls ~350 mA at full TX power; on this rig's 5 V rail that
+    // trips the brownout detector and the board resets in a loop. 8.5 dBm is
+    // still plenty of range for a phone hotspot at arm's length.
+    WiFi.setTxPower(WIFI_POWER_8_5dBm);
     WiFi.setAutoReconnect(true);
     WiFi.begin(cfgSsid.c_str(), cfgPass.c_str());
 
@@ -91,6 +95,15 @@ void connectWiFi() {
         Serial.println(WiFi.localIP());
     } else {
         Serial.println(" [TIMEOUT] Running in Offline / Testbench Mode.");
+        // A 2.4 GHz-only radio cannot see a 5 GHz hotspot at all, so print what
+        // it can actually reach before anyone starts doubting the password.
+        int n = WiFi.scanNetworks();
+        Serial.printf("[SCAN] %d network(s) visible:\n", n);
+        for (int i = 0; i < n; i++) {
+            Serial.printf("   %2d  %-32s %4d dBm%s\n", i + 1, WiFi.SSID(i).c_str(),
+                          WiFi.RSSI(i), WiFi.SSID(i) == cfgSsid ? "  <-- ours" : "");
+        }
+        if (n == 0) Serial.println("   none — hotspot off, or set to 5 GHz instead of 2.4 GHz");
     }
 }
 
@@ -410,6 +423,8 @@ void setup() {
 
     // NVS overrides (Serial-set) then connect WiFi
     loadRuntimeConfig();
+    Serial.printf("[CFG] SSID: %s | SERVER: %s:%s\n",
+                  cfgSsid.c_str(), cfgHost.c_str(), cfgPort.c_str());
     connectWiFi();
 
 #if ENABLE_AUTO_LIGHT_SLEEP
