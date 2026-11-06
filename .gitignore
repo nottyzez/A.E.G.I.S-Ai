@@ -82,3 +82,6 @@ ehthumbs.db
 desktop.ini
 .vscode/
 .idea/
+
+# Scratch: plan ledgers and debug dumps
+.superpowers/
