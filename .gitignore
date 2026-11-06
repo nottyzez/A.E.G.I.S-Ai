@@ -85,3 +85,6 @@ desktop.ini
 
 # Scratch: plan ledgers and debug dumps
 .superpowers/
+
+# Runtime state written by the server at boot
+server/runtime_state.db
