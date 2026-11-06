@@ -89,6 +89,14 @@ change rather than describe it. Three Figma suites had asserted the literal
 match the CountUp form. Suite is **249 tests OK**, verify_figma 26/26,
 check_jsx OK.
 
+**Live droplet: `165.245.191.33`** (root, Ubuntu 24.04, repo at `/root/aegis`,
+branch `feature/dashboard-overhaul`). Deploy = `git pull --ff-only` then
+`docker compose -f docker-compose.digitalocean.yml up -d --build`; TensorFlow
+needs ~75 s before `/health` answers. `AEGIS_REQUIRE_AUTH=1` is on — a token-less
+`POST /api/command` answers **401** and `GET /api/command` (the ESP32 path)
+stays 200. The token lives only in `/root/aegis/deploy/digitalocean/.env`; read
+it there, never paste it into this file. The board needs `SET SERVER 165.245.191.33 80`.
+
 **The automatic cycle is back to the full 8 phases: P0 → P1 → P2 → P3 → P4 →
 P5 (Probe Rinse, GPIO 7) → P6 (Drain Waste, GPIO 8) → P7 → IDLE.**
 Phase 5/6 were skipped in `d92a2bf` after the GPIO 7 pump brown-out; that pump's
