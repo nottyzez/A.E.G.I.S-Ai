@@ -211,6 +211,10 @@ def save_incoming_test_image(img_bytes: bytes) -> str:
 try:
     from predict_ensemble import HydroponicEnsemblePredictor
     predictor = HydroponicEnsemblePredictor()
+    if not predictor.loaded:
+        # Half-loaded predictors pass every isinstance check and then 500 on the
+        # first /predict; DEMO mode at least answers, and says so in `stage`.
+        raise RuntimeError(predictor.load_error or "model not loaded")
     CLASSES = predictor.classes
     logger.info(f"✅ Symptom-Gated Ensemble loaded | Classes: {CLASSES}")
     DEMO_MODE = False

@@ -144,6 +144,7 @@ class HydroponicEnsemblePredictor:
         self.a3 = None
         self.sensor_models = None
         self.scalers = None
+        self.load_error = None
         self._load()
 
     def _load(self):
@@ -154,7 +155,9 @@ class HydroponicEnsemblePredictor:
             sen_path = self.model_dir / "sensor_ensemble_models.pkl"
             sc_path = self.model_dir / "scalers_and_encoder.pkl"
 
-            if not (a1_path.exists() and a3_path.exists() and sen_path.exists() and sc_path.exists()):
+            missing = [p.name for p in (a1_path, a3_path, sen_path, sc_path) if not p.exists()]
+            if missing:
+                self.load_error = f"model files missing: {', '.join(missing)}"
                 return
 
             self.a1 = tf.keras.models.load_model(str(a1_path))
@@ -168,6 +171,7 @@ class HydroponicEnsemblePredictor:
             self.loaded = True
         except Exception as e:
             print(f"⚠️ Ensemble load warning: {e}")
+            self.load_error = f"{type(e).__name__}: {e}"
             self.loaded = False
 
     def predict_vision_patch_batch(self, patches_rgb):
@@ -218,12 +222,16 @@ class HydroponicEnsemblePredictor:
         """
         Full end-to-end ESP32-S3 CAM Top-Down Auto-Crop + Symptom-Gated Multimodal Inference.
         """
+        if not self.loaded:
+            self._load()
+        if not self.loaded:
+            # Without this the first symptom is a TypeError on self.scalers deep
+            # inside the patch batch — indistinguishable from a model bug.
+            raise RuntimeError(f"Ensemble models are not loaded ({self.load_error})")
+
         # 1. Run 3-Layer Illumination-Invariant & Symptom-Inclusive Auto-Cropper
         crop_res = extract_canopy_and_hole_patches(img_bgr, max_hole_patches=4)
         all_patches = [crop_res["canopy_rgb"]] + crop_res["hole_patches_rgb"]
-
-        if not self.loaded:
-            self._load()
 
         # 2. Compute Stream A (Vision Ensemble)
         P_img, patch_probs = self.predict_vision_patch_batch(all_patches)
