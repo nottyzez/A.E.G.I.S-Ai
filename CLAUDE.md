@@ -86,7 +86,7 @@ Pinned by `test_0c`/`test_0d`/`test_0e` in `tests/test_control_ux_cleanup.py`;
 9 of their 10 assertions fail against `HEAD`'s `index.html`, so they gate the
 change rather than describe it. Three Figma suites had asserted the literal
 `{activeTemp}°C` / `{pct}%` text that `<CountUp>` replaced — their regexes now
-match the CountUp form. Suite is **249 tests OK**, verify_figma 26/26,
+match the CountUp form. Suite is **252 tests OK**, verify_figma 26/26,
 check_jsx OK.
 
 **Live droplet: `165.245.191.33`** (root, Ubuntu 24.04, repo at `/root/aegis`,
