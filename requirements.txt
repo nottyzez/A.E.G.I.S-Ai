@@ -28,7 +28,9 @@ tensorflow>=2.15.0
 # The ensembles were pickled under keras 3.13.2 (see the `_loss` reference in
 # sensor_ensemble_models.pkl); newer keras moved it and the pickle stops loading.
 keras==3.13.2
-scikit-learn>=1.3.0
+# 1.8.0 wrote our sensor pickles; 1.9 pickles the Cython loss as module `_loss`,
+# which does not import back (`No module named '_loss'`).
+scikit-learn==1.8.0
 lightgbm>=4.0.0
 
 # Data Visualization & Reporting
