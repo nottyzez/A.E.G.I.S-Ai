@@ -136,10 +136,11 @@ gravity, flow-independent). **P0 must return exactly what P7 leaves behind**
 accumulates in the chamber every cycle. Changing any of these means re-flashing
 the main board and updating `tests/test_chamber_fsm_preservation.py`
 (`test_01` pins P0/P7 exactly, `test_01b` fails if any transfer exceeds 200 mL).
-`setPhase()` now clamps P0/P1/P3/P5/P7 at `MAX_SAFETY_PUMP_MS` (15 000) — that
-macro was declared but never enforced until 2026-11-05. `test_12` fails if any
-`TIME_*` diaphragm runtime exceeds it, so raising a phase time means raising the
-ceiling in the same edit. The firmware never computes these from flow itself; the mL/s
+`setPhase()` clamps P0/P1/P3/P5/P7 at `MAX_SAFETY_PUMP_MS` — **10 000 ms**, the
+operator's hard limit for GPIO 5/6/7 (was 15 000) — that macro was declared but
+never enforced until 2026-11-05. `test_12` fails if any `TIME_*` diaphragm
+runtime exceeds it or if the ceiling itself moves off 10 000, so raising a phase
+time means raising the ceiling in the same edit. The firmware never computes these from flow itself; the mL/s
 values are documentation a human re-derives the times from. `docs/chamber_operation_guide.md`
 is synced. **The poster is frozen:** it was printed and submitted before this
 calibration, and `scripts/generate_poster_blueprints.py` still emits the old

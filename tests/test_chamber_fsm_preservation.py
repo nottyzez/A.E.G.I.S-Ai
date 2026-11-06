@@ -228,6 +228,10 @@ class TestChamberFSMPreservation(unittest.TestCase):
         ceiling_match = re.search(r"#define\s+MAX_SAFETY_PUMP_MS\s+(\d+)", self.config_content)
         self.assertIsNotNone(ceiling_match)
         ceiling = int(ceiling_match.group(1))
+        # 10 s is the operator's hard limit for D1/D2/D3 (GPIO 5/6/7). Without
+        # this the rest of the test reads the ceiling dynamically and a raised
+        # ceiling silently passes.
+        self.assertEqual(ceiling, 10000, "MAX_SAFETY_PUMP_MS must stay at 10000 ms")
 
         set_phase_match = re.search(
             r"void\s+setPhase\(CyclePhase[^)]*\)\s*\{(.+?)\n    \}",

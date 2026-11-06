@@ -53,9 +53,9 @@
 // ==============================================================================
 // 4. Default Phase Timings & Safety Watchdogs (in Milliseconds)
 // ==============================================================================
-// Delivered volumes: chamber fill/return/rinse 250-300 mL (worst case 300 used
-// here); the standby soak fills the same 300 mL so the probe stays submerged
-// until the next cycle, and Phase 0 must return that same volume or it accumulates.
+// Delivered volumes: every transfer is capped at 200 mL (chamber holds 700 mL);
+// the standby soak fills the same 200 mL so the probe stays submerged until the
+// next cycle, and Phase 0 must return that same volume or it accumulates.
 #define DIAPHRAGM1_ML_S           30.0f   // D1 GPIO 5: sample in + preservation soak (measured 2026-11-05)
 #define DIAPHRAGM2_ML_S           38.0f   // D2 GPIO 6: pre-return + sample return (measured 2026-11-05)
 #define DIAPHRAGM3_ML_S           30.0f   // D3 GPIO 7: RO probe rinse (measured 2026-11-05)
@@ -72,7 +72,7 @@
 
 // Hardware Safety Guardrails
 #define MAX_SAFETY_DOSING_MS     30000   // Hard cutoff: No dosing pump may run > 30 seconds
-#define MAX_SAFETY_PUMP_MS       15000   // Hard cutoff for sampling pumps
+#define MAX_SAFETY_PUMP_MS       10000   // Hard limit for GPIO 5/6/7 (D1/D2/D3): 10 s is enough
 
 // Automatic light sleep while the loop is idle. millis() stays accurate, so
 // the non-blocking FSM timings are unaffected. Needs an Arduino core built
